@@ -1,0 +1,9 @@
+load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "genmsg",
+    srcs = glob(["src/**/*.py"]),
+    imports = ["src"],
+    deps = [requirement("empy")],
+    visibility = ["//visibility:public"],
+)

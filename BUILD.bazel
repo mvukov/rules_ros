@@ -1,0 +1,50 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "py_roslib_slim",
+    srcs = [
+        "//third_party/roslib:__init__.py",
+        "//third_party/roslib:message.py",
+        "//third_party/roslib:names.py",
+    ],
+    imports = ["third_party"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros_genmsg//:genmsg",
+        "@ros_genpy//:genpy",
+    ],
+)
+
+py_binary(
+    name = "rosgraph",
+    srcs = ["//third_party:rosgraph_app.py"],
+    main = "//third_party:rosgraph_app.py",
+    visibility = ["//visibility:public"],
+    deps = ["@ros_comm//:rosgraph"],
+)
+
+py_binary(
+    name = "rosmaster",
+    srcs = ["//third_party:rosmaster_app.py"],
+    main = "//third_party:rosmaster_app.py",
+    visibility = ["//visibility:public"],
+    deps = ["@ros_comm//:rosmaster"],
+)
+
+py_binary(
+    name = "rosparam",
+    srcs = ["//third_party:rosparam_app.py"],
+    main = "//third_party:rosparam_app.py",
+    visibility = ["//visibility:public"],
+    deps = ["@ros_comm//:rosparam"],
+)
+
+alias(
+    name = "rosbag_record",
+    actual = "@ros_comm//:rosbag_record"
+)
+
+alias(
+    name = "rosbag_play",
+    actual = "@ros_comm//:rosbag_play"
+)

@@ -1,0 +1,2 @@
+build:opt -c opt
+build:opt --copt=-O3

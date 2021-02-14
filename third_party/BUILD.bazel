@@ -1,0 +1,6 @@
+exports_files([
+    "rosgraph_app.py",
+    "rosmaster_app.py",
+    "rosparam_app.py",
+    "rostopic_app.py",
+])

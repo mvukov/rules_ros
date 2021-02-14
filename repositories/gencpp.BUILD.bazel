@@ -1,0 +1,15 @@
+py_library(
+    name = "gencpp_lib",
+    srcs = glob(["src/**/*.py"]),
+    imports = ["src"],
+    deps = ["@ros_genmsg//:genmsg"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "gencpp",
+    srcs = ["scripts/gen_cpp.py"],
+    main = "scripts/gen_cpp.py",
+    deps = [":gencpp_lib"],
+    visibility = ["//visibility:public"],
+)

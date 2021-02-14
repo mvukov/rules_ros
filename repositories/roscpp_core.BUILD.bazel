@@ -1,0 +1,55 @@
+cc_library(
+    name = "cpp_common",
+    hdrs = glob(["cpp_common/include/ros/*.h"]),
+    includes = ["cpp_common/include"],
+    srcs = glob(["cpp_common/src/*.cpp"]),
+    local_defines = ["HAVE_EXECINFO_H", "HAVE_CXXABI_H", "HAVE_GLIBC_BACKTRACE"],
+    deps = ["@console_bridge//:console_bridge"],
+    linkopts = [
+        "-lboost_system",
+        "-lboost_thread",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "rostime",
+    hdrs = glob(["rostime/include/ros/**/*.h"]),
+    includes = ["rostime/include"],
+    srcs = glob(["rostime/src/*.cpp"]),
+    deps = [":cpp_common"],
+    linkopts = [
+        "-lboost_date_time",
+        "-lboost_system",
+        "-lboost_thread",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "roscpp_traits",
+    hdrs = glob(["roscpp_traits/include/ros/*.h"]),
+    includes = ["roscpp_traits/include"],
+    deps = [":cpp_common", ":rostime"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "roscpp_serialization",
+    hdrs = glob(["roscpp_serialization/include/ros/*.h"]),
+    includes = ["roscpp_serialization/include"],
+    srcs = glob(["roscpp_serialization/src/*.cpp"]),
+    deps = [":cpp_common", ":rostime", ":roscpp_traits"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "roscpp_core",
+    deps = [
+        ":cpp_common",
+        ":roscpp_traits",
+        ":roscpp_serialization",
+        ":rostime",
+    ],
+    visibility = ["//visibility:public"],
+)

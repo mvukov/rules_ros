@@ -1,0 +1,84 @@
+load(
+    "//ros:message_generation.bzl",
+    "cc_ros_msg_library",
+    "py_ros_msg_library",
+    "ros_msg_library",
+)
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+# Handling of ROS messages & services resembles to some extent Bazel's rules for
+# handling protobuf messages (e.g. proto_library and cc_proto_library).
+
+# Defines a library of ROS messages. Can be used for services as well.
+ros_msg_library(
+    name = "example_msgs",
+    srcs = glob(["msg/*.msg"]),
+    deps = ["@ros_std_msgs//:std_msgs"],
+)
+
+# Defines a C++ library made of auto-generated code from the given messages.
+cc_ros_msg_library(
+    name = "cc_example_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":example_msgs"],
+)
+
+# Defines a Python library made of auto-generated code from the given messages.
+py_ros_msg_library(
+    name = "py_example_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":example_msgs"],
+)
+
+# Defines a talker ROS node.
+cc_binary(
+    name = "talker",
+    srcs = [
+        "talker.cc",
+    ],
+    deps = [
+        ":cc_example_msgs",
+        "@ros_comm//:roscpp",
+    ],
+)
+
+# Defines a C++ listener ROS node.
+cc_binary(
+    name = "listener",
+    srcs = [
+        "listener.cc",
+    ],
+    deps = [
+        ":cc_example_msgs",
+        "@ros_comm//:roscpp",
+    ],
+)
+
+# Defines a Python listener ROS node.
+py_binary(
+    name = "py_listener",
+    srcs = ["listener.py"],
+    main = "listener.py",
+    deps = [
+        ":py_example_msgs",
+        "@ros_comm//:rospy",
+    ],
+)
+
+# catkin workflow gives to rostopic app ability to handle all messages that
+# live the devel/install workspace. With Bazel workflow we don't have that.
+# Here, rostopic is deployment-specific -> we need to add our custom message
+# to the list of deps such that rostopic handle it. In particular,
+# py_example_msgs must be added to the deps of the local rostopic target.
+# This example target is purely for illustrational purpose.
+py_binary(
+    name = "rostopic",
+    srcs = ["//third_party:rostopic_app.py"],
+    main = "//third_party:rostopic_app.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":py_example_msgs",
+        "@ros_comm//:rostopic",
+    ],
+)

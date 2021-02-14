@@ -1,0 +1,21 @@
+cc_library(
+    name = "rosconsole",
+    hdrs = glob(["include/**/*.h"]),
+    includes = ["include"],
+    srcs = [
+        "src/rosconsole/impl/rosconsole_glog.cpp",
+        "src/rosconsole/rosconsole.cpp",
+        "src/rosconsole/rosconsole_backend.cpp",
+    ],
+    deps = [
+        "@com_github_google_glog//:glog",
+        "@roscpp_core//:cpp_common",
+        "@roscpp_core//:rostime",
+    ],
+    linkopts = [
+        "-lboost_regex",
+        "-lboost_system",
+        "-lboost_thread",
+    ],
+    visibility = ["//visibility:public"],
+)

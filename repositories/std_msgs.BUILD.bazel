@@ -1,0 +1,32 @@
+load(
+    "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
+    "cc_ros_msg_library",
+    "py_ros_msg_library",
+    "ros_msg_library",
+)
+
+ros_msg_library(
+    name = "std_msgs",
+    srcs = glob(["msg/*.msg"]),
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_msg_library(
+    name = "cc_std_msgs",
+    deps = [":std_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "cc_std_msgs_headers",
+    hdrs = glob(["include/std_msgs/*.h"]),
+    includes = ["include"],
+    deps = ["@roscpp_core//:roscpp_core"],
+    visibility = ["//visibility:public"],
+)
+
+py_ros_msg_library(
+    name = "py_std_msgs",
+    deps = [":std_msgs"],
+    visibility = ["//visibility:public"],
+)
