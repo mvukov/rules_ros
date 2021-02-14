@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "py_roslib_slim",
@@ -15,36 +15,27 @@ py_library(
     ],
 )
 
-py_binary(
+alias(
     name = "rosgraph",
-    srcs = ["//third_party:rosgraph_app.py"],
-    main = "//third_party:rosgraph_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosgraph"],
+    actual = "//third_party:rosgraph",
 )
 
-py_binary(
+alias(
     name = "rosmaster",
-    srcs = ["//third_party:rosmaster_app.py"],
-    main = "//third_party:rosmaster_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosmaster"],
+    actual = "//third_party:rosmaster",
 )
 
-py_binary(
+alias(
     name = "rosparam",
-    srcs = ["//third_party:rosparam_app.py"],
-    main = "//third_party:rosparam_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosparam"],
+    actual = "//third_party:rosparam",
 )
 
 alias(
     name = "rosbag_record",
-    actual = "@ros_comm//:rosbag_record"
+    actual = "@ros_comm//:rosbag_record",
 )
 
 alias(
     name = "rosbag_play",
-    actual = "@ros_comm//:rosbag_play"
+    actual = "@ros_comm//:rosbag_play",
 )
