@@ -45,13 +45,6 @@ numerous ROS tools (e.g. rostopic).
 
 """
 
-__version__ = '1.7.0'
-
-from roslib.launcher import load_manifest  # noqa: F401
-# this import is necessary due to a bug in purge_build.py in our
-# debian assets.
-import roslib.stacks  # noqa: F401, I100
-
 _is_interactive = False
 
 

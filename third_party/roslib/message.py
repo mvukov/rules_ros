@@ -40,23 +40,7 @@ name.
 """
 
 import genmsg
-
-import genpy.message  # for wrapping get_message_class, get_service_class
-# forward a bunch of old symbols from genpy for backwards compat
-from genpy import DeserializationError  # noqa: F401
-from genpy import Duration  # noqa: F401
-from genpy import Message  # noqa: F401
-from genpy import SerializationError  # noqa: F401
-from genpy import TVal  # noqa: F401
-from genpy import Time  # noqa: F401
-from genpy.message import check_type  # noqa: F401
-from genpy.message import fill_message_args  # noqa: F401
-from genpy.message import get_printable_message_args  # noqa: F401
-from genpy.message import strify_message  # noqa: F401
-
-import roslib
-
-import rospkg
+import genpy.message
 
 
 def _get_message_or_service_class(type_str, message_type, reload_on_error=False):
@@ -69,31 +53,14 @@ def _get_message_or_service_class(type_str, message_type, reload_on_error=False)
             raise ValueError('message type is missing package name: %s' % str(message_type))
     pypkg = val = None
     try:
-        # bootstrap our sys.path
-        roslib.launcher.load_manifest(package)
         # import the package and return the class
         pypkg = __import__('%s.%s' % (package, type_str))
         val = getattr(getattr(pypkg, type_str), base_type)
-    except rospkg.ResourceNotFound:
-        val = None
     except ImportError:
         val = None
     except AttributeError:
         val = None
 
-    # this logic is mainly to support rosh, so that a user doesn't
-    # have to exit a shell just because a message wasn't built yet
-    if val is None and reload_on_error:
-        try:
-            reload  # Python 2
-        except NameError:
-            from importlib import reload  # Python 3
-        try:
-            if pypkg:
-                reload(pypkg)
-            val = getattr(getattr(pypkg, type_str), base_type)
-        except Exception:
-            val = None
     return val
 
 
