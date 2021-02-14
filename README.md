@@ -88,14 +88,13 @@ generation was implemented. So I decided to make an alternative implementation
 on my own -- I wanted it to look and feel more like exisiting protobuf rules for
 Bazel. In addition, I wanted to see how difficult would it be to get rid of
 `catkin` :) `catkin`+`CMake` do a great job FWIW. However, Bazel workflow is
-simpler, at least from the perspective of roboticists who want to develop
-robotics software (included me) and are not much interested in build
-procedures.
+simpler, at least from the perspective of roboticists who "just" want to develop
+robotics software (including me).
 
 I think it would be cool if we would have a single e.g. `ros_launch`
 Bazel rule that can (build and) run a whole deployment of ROS nodes. That way it
 would be fairly easy, I believe, to pack the deployment in an archive or a
-Docker image (using convenient rules from [rules_docker](https://github.com/bazelbuild/rules_docker)).
+Docker image (using convenient Bazel rules from [rules_docker](https://github.com/bazelbuild/rules_docker)).
 Deployment of binaries to robots would be simplified this way, I believe.
 
 ## Additional
