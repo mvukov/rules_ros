@@ -103,7 +103,7 @@ def ros_repositories():
         urls = ["https://github.com/ros/ros_comm_msgs/archive/1.11.3.tar.gz"],
     )
 
-    # Branched off ros_comm 1.15.9.
+    # Branched off ros_comm 1.15.9. Changes are in branch feature/rules_ros.
     maybe(
         http_archive,
         name = "ros_comm",
