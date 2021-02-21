@@ -13,9 +13,13 @@ empy = "*"
 gnupg = "*"
 netifaces = "*"  # Compiled, could be replaced with ifaddr.
 numpy = "*"  # Compiled, only one file in rospy needs it.
+paramiko = "*"
 pycryptodomex = "*"
 rospkg = "*"
 pyyaml = "*"  # Compiled, find a way to install without libyaml here.
+
+[tool.poetry.dev-dependencies]
+pylint = "*"
 
 [build-system]
 requires = ["poetry>=1.1.1"]
