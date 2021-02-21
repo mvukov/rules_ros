@@ -31,16 +31,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 """
 Scripting interface for roslaunch
 """
 
-from roslaunch.core import Node, Master, RLException
+import rosgraph.masterapi
 
-import roslaunch.config
-import roslaunch.parent
-import roslaunch.xmlloader 
+from third_party.legacy_roslaunch import parent
+from third_party.legacy_roslaunch import rlutil
+from third_party.legacy_roslaunch.core import Node, RLException
+
 
 class ROSLaunch(object):
     """
@@ -49,41 +49,40 @@ class ROSLaunch(object):
     and then starting up any remote processes. The __main__ method
     delegates most of runtime to ROSLaunchParent.
 
-    This must be called from the Python Main thread due to signal registration.    
+    This must be called from the Python Main thread due to signal registration.
     """
 
     def __init__(self):
         """
         @raise RLException: if fails to initialize
         """
-        import rosgraph.masterapi
-        master = rosgraph.masterapi.Master('/roslaunch_script')
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, True)
-        self.parent = roslaunch.parent.ROSLaunchParent(uuid, [], is_core=False)
+        rosgraph.masterapi.Master('/roslaunch_script')
+        uuid = rlutil.get_or_generate_uuid(None, True)
+        self.parent = parent.ROSLaunchParent(uuid, [], is_core=False)
         self.started = False
 
     def load(self, f):
         """
         Load roslaunch file
-        
+
         @param f: filename
         @type  f: str
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     def load_str(self, s):
         """
         Load roslaunch string
-        
+
         @param s: string representation of roslaunch config
         @type  s: str
         """
-        raise NotImplemented
-        
+        raise NotImplementedError
+
     def launch(self, node):
         """
         Launch a roslaunch node instance
-        
+
         @param node: roslaunch Node instance
         @type  node: roslaunch.Node
         @return: node process
@@ -97,7 +96,8 @@ class ROSLaunch(object):
 
         proc, success = self.parent.runner.launch_node(node)
         if not success:
-            raise RLException("failed to launch %s/%s"%(node.package, node.type))
+            raise RLException("failed to launch %s/%s" %
+                              (node.package, node.type))
         return proc
 
     def start(self):
@@ -106,13 +106,12 @@ class ROSLaunch(object):
         """
         self.parent.start(auto_terminate=False)
         self.started = True
-        
+
     def spin(self):
         self.parent.spin()
 
     def spin_once(self):
-        self.parent.spin_once()        
-        
+        self.parent.spin_once()
+
     def stop(self):
         self.parent.shutdown()
-

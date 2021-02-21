@@ -1,0 +1,19 @@
+load("//build_tools:pylint.bzl", "pylint")
+load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "roslaunch",
+    srcs = glob(["*.py"]),
+    deps = [
+        "@ros_comm//:rosmaster",
+        "@ros_comm//:rosparam",
+        "@ros_comm_msgs//:py_rosgraph_msgs",
+        "//:py_roslib_slim",
+        requirement("paramiko"),
+        requirement("pyyaml"),
+        requirement("rospkg"),
+    ],
+    visibility = ["//visibility:public"],
+)
+
+pylint()

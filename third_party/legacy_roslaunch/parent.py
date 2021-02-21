@@ -31,10 +31,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 """
 roslaunch.parent providees the L{ROSLaunchParent} implementation,
-which represents the main 'parent' roslaunch process. 
+which represents the main 'parent' roslaunch process.
 
 ROSLaunch has a client/server architecture for running remote
 processes. When a user runs roslaunch, this creates a "parent"
@@ -47,21 +46,16 @@ on the parent to provide feedback.
 
 import logging
 
-import roslaunch.config
-from roslaunch.core import printlog_bold, printerrlog, RLException
-import roslaunch.launch
-import roslaunch.pmon
-import roslaunch.server
-import roslaunch.xmlloader 
-
 from rosmaster.master_api import NUM_WORKERS
-from roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
 
-#TODO: probably move process listener infrastructure into here
+from third_party.legacy_roslaunch import config
+from third_party.legacy_roslaunch import launch
+from third_party.legacy_roslaunch import pmon
+from third_party.legacy_roslaunch import remote
+from third_party.legacy_roslaunch import server
+from third_party.legacy_roslaunch.core import printlog_bold, printerrlog, RLException
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
 
-# TODO: remove after wg_hardware_roslaunch has been updated
-# qualification accesses this API, which has been relocated
-load_config_default = roslaunch.config.load_config_default
 
 class ROSLaunchParent(object):
     """
@@ -70,12 +64,28 @@ class ROSLaunchParent(object):
     and then starting up any remote processes. The __main__ method
     delegates most of runtime to ROSLaunchParent.
 
-    This must be called from the Python Main thread due to signal registration.    
+    This must be called from the Python Main thread due to signal registration.
     """
 
-    def __init__(self, run_id, roslaunch_files, is_core=False, port=None, local_only=False, process_listeners=None,
-            verbose=False, force_screen=False, force_log=False, is_rostest=False, roslaunch_strs=None, num_workers=NUM_WORKERS, timeout=None, master_logger_level=False, show_summary=True, force_required=False,
-            sigint_timeout=DEFAULT_TIMEOUT_SIGINT, sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
+    def __init__(self,
+                 run_id,
+                 roslaunch_files,
+                 is_core=False,
+                 port=None,
+                 local_only=False,
+                 process_listeners=None,
+                 verbose=False,
+                 force_screen=False,
+                 force_log=False,
+                 is_rostest=False,
+                 roslaunch_strs=None,
+                 num_workers=NUM_WORKERS,
+                 timeout=None,
+                 master_logger_level=False,
+                 show_summary=True,
+                 force_required=False,
+                 sigint_timeout=DEFAULT_TIMEOUT_SIGINT,
+                 sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
         """
         @param run_id: UUID of roslaunch session
         @type  run_id: str
@@ -88,7 +98,7 @@ class ROSLaunchParent(object):
         @type  is_core: bool
         @param process_listeners: (optional) list of process listeners
             to register with process monitor once launch is running
-        @type  process_listeners: [L{roslaunch.pmon.ProcessListener}]
+        @type  process_listeners: [L{pmon.ProcessListener}]
         @param port: (optional) override master port number from what is specified in the master URI.
         @type  port: int
         @param verbose: (optional) print verbose output
@@ -118,14 +128,18 @@ class ROSLaunchParent(object):
         @raise RLException: If sigint_timeout or sigterm_timeout are nonpositive.
         """
         if sigint_timeout <= 0:
-            raise RLException("sigint_timeout must be a positive number, received %f" % sigint_timeout)
+            raise RLException(
+                "sigint_timeout must be a positive number, received %f" %
+                sigint_timeout)
         if sigterm_timeout <= 0:
-            raise RLException("sigterm_timeout must be a positive number, received %f" % sigterm_timeout)
-        
+            raise RLException(
+                "sigterm_timeout must be a positive number, received %f" %
+                sigterm_timeout)
+
         self.logger = logging.getLogger('roslaunch.parent')
         self.run_id = run_id
         self.process_listeners = process_listeners
-        
+
         self.roslaunch_files = roslaunch_files
         self.roslaunch_strs = roslaunch_strs
         self.is_core = is_core
@@ -146,15 +160,18 @@ class ROSLaunchParent(object):
         self.force_screen = force_screen
         self.force_log = force_log
         self.force_required = force_required
-        
+
         # flag to prevent multiple shutdown attempts
         self._shutting_down = False
-        
+
         self.config = self.runner = self.server = self.pm = self.remote_runner = None
 
     def _load_config(self):
-        self.config = roslaunch.config.load_config_default(self.roslaunch_files, self.port,
-                roslaunch_strs=self.roslaunch_strs, verbose=self.verbose)
+        self.config = config.load_config_default(
+            self.roslaunch_files,
+            self.port,
+            roslaunch_strs=self.roslaunch_strs,
+            verbose=self.verbose)
 
         # #2370 (I really want to move this logic outside of parent)
         if self.force_screen:
@@ -167,15 +184,15 @@ class ROSLaunchParent(object):
             for n in self.config.nodes:
                 n.required = True
                 if n.respawn and n.required:
-                  raise ValueError("respawn and required cannot both be set to true")
-
+                    raise ValueError(
+                        "respawn and required cannot both be set to true")
 
     def _start_pm(self):
         """
         Start the process monitor
         """
-        self.pm = roslaunch.pmon.start_process_monitor()
-        
+        self.pm = pmon.start_process_monitor()
+
     def _init_runner(self):
         """
         Initialize the roslaunch runner
@@ -186,21 +203,33 @@ class ROSLaunchParent(object):
             raise RLException("pm is not initialized")
         if self.server is None:
             raise RLException("server is not initialized")
-        self.runner = roslaunch.launch.ROSLaunchRunner(self.run_id, self.config, server_uri=self.server.uri, pmon=self.pm, is_core=self.is_core, remote_runner=self.remote_runner, is_rostest=self.is_rostest, num_workers=self.num_workers, timeout=self.timeout, master_logger_level=self.master_logger_level,
-                                                       sigint_timeout=self.sigint_timeout, sigterm_timeout=self.sigterm_timeout)
+        self.runner = launch.ROSLaunchRunner(
+            self.run_id,
+            self.config,
+            server_uri=self.server.uri,
+            pmon=self.pm,
+            is_core=self.is_core,
+            remote_runner=self.remote_runner,
+            is_rostest=self.is_rostest,
+            num_workers=self.num_workers,
+            timeout=self.timeout,
+            master_logger_level=self.master_logger_level,
+            sigint_timeout=self.sigint_timeout,
+            sigterm_timeout=self.sigterm_timeout)
 
         # print runner info to user, put errors last to make the more visible
         if self.is_core:
-            print("ros_comm version %s" % (self.config.params['/rosversion'].value))
-        if self.show_summary:    
+            print("ros_comm version %s" %
+                  (self.config.params['/rosversion'].value))
+        if self.show_summary:
             print(self.config.summary(local=self.remote_runner is None))
         if self.config:
             for err in self.config.config_errors:
-                printerrlog("WARNING: %s"%err)
+                printerrlog("WARNING: %s" % err)
 
     def _start_server(self):
         """
-        Initialize the roslaunch parent XML-RPC server        
+        Initialize the roslaunch parent XML-RPC server
         """
         if self.config is None:
             raise RLException("config is not initialized")
@@ -208,12 +237,12 @@ class ROSLaunchParent(object):
             raise RLException("pm is not initialized")
 
         self.logger.info("starting parent XML-RPC server")
-        self.server = roslaunch.server.ROSLaunchParentNode(self.config, self.pm)
+        self.server = server.ROSLaunchParentNode(self.config, self.pm)
         self.server.start()
         if not self.server.uri:
             raise RLException("server URI did not initialize")
-        self.logger.info("... parent XML-RPC server started")        
-        
+        self.logger.info("... parent XML-RPC server started")
+
     def _init_remote(self):
         """
         Initialize the remote process runner, if required. Subroutine
@@ -227,13 +256,17 @@ class ROSLaunchParent(object):
             raise RLException("server is not initialized")
 
         if not self.local_only and self.config.has_remote_nodes():
-            # keep the remote package lazy-imported
-            import roslaunch.remote
-            self.remote_runner = roslaunch.remote.ROSRemoteRunner(self.run_id, self.config, self.pm, self.server,
-                                                                  sigint_timeout=self.sigint_timeout,
-                                                                  sigterm_timeout=self.sigterm_timeout)
+            self.remote_runner = remote.ROSRemoteRunner(
+                self.run_id,
+                self.config,
+                self.pm,
+                self.server,
+                sigint_timeout=self.sigint_timeout,
+                sigterm_timeout=self.sigterm_timeout)
         elif self.local_only:
-            printlog_bold("LOCAL\nlocal only launch specified, will not launch remote nodes\nLOCAL\n")
+            printlog_bold(
+                "LOCAL\nlocal only launch specified, will not launch remote nodes\nLOCAL\n"
+            )
 
     def _start_remote(self):
         """
@@ -241,11 +274,11 @@ class ROSLaunchParent(object):
         """
         if self.remote_runner is None:
             self._init_remote()
-            
+
         if self.remote_runner is not None:
             # start_servers() runs the roslaunch children
             self.remote_runner.start_children()
-    
+
     def _start_infrastructure(self):
         """
         load config, start XMLRPC servers and process monitor
@@ -276,7 +309,7 @@ class ROSLaunchParent(object):
         if self._shutting_down:
             return
         self._shutting_down = True
-        
+
         if self.server:
             try:
                 self.server.shutdown("roslaunch parent complete")
@@ -286,7 +319,7 @@ class ROSLaunchParent(object):
         if self.pm:
             self.pm.shutdown()
             self.pm.join()
-        
+
     def start(self, auto_terminate=True):
         """
         Run the parent roslaunch.
@@ -299,7 +332,7 @@ class ROSLaunchParent(object):
         monitored.
         """
         self.logger.info("starting roslaunch parent run")
-        
+
         # load config, start XMLRPC servers and process monitor
         try:
             self._start_infrastructure()
@@ -307,8 +340,8 @@ class ROSLaunchParent(object):
             # infrastructure did not initialize, do teardown on whatever did come up
             self._stop_infrastructure()
             raise
-            
-        # Initialize the actual runner. 
+
+        # Initialize the actual runner.
         # Requires config, pm, server and remote_runner
         self._init_runner()
 
@@ -318,8 +351,9 @@ class ROSLaunchParent(object):
         # inform process monitor that we are done with process registration
         if auto_terminate:
             self.pm.registrations_complete()
-        
-        self.logger.info("... roslaunch parent running, waiting for process exit")
+
+        self.logger.info(
+            "... roslaunch parent running, waiting for process exit")
         if self.process_listeners:
             for l in self.process_listeners:
                 self.runner.pm.add_process_listener(l)
@@ -350,4 +384,4 @@ class ROSLaunchParent(object):
         """
         Stop the parent roslaunch.
         """
-        self._stop_infrastructure()        
+        self._stop_infrastructure()

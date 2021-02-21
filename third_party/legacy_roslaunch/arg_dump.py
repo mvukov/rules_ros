@@ -31,23 +31,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
-from __future__ import print_function
-
 """
 Utility module of roslaunch that computes the command-line arguments
 for a launch file.
 """
 
 import sys
-import roslaunch.xmlloader
-from roslaunch.core import RLException
-from roslaunch.config import load_config_default
+
+from third_party.legacy_roslaunch import xmlloader
+from third_party.legacy_roslaunch.config import load_config_default
+from third_party.legacy_roslaunch.core import RLException
+
 
 def get_args(roslaunch_files):
-    loader = roslaunch.xmlloader.XmlLoader(resolve_anon=False, args_only=True)
-    config = load_config_default(roslaunch_files, None, loader=loader, verbose=False, assign_machines=False)
+    loader = xmlloader.XmlLoader(resolve_anon=False, args_only=True)
+    load_config_default(roslaunch_files,
+                        None,
+                        loader=loader,
+                        verbose=False,
+                        assign_machines=False)
     return loader.root_context.resolve_dict.get('arg_doc', {})
+
 
 def dump_args(roslaunch_files):
     """
@@ -64,8 +68,12 @@ def dump_args(roslaunch_files):
         if len(args) == 0:
             print("No arguments.")
         else:
-            required_args = [(name, (doc or 'undocumented', default)) for (name, (doc, default)) in args.items() if not default]
-            optional_args = [(name, (doc or 'undocumented', default)) for (name, (doc, default)) in args.items() if default]
+            required_args = [(name, (doc or 'undocumented', default))
+                             for (name, (doc, default)) in args.items()
+                             if not default]
+            optional_args = [(name, (doc or 'undocumented', default))
+                             for (name, (doc, default)) in args.items()
+                             if default]
 
             if len(required_args) > 0:
                 print("Required Arguments:")

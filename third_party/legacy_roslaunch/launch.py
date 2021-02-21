@@ -31,9 +31,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
-from __future__ import print_function
-
 """
 Top-level implementation of launching processes. Coordinates
 lower-level libraries.
@@ -48,23 +45,24 @@ import traceback
 
 import rosgraph
 import rosgraph.names
-import rosgraph.network 
-
-from roslaunch.core import *
-#from roslaunch.core import setup_env
-from roslaunch.nodeprocess import create_master_process, create_node_process, DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
-from roslaunch.pmon import start_process_monitor, ProcessListener
-
-from roslaunch.rlutil import update_terminal_name
-
+import rosgraph.network
 from rosmaster.master_api import NUM_WORKERS
 
-_TIMEOUT_MASTER_START = 10.0 #seconds
-_TIMEOUT_MASTER_STOP  = 10.0 #seconds
+from third_party.legacy_roslaunch import node_args
+from third_party.legacy_roslaunch.core import *
+from third_party.legacy_roslaunch.nodeprocess import create_master_process, create_node_process, DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
+from third_party.legacy_roslaunch.pmon import start_process_monitor, ProcessListener
+from third_party.legacy_roslaunch.rlutil import update_terminal_name
+
+_TIMEOUT_MASTER_START = 10.0  #seconds
+_TIMEOUT_MASTER_STOP = 10.0  #seconds
 
 _ID = '/roslaunch'
 
-class RLTestTimeoutException(RLException): pass
+
+class RLTestTimeoutException(RLException):
+    pass
+
 
 def validate_master_launch(m, is_core, is_rostest=False):
     """
@@ -88,22 +86,30 @@ def validate_master_launch(m, is_core, is_rostest=False):
             # only warn if network configuration appears
             # non-local.
             try:
-                reverse_ips = [host[4][0] for host in socket.getaddrinfo(m.get_host(), 0, 0, 0, socket.SOL_TCP)]
+                reverse_ips = [
+                    host[4][0] for host in socket.getaddrinfo(
+                        m.get_host(), 0, 0, 0, socket.SOL_TCP)
+                ]
                 local_addrs = rosgraph.network.get_local_addresses()
-                printerrlog("""WARNING: IP addresses %s for local hostname '%s' do not appear to match
+                printerrlog(
+                    """WARNING: IP addresses %s for local hostname '%s' do not appear to match
     any local IP address (%s). Your ROS nodes may fail to communicate.
 
-    Please use ROS_IP to set the correct IP address to use."""%(','.join(reverse_ips), m.get_host(), ','.join(local_addrs)))
+    Please use ROS_IP to set the correct IP address to use.""" %
+                    (','.join(reverse_ips), m.get_host(),
+                     ','.join(local_addrs)))
             except:
-                printerrlog("""WARNING: local hostname '%s' does not map to an IP address.
+                printerrlog(
+                    """WARNING: local hostname '%s' does not map to an IP address.
     Your ROS nodes may fail to communicate.
 
-    Please use ROS_IP to set the correct IP address to use."""%(m.get_host()))
-                
+    Please use ROS_IP to set the correct IP address to use.""" % (m.get_host()))
+
         else:
             # ... the remote master cannot be contacted, so we fail. #3097
-            raise RLException("ERROR: unable to contact ROS master at [%s]"%(m.uri))
-            
+            raise RLException("ERROR: unable to contact ROS master at [%s]" %
+                              (m.uri))
+
     if is_core and not is_rostest:
         # User wants to start a master, and our configuration does
         # point to the local host, and we're not running as rostest.
@@ -112,21 +118,27 @@ def validate_master_launch(m, is_core, is_rostest=False):
 
         if not rosgraph.network.is_local_address(env_host):
             # The ROS_MASTER_URI points to a different machine, warn user
-            printerrlog("WARNING: ROS_MASTER_URI [%s] host is not set to this machine"%(env_uri))
+            printerrlog(
+                "WARNING: ROS_MASTER_URI [%s] host is not set to this machine" %
+                (env_uri))
         elif env_port != m.get_port():
             # The ROS_MASTER_URI points to a master on a different port, warn user
-            printerrlog("WARNING: ROS_MASTER_URI port [%s] does not match this roscore [%s]"%(env_port, m.get_port()))
+            printerrlog(
+                "WARNING: ROS_MASTER_URI port [%s] does not match this roscore [%s]"
+                % (env_port, m.get_port()))
+
 
 def _all_namespace_parents(p):
     splits = [s for s in p.split(rosgraph.names.SEP) if s]
-    curr =rosgraph.names.SEP
+    curr = rosgraph.names.SEP
     parents = [curr]
     for s in splits[:-1]:
         next_ = curr + s + rosgraph.names.SEP
         parents.append(next_)
         curr = next_
     return parents
-    
+
+
 def _unify_clear_params(params):
     """
     Reduce clear_params such that only the highest-level namespaces
@@ -139,7 +151,7 @@ def _unify_clear_params(params):
     @rtype: [str]
     """
     # note: this is a quick-and-dirty implementation
-    
+
     # canonicalize parameters
     canon_params = []
     for p in params:
@@ -155,11 +167,12 @@ def _unify_clear_params(params):
                 clear_params.remove(p)
     return clear_params
 
+
 def _hostname_to_rosname(hostname):
     """
     Utility function to strip illegal characters from hostname.  This
     is implemented to be correct, not efficient."""
-    
+
     # prepend 'host_', which guarantees leading alpha character
     fixed = 'host_'
     # simplify comparison by making name lowercase
@@ -168,11 +181,12 @@ def _hostname_to_rosname(hostname):
         # only allow alphanumeric and numeral
         if (c >= 'a' and c <= 'z') or \
                 (c >= '0' and c <= '9'):
-            fixed+=c
+            fixed += c
         else:
-            fixed+='_'
+            fixed += '_'
     return fixed
-    
+
+
 class _ROSLaunchListeners(ProcessListener):
     """
     Helper class to manage distributing process events. It functions as
@@ -180,6 +194,7 @@ class _ROSLaunchListeners(ProcessListener):
     remote and local processes require different mechanisms for being
     caught and reported.
     """
+
     def __init__(self):
         self.process_listeners = []
 
@@ -200,7 +215,8 @@ class _ROSLaunchListeners(ProcessListener):
                 l.process_died(process_name, exit_code)
             except Exception as e:
                 logging.getLogger('roslaunch').error(traceback.format_exc())
-                
+
+
 class ROSLaunchListener(object):
     """
     Listener interface for events related to ROSLaunch.
@@ -210,7 +226,7 @@ class ROSLaunchListener(object):
     L{roslaunch.pmon.ProcessMonitor} does not provide events about
     remotely running processes.
     """
-    
+
     def process_died(self, process_name, exit_code):
         """
         Notifies listener that process has died. This callback only
@@ -224,7 +240,8 @@ class ROSLaunchListener(object):
         @type  exit_code: int
         """
         pass
-    
+
+
 class ROSLaunchRunner(object):
     """
     Runs a roslaunch. The normal sequence of API calls is L{launch()}
@@ -234,24 +251,36 @@ class ROSLaunchRunner(object):
     allows the main thread to continue to do work while processes are
     monitored.
     """
-    
-    def __init__(self, run_id, config, server_uri=None, pmon=None, is_core=False, remote_runner=None, is_child=False, is_rostest=False, num_workers=NUM_WORKERS, timeout=None,
-                 master_logger_level=False, sigint_timeout=DEFAULT_TIMEOUT_SIGINT, sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
+
+    def __init__(self,
+                 run_id,
+                 config,
+                 server_uri=None,
+                 pmon=None,
+                 is_core=False,
+                 remote_runner=None,
+                 is_child=False,
+                 is_rostest=False,
+                 num_workers=NUM_WORKERS,
+                 timeout=None,
+                 master_logger_level=False,
+                 sigint_timeout=DEFAULT_TIMEOUT_SIGINT,
+                 sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
         """
         @param run_id: /run_id for this launch. If the core is not
             running, this value will be used to initialize /run_id. If
             the core is already running, this value will be checked
             against the value stored on the core. L{ROSLaunchRunner} will
             fail during L{launch()} if they do not match.
-        @type  run_id: str            
+        @type  run_id: str
         @param config: roslauch instance to run
         @type  config: L{ROSLaunchConfig}
-        @param server_uri: XML-RPC URI of roslaunch server. 
+        @param server_uri: XML-RPC URI of roslaunch server.
         @type  server_uri: str
         @param pmon: optionally override the process
             monitor the runner uses for starting and tracking processes
         @type  pmon: L{ProcessMonitor}
-    
+
         @param is_core: if True, this runner is a roscore
             instance. This affects the error behavior if a master is
             already running -- aborts if is_core is True and a core is
@@ -276,9 +305,13 @@ class ROSLaunchRunner(object):
         if run_id is None:
             raise RLException("run_id is None")
         if sigint_timeout <= 0:
-            raise RLException("sigint_timeout must be a positive number, received %f" % sigint_timeout)
+            raise RLException(
+                "sigint_timeout must be a positive number, received %f" %
+                sigint_timeout)
         if sigterm_timeout <= 0:
-            raise RLException("sigterm_timeout must be a positive number, received %f" % sigterm_timeout)
+            raise RLException(
+                "sigterm_timeout must be a positive number, received %f" %
+                sigterm_timeout)
 
         self.run_id = run_id
 
@@ -307,12 +340,14 @@ class ROSLaunchRunner(object):
         if self.pm is None:
             raise RLException("unable to initialize roslaunch process monitor")
         if self.pm.is_shutdown:
-            raise RLException("bad roslaunch process monitor initialization: process monitor is already dead")
-        
+            raise RLException(
+                "bad roslaunch process monitor initialization: process monitor is already dead"
+            )
+
         self.pm.add_process_listener(self.listeners)
-        
+
         self.remote_runner = remote_runner
-                
+
     def add_process_listener(self, l):
         """
         Add listener to list of listeners. Not threadsafe. Must be
@@ -343,24 +378,26 @@ class ROSLaunchRunner(object):
             r = param_server_multi()
             for code, msg, _ in r:
                 if code != 1:
-                    raise RLException("Failed to clear parameter: %s"%(msg))
+                    raise RLException("Failed to clear parameter: %s" % (msg))
 
             # multi-call objects are not reusable
-            param_server_multi = config.master.get_multi()            
+            param_server_multi = config.master.get_multi()
             for p in config.params.values():
                 # suppressing this as it causes too much spam
                 #printlog("setting parameter [%s]"%p.key)
                 param_server_multi.setParam(_ID, p.key, p.value)
-            r  = param_server_multi()
+            r = param_server_multi()
             for code, msg, _ in r:
                 if code != 1:
-                    raise RLException("Failed to set parameter: %s"%(msg))
+                    raise RLException("Failed to set parameter: %s" % (msg))
         except RLException:
             raise
         except Exception as e:
-            printerrlog("load_parameters: unable to set parameters (last param was [%s]): %s"%(p,e))
-            raise #re-raise as this is fatal
-        self.logger.info("... load_parameters complete")            
+            printerrlog(
+                "load_parameters: unable to set parameters (last param was [%s]): %s"
+                % (p, e))
+            raise  #re-raise as this is fatal
+        self.logger.info("... load_parameters complete")
 
     def _launch_nodes(self):
         """
@@ -369,7 +406,7 @@ class ROSLaunchRunner(object):
         is the nodes that successfully launched and the second is the
         nodes that failed to launch.
         @rtype: [[str], [str]]
-        """        
+        """
         config = self.config
         succeeded = []
         failed = []
@@ -390,14 +427,14 @@ class ROSLaunchRunner(object):
             self.logger.info("launch_nodes: launching remote nodes ...")
             r_succ, r_fail = self.remote_runner.launch_remote_nodes()
             succeeded.extend(r_succ)
-            failed.extend(r_fail)            
-                
+            failed.extend(r_fail)
+
         self.logger.info("... launch_nodes complete")
         return succeeded, failed
 
     def _launch_master(self):
         """
-        Launches master if requested. 
+        Launches master if requested.
         @return: True if a master was launched, False if a master was
         already running.
         @rtype: bool
@@ -407,16 +444,24 @@ class ROSLaunchRunner(object):
         is_running = m.is_running()
 
         if self.is_core and is_running:
-            raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+            raise RLException(
+                "roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"
+                % (m.uri))
 
         if not is_running:
             validate_master_launch(m, self.is_core, self.is_rostest)
 
             printlog("auto-starting new master")
             p = create_master_process(
-                self.run_id, m.type, get_ros_root(), m.get_port(), self.num_workers,
-                self.timeout, master_logger_level=self.master_logger_level,
-                sigint_timeout=self.sigint_timeout, sigterm_timeout=self.sigterm_timeout)
+                self.run_id,
+                m.type,
+                get_ros_root(),
+                m.get_port(),
+                self.num_workers,
+                self.timeout,
+                master_logger_level=self.master_logger_level,
+                sigint_timeout=self.sigint_timeout,
+                sigterm_timeout=self.sigterm_timeout)
             self.pm.register_core_proc(p)
             success = p.start()
             if not success:
@@ -426,9 +471,9 @@ class ROSLaunchRunner(object):
                 time.sleep(0.1)
 
         if not m.is_running():
-            raise RLException("ERROR: could not contact master [%s]"%m.uri)
-        
-        printlog_bold("ROS_MASTER_URI=%s"%m.uri)
+            raise RLException("ERROR: could not contact master [%s]" % m.uri)
+
+        printlog_bold("ROS_MASTER_URI=%s" % m.uri)
         # TODO: although this dependency doesn't cause anything bad,
         # it's still odd for launch to know about console stuff. This
         # really should be an event.
@@ -436,17 +481,21 @@ class ROSLaunchRunner(object):
 
         # Param Server config params
         param_server = m.get()
-        
+
         # #773: unique run ID
         self._check_and_set_run_id(param_server, self.run_id)
 
         if self.server_uri:
             # store parent XML-RPC URI on param server
             # - param name is the /roslaunch/hostname:port so that multiple roslaunches can store at once
-            hostname, port = rosgraph.network.parse_http_host_and_port(self.server_uri)
+            hostname, port = rosgraph.network.parse_http_host_and_port(
+                self.server_uri)
             hostname = _hostname_to_rosname(hostname)
-            self.logger.info("setting /roslaunch/uris/%s__%s' to %s"%(hostname, port, self.server_uri))
-            param_server.setParam(_ID, '/roslaunch/uris/%s__%s'%(hostname, port),self.server_uri)
+            self.logger.info("setting /roslaunch/uris/%s__%s' to %s" %
+                             (hostname, port, self.server_uri))
+            param_server.setParam(_ID,
+                                  '/roslaunch/uris/%s__%s' % (hostname, port),
+                                  self.server_uri)
 
         return not is_running
 
@@ -461,7 +510,7 @@ class ROSLaunchRunner(object):
         """
         code, _, val = param_server.hasParam(_ID, '/run_id')
         if code == 1 and not val:
-            printlog_bold("setting /run_id to %s"%run_id)
+            printlog_bold("setting /run_id to %s" % run_id)
             param_server.setParam('/roslaunch', '/run_id', run_id)
         else:
             # verify that the run_id we have been set to matches what's on the parameter server
@@ -469,11 +518,14 @@ class ROSLaunchRunner(object):
             if code != 1:
                 #could only happen in a bad race condition with
                 #someone else restarting core
-                raise RLException("ERROR: unable to retrieve /run_id from parameter server")
+                raise RLException(
+                    "ERROR: unable to retrieve /run_id from parameter server")
             if run_id != val:
-                raise RLException("run_id on parameter server does not match declared run_id: %s vs %s"%(val, run_id))
+                raise RLException(
+                    "run_id on parameter server does not match declared run_id: %s vs %s"
+                    % (val, run_id))
             #self.run_id = val
-            #printlog_bold("/run_id is %s"%self.run_id)            
+            #printlog_bold("/run_id is %s"%self.run_id)
 
     def _launch_executable(self, e):
         """
@@ -485,16 +537,17 @@ class ROSLaunchRunner(object):
         try:
             #kwc: I'm still debating whether shell=True is proper
             cmd = e.command
-            cmd = "%s %s"%(cmd, ' '.join(e.args))
+            cmd = "%s %s" % (cmd, ' '.join(e.args))
             print("running %s" % cmd)
             local_machine = self.config.machines['']
             env = setup_env(None, local_machine, self.config.master.uri)
             retcode = subprocess.call(cmd, shell=True, env=env)
             if retcode < 0:
-                raise RLException("command [%s] failed with exit code %s"%(cmd, retcode))
+                raise RLException("command [%s] failed with exit code %s" %
+                                  (cmd, retcode))
         except OSError as e:
-            raise RLException("command [%s] failed: %s"%(cmd, e))
-        
+            raise RLException("command [%s] failed: %s" % (cmd, e))
+
     #TODO: _launch_run_executables, _launch_teardown_executables
     #TODO: define and implement behavior for remote launch
     def _launch_setup_executables(self):
@@ -504,7 +557,7 @@ class ROSLaunchRunner(object):
         exes = [e for e in self.config.executables if e.phase == PHASE_SETUP]
         for e in exes:
             self._launch_executable(e)
-    
+
     def _launch_core_nodes(self):
         """
         launch any core services that are not already running. master must
@@ -522,28 +575,34 @@ class ROSLaunchRunner(object):
             elif code == 1:
                 print("core service [%s] found" % node_name)
             else:
-                print("WARN: master is not behaving well (unexpected return value when looking up node)", file=sys.stderr)
-                self.logger.error("ERROR: master return [%s][%s] on lookupNode call"%(code,msg))
-                
+                print(
+                    "WARN: master is not behaving well (unexpected return value when looking up node)",
+                    file=sys.stderr)
+                self.logger.error(
+                    "ERROR: master return [%s][%s] on lookupNode call" %
+                    (code, msg))
+
         for node in tolaunch:
             node_name = rosgraph.names.ns_join(node.namespace, node.name)
             name, success = self.launch_node(node, core=True)
             if success:
                 print("started core service [%s]" % node_name)
             else:
-                raise RLException("failed to start core service [%s]"%node_name)
+                raise RLException("failed to start core service [%s]" %
+                                  node_name)
 
     def launch_node(self, node, core=False):
         """
         Launch a single node locally. Remote launching is handled separately by the remote module.
         If node name is not assigned, one will be created for it.
-        
+
         @param node Node: node to launch
         @param core bool: if True, core node
         @return obj, bool: Process handle, successful launch. If success, return actual Process instance. Otherwise return name.
         """
-        self.logger.info("... preparing to launch node of type [%s/%s]", node.package, node.type)
-        
+        self.logger.info("... preparing to launch node of type [%s/%s]",
+                         node.package, node.type)
+
         # TODO: should this always override, per spec?. I added this
         # so that this api can be called w/o having to go through an
         # extra assign machines step.
@@ -551,38 +610,44 @@ class ROSLaunchRunner(object):
             node.machine = self.config.machines['']
         if node.name is None:
             node.name = rosgraph.names.anonymous_name(node.type)
-            
+
         master = self.config.master
-        import roslaunch.node_args
         try:
-            process = create_node_process(self.run_id, node, master.uri, sigint_timeout=self.sigint_timeout, sigterm_timeout=self.sigterm_timeout)
-        except roslaunch.node_args.NodeParamsException as e:
+            process = create_node_process(self.run_id,
+                                          node,
+                                          master.uri,
+                                          sigint_timeout=self.sigint_timeout,
+                                          sigterm_timeout=self.sigterm_timeout)
+        except node_args.NodeParamsException as e:
             self.logger.error(e)
-            printerrlog("ERROR: cannot launch node of type [%s/%s]: %s"%(node.package, node.type, str(e)))
+            printerrlog("ERROR: cannot launch node of type [%s/%s]: %s" %
+                        (node.package, node.type, str(e)))
             if node.name:
                 return node.name, False
             else:
-                return "%s/%s"%(node.package,node.type), False                
+                return "%s/%s" % (node.package, node.type), False
 
         self.logger.info("... created process [%s]", process.name)
         if core:
             self.pm.register_core_proc(process)
         else:
-            self.pm.register(process)            
-        node.process_name = process.name #store this in the node object for easy reference
+            self.pm.register(process)
+        node.process_name = process.name  #store this in the node object for easy reference
         self.logger.info("... registered process [%s]", process.name)
 
         # note: this may raise FatalProcessLaunch, which aborts the entire launch
         success = process.start()
         if not success:
             if node.machine.name:
-                printerrlog("launch of %s/%s on %s failed"%(node.package, node.type, node.machine.name))
+                printerrlog("launch of %s/%s on %s failed" %
+                            (node.package, node.type, node.machine.name))
             else:
-                printerrlog("local launch of %s/%s failed"%(node.package, node.type))   
+                printerrlog("local launch of %s/%s failed" %
+                            (node.package, node.type))
         else:
             self.logger.info("... successfully launched [%s]", process.name)
         return process, success
-        
+
     def is_node_running(self, node):
         """
         Check for running node process.
@@ -591,7 +656,7 @@ class ROSLaunchRunner(object):
         """
         #process_name is not set until node is launched.
         return node.process_name and self.pm.has_process(node.process_name)
-    
+
     def spin_once(self):
         """
         Same as spin() but only does one cycle. must be run from the main thread.
@@ -599,7 +664,7 @@ class ROSLaunchRunner(object):
         if not self.pm:
             return False
         return self.pm.mainthread_spin_once()
-        
+
     def spin(self):
         """
         spin() must be run from the main thread. spin() is very
@@ -613,21 +678,22 @@ class ROSLaunchRunner(object):
         if not self.pm or not self.pm.get_active_names():
             printlog_bold("No processes to monitor")
             self.stop()
-            return # no processes
+            return  # no processes
         self.pm.mainthread_spin()
         #self.pm.join()
-        self.logger.info("process monitor is done spinning, initiating full shutdown")
+        self.logger.info(
+            "process monitor is done spinning, initiating full shutdown")
         self.stop()
         printlog_bold("done")
-    
+
     def stop(self):
         """
         Stop the launch and all associated processes. not thread-safe.
-        """        
+        """
         self.logger.info("runner.stop()")
         if self.pm is not None:
             printlog("shutting down processing monitor...")
-            self.logger.info("shutting down processing monitor %s"%self.pm)            
+            self.logger.info("shutting down processing monitor %s" % self.pm)
             self.pm.shutdown()
             self.pm.join()
             self.pm = None
@@ -642,16 +708,16 @@ class ROSLaunchRunner(object):
         """
         # this may have already been done, but do just in case
         self.config.assign_machines()
-        
+
         if self.remote_runner:
             # hook in our listener aggregator
-            self.remote_runner.add_process_listener(self.listeners)            
+            self.remote_runner.add_process_listener(self.listeners)
 
         # start up the core: master + core nodes defined in core.xml
         launched = self._launch_master()
         if launched:
             self._launch_core_nodes()
-        
+
         # run executables marked as setup period. this will block
         # until these executables exit. setup executable have to run
         # *before* parameters are uploaded so that commands like
@@ -673,7 +739,7 @@ class ROSLaunchRunner(object):
         not match ID on parameter server)
         """
         try:
-            self._setup()        
+            self._setup()
             succeeded, failed = self._launch_nodes()
             return succeeded, failed
         except KeyboardInterrupt:
@@ -687,10 +753,11 @@ class ROSLaunchRunner(object):
         @type  test: Test
         @raise RLTestTimeoutException: if test fails to launch or test times out
         """
-        self.logger.info("... preparing to run test [%s] of type [%s/%s]", test.test_name, test.package, test.type)
+        self.logger.info("... preparing to run test [%s] of type [%s/%s]",
+                         test.test_name, test.package, test.type)
         proc_h, success = self.launch_node(test)
         if not success:
-            raise RLException("test [%s] failed to launch"%test.test_name)
+            raise RLException("test [%s] failed to launch" % test.test_name)
 
         #poll until test terminates or alloted time exceed
         timeout_t = time.time() + test.time_limit
@@ -702,19 +769,24 @@ class ROSLaunchRunner(object):
                     "max time [%ss] allotted for test [%s] of type [%s/%s]" %
                     (test.time_limit, test.test_name, test.package, test.type))
             time.sleep(0.1)
-        
+
+
 # NOTE: the mainly exists to prevent implicit circular dependency as
 # the runner needs to invoke methods on the remote API, which depends
 # on launch.
+
 
 class ROSRemoteRunnerIF(object):
     """
     API for remote running
     """
+
     def __init__(self):
         pass
+
     def setup(self):
         pass
+
     def add_process_listener(self, l):
         """
         Listen to events about remote processes dying. Not

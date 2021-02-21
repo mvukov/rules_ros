@@ -31,42 +31,39 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
-from __future__ import print_function
-
 """
 Implementation for roslaunch-logs command-line utility.
 """
 
 import os
 import sys
-import time
-import traceback
+from optparse import OptionParser
 
 import rospkg
 import rosgraph
 
 NAME = 'roslaunch-logs'
 
+
 def get_run_id():
     try:
         param_server = rosgraph.Master('/roslaunch')
         return param_server.getParam('/run_id')
-    except: # cannot contact parameter server
+    except:  # cannot contact parameter server
         pass
 
+
 def logs_main():
-    from optparse import OptionParser
     parser = OptionParser(usage="usage: %prog", prog=NAME)
-    options, args = parser.parse_args()
+    _, args = parser.parse_args()
     if args:
-        parser.error("%s takes no arguments"%NAME)
-        
+        parser.error("%s takes no arguments" % NAME)
+
     log_dir = rospkg.get_log_dir()
     if not log_dir:
         print("Cannot determine ROS log directory", file=sys.stderr)
         sys.exit(1)
-        
+
     run_id = get_run_id()
     if not run_id:
         # go ahead and print the log directory

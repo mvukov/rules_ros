@@ -31,35 +31,36 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 """
 General routines and representations for loading roslaunch model.
 """
 
 import errno
 import os
+import shlex
+import stat
+import subprocess
 import sys
 from copy import deepcopy
+from xmlrpc.client import Binary
 
 import yaml
-
-from roslaunch.core import Param, RosbinExecutable, RLException, PHASE_SETUP
-
 from rosgraph.names import make_global_ns, ns_join, PRIV_NAME, load_mappings, is_legal_name, canonicalize_name
 
-#lazy-import global for yaml and rosparam
-rosparam = None
+from third_party.legacy_roslaunch.core import Param, RosbinExecutable, RLException, PHASE_SETUP
+
 
 class LoadException(RLException):
     """Error loading data as specified (e.g. cannot find included files, etc...)"""
     pass
+
 
 #TODO: lists, maps(?)
 def convert_value(value, type_):
     """
     Convert a value from a string representation into the specified
     type
-    
+
     @param value: string representation of value
     @type  value: str
     @param type_: int, double, string, bool, or auto
@@ -98,14 +99,15 @@ def convert_value(value, type_):
             return True
         elif value == 'false' or value == '0':
             return False
-        raise ValueError("%s is not a '%s' type"%(value, type_))
+        raise ValueError("%s is not a '%s' type" % (value, type_))
     elif type_ == 'yaml':
         try:
             return yaml.safe_load(value)
         except yaml.parser.ParserError as e:
             raise ValueError(e)
     else:
-        raise ValueError("Unknown type '%s'"%type_)        
+        raise ValueError("Unknown type '%s'" % type_)
+
 
 def process_include_args(context):
     """
@@ -120,7 +122,7 @@ def process_include_args(context):
     for arg in context.arg_names:
         if not arg in arg_dict:
             raise LoadException("include args must have declared values")
-        
+
     # save args that were passed so we can check for unused args in post-processing
     context.args_passed = list(arg_dict.keys())
     # clear arg declarations so included file can re-declare
@@ -129,11 +131,14 @@ def process_include_args(context):
     # swap in new resolve dict for passing
     context.resolve_dict = context.include_resolve_dict
     context.include_resolve_dict = None
-    
+
+
 def post_process_include_args(context):
     bad = [a for a in context.args_passed if a not in context.arg_names]
     if bad:
-        raise LoadException("unused args [%s] for include of [%s]"%(', '.join(bad), context.filename))
+        raise LoadException("unused args [%s] for include of [%s]" %
+                            (', '.join(bad), context.filename))
+
 
 def load_sysargs_into_context(context, argv):
     """
@@ -148,12 +153,13 @@ def load_sysargs_into_context(context, argv):
     mappings = load_mappings(argv)
     context.resolve_dict['arg'] = mappings
 
+
 class LoaderContext(object):
     """
     Container for storing current loader context (e.g. namespace,
     local parameter state, remapping state).
     """
-    
+
     def __init__(self, ns, filename, parent=None, params=None, env_args=None, \
                      resolve_dict=None, include_resolve_dict=None, arg_names=None):
         """
@@ -193,18 +199,18 @@ class LoaderContext(object):
         @param p: parameter
         @type  p: L{Param}
         """
-        
+
         # override any params already set
         matches = [m for m in self.params if m.key == p.key]
         for m in matches:
             self.params.remove(m)
         self.params.append(p)
-        
+
     def add_remap(self, remap):
         """
         Add a new remap setting to the context. if a remap already
         exists with the same from key, it will be removed
-        
+
         @param remap: remap setting
         @type  remap: (str, str)
         """
@@ -212,15 +218,17 @@ class LoaderContext(object):
         if not remap[0] or not remap[1]:
             raise RLException("remap from/to attributes cannot be empty")
         if not is_legal_name(remap[0]):
-            raise RLException("remap from [%s] is not a valid ROS name"%remap[0])
+            raise RLException("remap from [%s] is not a valid ROS name" %
+                              remap[0])
         if not is_legal_name(remap[1]):
-            raise RLException("remap to [%s] is not a valid ROS name"%remap[1])
-        
+            raise RLException("remap to [%s] is not a valid ROS name" %
+                              remap[1])
+
         matches = [r for r in self._remap_args if r[0] == remap[0]]
         for m in matches:
             self._remap_args.remove(m)
         self._remap_args.append(remap)
-        
+
     def add_arg(self, name, default=None, value=None, doc=None):
         """
         Add 'arg' to existing context. Args are only valid for their immediate context.
@@ -228,7 +236,7 @@ class LoaderContext(object):
         if name in self.arg_names:
             # Ignore the duplication if pass_all_args was set
             if not self.pass_all_args:
-                raise LoadException("arg '%s' has already been declared"%name)
+                raise LoadException("arg '%s' has already been declared" % name)
         else:
             self.arg_names.append(name)
 
@@ -246,7 +254,9 @@ class LoaderContext(object):
             # But don't error if pass_all_args was used to include this
             # context; rather just override the passed-in value.
             if name in arg_dict and not self.pass_all_args:
-                raise LoadException("cannot override arg '%s', which has already been set"%name)
+                raise LoadException(
+                    "cannot override arg '%s', which has already been set" %
+                    name)
             arg_dict[name] = value
         elif default is not None:
             # assign value if not in context
@@ -266,7 +276,6 @@ class LoaderContext(object):
             # store the documentation for this argument
             arg_doc_dict[name] = (doc, default)
 
-        
     def remap_args(self):
         """
         @return: copy of the current remap arguments
@@ -281,7 +290,7 @@ class LoaderContext(object):
             args.extend(self._remap_args)
             return args
         return self._remap_args[:]
-    
+
     def include_child(self, ns, filename):
         """
         Create child namespace based on include inheritance rules
@@ -289,7 +298,7 @@ class LoaderContext(object):
            child context shares the same namespace
         @type  ns: str
         @param filename: name of include file
-        @type  filename: str        
+        @type  filename: str
         @return: A child xml context that inherits from this context
         @rtype: L{LoaderContext}jj
         """
@@ -311,25 +320,31 @@ class LoaderContext(object):
         @rtype: L{LoaderContext}
         """
         if ns:
-            if ns[0] == '/': # global (discouraged)
+            if ns[0] == '/':  # global (discouraged)
                 child_ns = ns
-            elif ns == PRIV_NAME: # ~name
+            elif ns == PRIV_NAME:  # ~name
                 # private names can only be scoped privately or globally
                 child_ns = PRIV_NAME
             else:
                 child_ns = ns_join(self.ns, ns)
         else:
             child_ns = self.ns
-        return LoaderContext(child_ns, self.filename, parent=self,
-                             params=self.params, env_args=self.env_args[:],
+        return LoaderContext(child_ns,
+                             self.filename,
+                             parent=self,
+                             params=self.params,
+                             env_args=self.env_args[:],
                              resolve_dict=deepcopy(self.resolve_dict),
-                             arg_names=self.arg_names[:], include_resolve_dict=self.include_resolve_dict)
-        
+                             arg_names=self.arg_names[:],
+                             include_resolve_dict=self.include_resolve_dict)
+
+
 #TODO: in-progress refactorization. I'm slowly separating out
 #non-XML-specific logic from xmlloader and moving into Loader. Soon
 #this will mean that it will be easier to write coverage tests for
 #lower-level logic.
-        
+
+
 class Loader(object):
     """
     Lower-level library for loading ROS launch model. It provides an
@@ -357,21 +372,34 @@ class Loader(object):
         # shouldn't ever happen
         if not param_name:
             raise ValueError("no parameter name specified")
-        
+
         if param_name == '/' and type(param_value) != dict:
-            raise ValueError("Cannot load non-dictionary types into global namespace '/'")
+            raise ValueError(
+                "Cannot load non-dictionary types into global namespace '/'")
 
         if type(param_value) == dict:
             # unroll params
             for k, v in param_value.items():
-                self.add_param(ros_config, ns_join(param_name, k), v, verbose=verbose)
+                self.add_param(ros_config,
+                               ns_join(param_name, k),
+                               v,
+                               verbose=verbose)
         else:
-            ros_config.add_param(Param(param_name, param_value), verbose=verbose)
-        
-    def load_rosparam(self, context, ros_config, cmd, param, file_, text, verbose=True, subst_function=None):
+            ros_config.add_param(Param(param_name, param_value),
+                                 verbose=verbose)
+
+    def load_rosparam(self,
+                      context,
+                      ros_config,
+                      cmd,
+                      param,
+                      file_,
+                      text,
+                      verbose=True,
+                      subst_function=None):
         """
         Load rosparam setting
-        
+
         @param context: Loader context
         @type  context: L{LoaderContext}
         @param ros_config: launch configuration
@@ -388,29 +416,28 @@ class Loader(object):
             raise ValueError("command must be 'load', 'dump', or 'delete'")
         if file_ is not None:
             if cmd == 'load' and not os.path.isfile(file_):
-                raise ValueError("file does not exist [%s]"%file_)
+                raise ValueError("file does not exist [%s]" % file_)
             if cmd == 'delete':
-                raise ValueError("'file' attribute is invalid with 'delete' command.")
+                raise ValueError(
+                    "'file' attribute is invalid with 'delete' command.")
 
         full_param = ns_join(context.ns, param) if param else context.ns
 
         if cmd == 'dump':
-            ros_config.add_executable(RosbinExecutable('rosparam', (cmd, file_, full_param), PHASE_SETUP))
+            ros_config.add_executable(
+                RosbinExecutable('rosparam', (cmd, file_, full_param),
+                                 PHASE_SETUP))
         elif cmd == 'delete':
-            ros_config.add_executable(RosbinExecutable('rosparam', (cmd, full_param), PHASE_SETUP))
+            ros_config.add_executable(
+                RosbinExecutable('rosparam', (cmd, full_param), PHASE_SETUP))
         elif cmd == 'load':
             # load YAML text
             if file_:
                 with open(file_, 'r') as f:
                     text = f.read()
-                    
+
             if subst_function is not None:
                 text = subst_function(text)
-            # parse YAML text
-            # - lazy import: we have to import rosparam in oder to to configure the YAML constructors
-            global rosparam
-            if rosparam is None:
-                import rosparam
             try:
                 data = yaml.safe_load(text)
                 # #3162: if there is no YAML, load() will return an
@@ -419,25 +446,30 @@ class Loader(object):
                 if data is None:
                     data = {}
             except yaml.MarkedYAMLError as e:
-                if not file_: 
-                    raise ValueError("Error within YAML block:\n\t%s\n\nYAML is:\n%s"%(str(e), text))
+                if not file_:
+                    raise ValueError(
+                        "Error within YAML block:\n\t%s\n\nYAML is:\n%s" %
+                        (str(e), text))
                 else:
-                    raise ValueError("file %s contains invalid YAML:\n%s"%(file_, str(e)))
+                    raise ValueError("file %s contains invalid YAML:\n%s" %
+                                     (file_, str(e)))
             except Exception as e:
                 if not file_:
-                    raise ValueError("invalid YAML: %s\n\nYAML is:\n%s"%(str(e), text))
+                    raise ValueError("invalid YAML: %s\n\nYAML is:\n%s" %
+                                     (str(e), text))
                 else:
-                    raise ValueError("file %s contains invalid YAML:\n%s"%(file_, str(e)))
+                    raise ValueError("file %s contains invalid YAML:\n%s" %
+                                     (file_, str(e)))
 
             # 'param' attribute is required for non-dictionary types
             if not param and type(data) != dict:
-                raise ValueError("'param' attribute must be set for non-dictionary values")
+                raise ValueError(
+                    "'param' attribute must be set for non-dictionary values")
 
             self.add_param(ros_config, full_param, data, verbose=verbose)
 
         else:
-            raise ValueError("unknown command %s"%cmd)
-
+            raise ValueError("unknown command %s" % cmd)
 
     def load_env(self, context, ros_config, name, value):
         """
@@ -456,8 +488,8 @@ class Loader(object):
             raise ValueError("'name' attribute must be non-empty")
         context.env_args.append((name, value))
 
-
-    def param_value(self, verbose, name, ptype, value, textfile, binfile, command):
+    def param_value(self, verbose, name, ptype, value, textfile, binfile,
+                    command):
         """
         Parse text representation of param spec into Python value
         @param name: param name, for error message use only
@@ -465,9 +497,9 @@ class Loader(object):
         @param verbose: print verbose output
         @type  verbose: bool
         @param textfile: name of text file to load from, or None
-        @type  textfile: str        
+        @type  textfile: str
         @param binfile: name of binary file to load from, or None
-        @type  binfile: str        
+        @type  binfile: str
         @param command: command to execute for parameter value, or None
         @type  command: str
         @raise ValueError: if parameters are invalid
@@ -478,32 +510,33 @@ class Loader(object):
             with open(textfile, 'r') as f:
                 return convert_value(f.read(), ptype)
         elif binfile is not None:
-            try:
-                from xmlrpc.client import Binary
-            except ImportError:
-                from xmlrpclib import Binary
             with open(binfile, 'rb') as f:
                 return Binary(f.read())
         elif command is not None:
             try:
                 if type(command) == unicode:
-                    command = command.encode('utf-8') #attempt to force to string for shlex/subprocess
+                    command = command.encode(
+                        'utf-8'
+                    )  #attempt to force to string for shlex/subprocess
             except NameError:
                 pass
             if verbose:
                 print("... executing command param [%s]" % command)
-            import subprocess, shlex #shlex rocks
             try:
                 if os.name != 'nt':
                     command = shlex.split(command)
                 else:
-                    cl = shlex.split(command, posix=False)  # use non-posix method on Windows
+                    cl = shlex.split(
+                        command, posix=False)  # use non-posix method on Windows
 
                     # On Linux, single quotes are commonly used to enclose a path to escape spaces.
                     # However, on Windows, the single quotes are treated as part of the arguments.
                     # Special handling is required to remove the extra single quotes.
                     if "'" in command:
-                        cl = [token[1:-1] if token.startswith("'") and token.endswith("'") else token for token in cl]
+                        cl = [
+                            token[1:-1] if token.startswith("'") and
+                            token.endswith("'") else token for token in cl
+                        ]
                     command = cl
 
                     # Python scripts in ROS tend to omit .py extension since they could become executable with shebang line
@@ -512,13 +545,15 @@ class Loader(object):
                     # 2. if no wrapper is present, prepend command with 'python' executable
                     if os.path.isabs(cl[0]):
                         # trying to launch an executable from a specific location(package), e.g. xacro
-                        import stat
                         rx_flag = stat.S_IRUSR | stat.S_IXUSR
-                        if not os.path.exists(cl[0]) or os.stat(cl[0]).st_mode & rx_flag != rx_flag:
+                        if not os.path.exists(cl[0]) or os.stat(
+                                cl[0]).st_mode & rx_flag != rx_flag:
                             d = os.path.dirname(cl[0])
                             files_of_same_name = [
-                                os.path.join(d, f) for f in os.listdir(d)
-                                if os.path.splitext(f)[0].lower() == os.path.splitext(os.path.basename(cl[0]))[0].lower()
+                                os.path.join(d, f)
+                                for f in os.listdir(d)
+                                if os.path.splitext(f)[0].lower() == os.path.
+                                splitext(os.path.basename(cl[0]))[0].lower()
                             ] if os.path.exists(d) else []
                             executable_command = None
                             for f in files_of_same_name:
@@ -529,10 +564,15 @@ class Loader(object):
                             if not executable_command:
                                 for f in files_of_same_name:
                                     mode = os.stat(f).st_mode
-                                    if (mode & stat.S_IRUSR == stat.S_IRUSR) and (mode & stat.S_IXUSR != stat.S_IXUSR):
+                                    if (mode & stat.S_IRUSR == stat.S_IRUSR
+                                       ) and (mode & stat.S_IXUSR !=
+                                              stat.S_IXUSR):
                                         # when there is read permission but not execute permission, this is typically a Python script (in ROS)
-                                        if os.path.splitext(f)[1].lower() in ['.py', '']:
-                                            executable_command = ' '.join([sys.executable, f])
+                                        if os.path.splitext(f)[1].lower() in [
+                                                '.py', ''
+                                        ]:
+                                            executable_command = ' '.join(
+                                                [sys.executable, f])
                             if executable_command:
                                 command[0] = executable_command
                 p = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -540,14 +580,18 @@ class Loader(object):
                 if not isinstance(c_value, str):
                     c_value = c_value.decode('utf-8')
                 if p.returncode != 0:
-                    raise ValueError("Cannot load command parameter [%s]: command [%s] returned with code [%s]"%(name, command, p.returncode))
+                    raise ValueError(
+                        "Cannot load command parameter [%s]: command [%s] returned with code [%s]"
+                        % (name, command, p.returncode))
             except OSError as e:
                 if e.errno == errno.ENOENT:
-                    raise ValueError("Cannot load command parameter [%s]: no such command [%s]"%(name, command))
+                    raise ValueError(
+                        "Cannot load command parameter [%s]: no such command [%s]"
+                        % (name, command))
                 raise
             if c_value is None:
-                raise ValueError("parameter: unable to get output of command [%s]"%command)
+                raise ValueError(
+                    "parameter: unable to get output of command [%s]" % command)
             return convert_value(c_value, ptype)
-        else: #_param_tag prevalidates, so this should not be reachable
+        else:  #_param_tag prevalidates, so this should not be reachable
             raise ValueError("unable to determine parameter value")
-

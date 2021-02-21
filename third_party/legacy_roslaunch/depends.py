@@ -29,26 +29,26 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
 """
 Utility module of roslaunch that extracts dependency information from
 roslaunch files, including calculating missing package dependencies.
 """
 
-from __future__ import print_function
-
 import os
+import re
 import sys
-
+from optparse import OptionParser
 from xml.dom.minidom import parse
 from xml.dom import Node as DomNode
 
+from catkin_pkg.package import parse_package
 import rospkg
 
-from .loader import convert_value, load_mappings
-from .substitution_args import resolve_args
+from third_party.legacy_roslaunch.loader import convert_value, load_mappings
+from third_party.legacy_roslaunch.substitution_args import resolve_args
 
-NAME="roslaunch-deps"
+NAME = "roslaunch-deps"
+
 
 class RoslaunchDepsException(Exception):
     """
@@ -56,10 +56,12 @@ class RoslaunchDepsException(Exception):
     """
     pass
 
+
 class RoslaunchDeps(object):
     """
-    Represents dependencies of a roslaunch file. 
+    Represents dependencies of a roslaunch file.
     """
+
     def __init__(self, nodes=None, includes=None, pkgs=None):
         if nodes == None:
             nodes = []
@@ -70,7 +72,7 @@ class RoslaunchDeps(object):
         self.nodes = nodes
         self.includes = includes
         self.pkgs = pkgs
-        
+
     def __eq__(self, other):
         if not isinstance(other, RoslaunchDeps):
             return False
@@ -79,10 +81,13 @@ class RoslaunchDeps(object):
                set(self.pkgs) == set(other.pkgs)
 
     def __repr__(self):
-        return "nodes: %s\nincludes: %s\npkgs: %s"%(str(self.nodes), str(self.includes), str(self.pkgs))
+        return "nodes: %s\nincludes: %s\npkgs: %s" % (str(
+            self.nodes), str(self.includes), str(self.pkgs))
 
     def __str__(self):
-        return "nodes: %s\nincludes: %s\npkgs: %s"%(str(self.nodes), str(self.includes), str(self.pkgs))
+        return "nodes: %s\nincludes: %s\npkgs: %s" % (str(
+            self.nodes), str(self.includes), str(self.pkgs))
+
 
 def _get_arg_value(tag, context):
     name = tag.attributes['name'].value
@@ -93,7 +98,8 @@ def _get_arg_value(tag, context):
     elif 'default' in tag.attributes.keys():
         return resolve_args(tag.attributes['default'].value, context)
     else:
-        raise RoslaunchDepsException("No value for arg [%s]"%(name))
+        raise RoslaunchDepsException("No value for arg [%s]" % (name))
+
 
 def _check_ifunless(tag, context):
     if 'if' in tag.attributes.keys():
@@ -106,40 +112,48 @@ def _check_ifunless(tag, context):
             return False
     return True
 
+
 def _parse_subcontext(tags, context):
     subcontext = {'arg': {}}
 
     if tags == None:
-       return subcontext
-    
+        return subcontext
+
     for tag in [t for t in tags if t.nodeType == DomNode.ELEMENT_NODE]:
         if tag.tagName == 'arg' and _check_ifunless(tag, context):
-            subcontext['arg'][tag.attributes['name'].value] = _get_arg_value(tag, context)
+            subcontext['arg'][tag.attributes['name'].value] = _get_arg_value(
+                tag, context)
     return subcontext
+
 
 def _parse_launch(tags, launch_file, file_deps, verbose, context):
     context['filename'] = os.path.abspath(launch_file)
     dir_path = os.path.dirname(os.path.abspath(launch_file))
     launch_file_pkg = rospkg.get_package_name(dir_path)
-            
+
     # process group, include, node, and test tags from launch file
     for tag in [t for t in tags if t.nodeType == DomNode.ELEMENT_NODE]:
         if not _check_ifunless(tag, context):
             continue
 
         if tag.tagName == 'group':
-            
+
             #descend group tags as they can contain node tags
-            _parse_launch(tag.childNodes, launch_file, file_deps, verbose, context)
+            _parse_launch(tag.childNodes, launch_file, file_deps, verbose,
+                          context)
 
         elif tag.tagName == 'arg':
-            context['arg'][tag.attributes['name'].value] = _get_arg_value(tag, context)
+            context['arg'][tag.attributes['name'].value] = _get_arg_value(
+                tag, context)
 
         elif tag.tagName == 'include':
             try:
-                sub_launch_file = resolve_args(tag.attributes['file'].value, context)
+                sub_launch_file = resolve_args(tag.attributes['file'].value,
+                                               context)
             except KeyError as e:
-                raise RoslaunchDepsException("Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"%(tag.tagName, str(e), tag.toxml()))
+                raise RoslaunchDepsException(
+                    "Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"
+                    % (tag.tagName, str(e), tag.toxml()))
 
             # Check if an empty file is included, and skip if so.
             # This will allow a default-empty <include> inside a conditional to pass
@@ -150,64 +164,82 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
                 continue
 
             if verbose:
-                print("processing included launch %s"%sub_launch_file)
+                print("processing included launch %s" % sub_launch_file)
 
             # determine package dependency for included file
-            sub_pkg = rospkg.get_package_name(os.path.dirname(os.path.abspath(sub_launch_file)))
+            sub_pkg = rospkg.get_package_name(
+                os.path.dirname(os.path.abspath(sub_launch_file)))
             if sub_pkg is None:
-                print("ERROR: cannot determine package for [%s]"%sub_launch_file, file=sys.stderr)
-            
+                print("ERROR: cannot determine package for [%s]" %
+                      sub_launch_file,
+                      file=sys.stderr)
+
             if sub_launch_file not in file_deps[launch_file].includes:
                 file_deps[launch_file].includes.append(sub_launch_file)
-            if launch_file_pkg != sub_pkg:            
+            if launch_file_pkg != sub_pkg:
                 file_deps[launch_file].pkgs.append(sub_pkg)
-            
+
             # recurse
             file_deps[sub_launch_file] = RoslaunchDeps()
             try:
                 dom = parse(sub_launch_file).getElementsByTagName('launch')
                 if not len(dom):
-                    print("ERROR: %s is not a valid roslaunch file"%sub_launch_file, file=sys.stderr)
+                    print("ERROR: %s is not a valid roslaunch file" %
+                          sub_launch_file,
+                          file=sys.stderr)
                 else:
                     launch_tag = dom[0]
                     sub_context = _parse_subcontext(tag.childNodes, context)
                     try:
                         if tag.attributes['pass_all_args']:
                             sub_context["arg"] = context["arg"]
-                            sub_context["arg"].update(_parse_subcontext(tag.childNodes, context)["arg"])
+                            sub_context["arg"].update(
+                                _parse_subcontext(tag.childNodes,
+                                                  context)["arg"])
                     except KeyError as e:
                         pass
-                    _parse_launch(launch_tag.childNodes, sub_launch_file, file_deps, verbose, sub_context)
+                    _parse_launch(launch_tag.childNodes, sub_launch_file,
+                                  file_deps, verbose, sub_context)
             except IOError as e:
-                raise RoslaunchDepsException("Cannot load roslaunch include '%s' in '%s'"%(sub_launch_file, launch_file))
+                raise RoslaunchDepsException(
+                    "Cannot load roslaunch include '%s' in '%s'" %
+                    (sub_launch_file, launch_file))
 
         elif tag.tagName in ['node', 'test']:
             try:
-                pkg, type = [resolve_args(tag.attributes[a].value, context) for a in ['pkg', 'type']]
+                pkg, type = [
+                    resolve_args(tag.attributes[a].value, context)
+                    for a in ['pkg', 'type']
+                ]
             except KeyError as e:
-                raise RoslaunchDepsException("Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"%(tag.tagName, str(e), tag.toxml()))
+                raise RoslaunchDepsException(
+                    "Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"
+                    % (tag.tagName, str(e), tag.toxml()))
             if (pkg, type) not in file_deps[launch_file].nodes:
                 file_deps[launch_file].nodes.append((pkg, type))
             # we actually want to include the package itself if that's referenced
             #if launch_file_pkg != pkg:
             if pkg not in file_deps[launch_file].pkgs:
                 file_deps[launch_file].pkgs.append(pkg)
-            
+
+
 def parse_launch(launch_file, file_deps, verbose):
     if verbose:
-        print("processing launch %s"%launch_file)
+        print("processing launch %s" % launch_file)
 
     try:
         dom = parse(launch_file).getElementsByTagName('launch')
     except:
-        raise RoslaunchDepsException("invalid XML in %s"%(launch_file))
+        raise RoslaunchDepsException("invalid XML in %s" % (launch_file))
     if not len(dom):
-        raise RoslaunchDepsException("invalid XML in %s"%(launch_file))
+        raise RoslaunchDepsException("invalid XML in %s" % (launch_file))
 
     file_deps[launch_file] = RoslaunchDeps()
     launch_tag = dom[0]
-    context = { 'arg': load_mappings(sys.argv) }
-    _parse_launch(launch_tag.childNodes, launch_file, file_deps, verbose, context)
+    context = {'arg': load_mappings(sys.argv)}
+    _parse_launch(launch_tag.childNodes, launch_file, file_deps, verbose,
+                  context)
+
 
 def rl_file_deps(file_deps, launch_file, verbose=False):
     """
@@ -216,19 +248,21 @@ def rl_file_deps(file_deps, launch_file, verbose=False):
     @param file_deps: dictionary mapping roslaunch filenames to
         roslaunch dependency information. This dictionary will be
         updated with dependency information.
-    @type  file_deps: { str : RoslaunchDeps } 
+    @type  file_deps: { str : RoslaunchDeps }
     @param verbose: if True, print verbose output
     @type  verbose: bool
     @param launch_file: name of roslaunch file
     @type  launch_file: str
     """
     parse_launch(launch_file, file_deps, verbose)
-    
+
+
 def fullusage():
     name = NAME
     print("""Usage:
 \t%(name)s [options] <file-or-package>
-"""%locals())
+""" % locals())
+
 
 def print_deps(base_pkg, file_deps, verbose):
     pkgs = []
@@ -237,27 +271,29 @@ def print_deps(base_pkg, file_deps, verbose):
     if verbose:
         for f, deps in file_deps.items():
             for p, t in deps.nodes:
-                print("%s [%s/%s]"%(p, p, t))
+                print("%s [%s/%s]" % (p, p, t))
 
             pkg = rospkg.get_package_name(os.path.dirname(os.path.abspath(f)))
-            if pkg is None: #cannot determine package
-                print("ERROR: cannot determine package for [%s]"%pkg, file=sys.stderr)
+            if pkg is None:  #cannot determine package
+                print("ERROR: cannot determine package for [%s]" % pkg,
+                      file=sys.stderr)
             else:
-                print("%s [%s]"%(pkg, f))
-        print('-'*80)
+                print("%s [%s]" % (pkg, f))
+        print('-' * 80)
 
     # print out list of package dependencies
-    pkgs = [] 
+    pkgs = []
     for deps in file_deps.values():
         pkgs.extend(deps.pkgs)
     # print space-separated to be friendly to rosmake
     print(' '.join([p for p in set(pkgs)]))
 
+
 def calculate_missing(base_pkg, missing, file_deps, use_test_depends=False):
     """
     Calculate missing package dependencies in the manifest. This is
     mainly used as a subroutine of roslaunch_deps().
-    
+
     @param base_pkg: name of package where initial walk begins (unused).
     @type  base_pkg: str
     @param missing: dictionary mapping package names to set of missing package dependencies.
@@ -271,10 +307,12 @@ def calculate_missing(base_pkg, missing, file_deps, use_test_depends=False):
     """
     rospack = rospkg.RosPack()
     for launch_file in file_deps.keys():
-        pkg = rospkg.get_package_name(os.path.dirname(os.path.abspath(launch_file)))
+        pkg = rospkg.get_package_name(
+            os.path.dirname(os.path.abspath(launch_file)))
 
-        if pkg is None: #cannot determine package
-            print("ERROR: cannot determine package for [%s]"%pkg, file=sys.stderr)
+        if pkg is None:  #cannot determine package
+            print("ERROR: cannot determine package for [%s]" % pkg,
+                  file=sys.stderr)
             continue
         m = rospack.get_manifest(pkg)
         d_pkgs = set([d.name for d in m.depends])
@@ -282,7 +320,6 @@ def calculate_missing(base_pkg, missing, file_deps, use_test_depends=False):
             # for catkin packages consider the run dependencies instead
             # else not released packages will not appear in the dependency list
             # since rospkg  does uses rosdep to decide which dependencies to return
-            from catkin_pkg.package import parse_package
             p = parse_package(os.path.dirname(m.filename))
             d_pkgs = set([d.name for d in p.run_depends])
             if use_test_depends:
@@ -298,7 +335,10 @@ def calculate_missing(base_pkg, missing, file_deps, use_test_depends=False):
     return missing
 
 
-def roslaunch_deps(files, verbose=False, use_test_depends=False, ignore_unset_args=False):
+def roslaunch_deps(files,
+                   verbose=False,
+                   use_test_depends=False,
+                   ignore_unset_args=False):
     """
     @param packages: list of packages to check
     @type  packages: [str]
@@ -324,35 +364,48 @@ def roslaunch_deps(files, verbose=False, use_test_depends=False, ignore_unset_ar
 
     for launch_file in files:
         if not os.path.exists(launch_file):
-            raise RoslaunchDepsException("roslaunch file [%s] does not exist"%launch_file)
+            raise RoslaunchDepsException("roslaunch file [%s] does not exist" %
+                                         launch_file)
 
-        pkg = rospkg.get_package_name(os.path.dirname(os.path.abspath(launch_file)))
+        pkg = rospkg.get_package_name(
+            os.path.dirname(os.path.abspath(launch_file)))
         if base_pkg and pkg != base_pkg:
-            raise RoslaunchDepsException("roslaunch files must be in the same package: %s vs. %s"%(base_pkg, pkg))
+            raise RoslaunchDepsException(
+                "roslaunch files must be in the same package: %s vs. %s" %
+                (base_pkg, pkg))
         base_pkg = pkg
         try:
             rl_file_deps(file_deps, launch_file, verbose)
         except RoslaunchDepsException as e:
             if ignore_unset_args:
-                import re
                 if not re.compile(r'No value for arg').search(str(e)):
                     raise RoslaunchDepsException(str(e))
             else:
                 raise RoslaunchDepsException(str(e))
 
-    calculate_missing(base_pkg, missing, file_deps, use_test_depends=use_test_depends)
-    return base_pkg, file_deps, missing            
-    
+    calculate_missing(base_pkg,
+                      missing,
+                      file_deps,
+                      use_test_depends=use_test_depends)
+    return base_pkg, file_deps, missing
+
+
 def roslaunch_deps_main(argv=sys.argv):
-    from optparse import OptionParser
-    parser = OptionParser(usage="usage: %prog [options] <file(s)...>", prog=NAME)
-    parser.add_option("--verbose", "-v", action="store_true",
-                      dest="verbose", default=False, 
+    parser = OptionParser(usage="usage: %prog [options] <file(s)...>",
+                          prog=NAME)
+    parser.add_option("--verbose",
+                      "-v",
+                      action="store_true",
+                      dest="verbose",
+                      default=False,
                       help="Verbose output")
-    parser.add_option("--warn", "-w", action="store_true",
-                      dest="warn", default=False, 
+    parser.add_option("--warn",
+                      "-w",
+                      action="store_true",
+                      dest="warn",
+                      default=False,
                       help="Warn about missing manifest dependencies")
-        
+
     (options, args) = parser.parse_args(argv[1:])
     if not args:
         parser.error('please specify a launch file')
@@ -360,23 +413,23 @@ def roslaunch_deps_main(argv=sys.argv):
     files = [arg for arg in args if os.path.exists(arg)]
     packages = [arg for arg in args if not os.path.exists(arg)]
     if packages:
-        parser.error("cannot locate %s"%','.join(packages))
+        parser.error("cannot locate %s" % ','.join(packages))
     try:
-        base_pkg, file_deps, missing = roslaunch_deps(files, verbose=options.verbose)
+        base_pkg, file_deps, missing = roslaunch_deps(files,
+                                                      verbose=options.verbose)
     except RoslaunchDepsException as e:
         print(sys.stderr, str(e))
         sys.exit(1)
 
     if options.warn:
         print("Dependencies:")
-        
+
     print_deps(base_pkg, file_deps, options.verbose)
-    
+
     if options.warn:
         print('\nMissing declarations:')
         for pkg, miss in missing.items():
             if miss:
-                print("%s/manifest.xml:"%pkg)
+                print("%s/manifest.xml:" % pkg)
                 for m in miss:
-                    print('  <depend package="%s" />'%m)
-    
+                    print('  <depend package="%s" />' % m)

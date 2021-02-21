@@ -29,52 +29,48 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
-from __future__ import print_function
-
 """
 Core roslaunch model and lower-level utility routines.
 """
 
-import os
+import getpass
 import logging
-
+import os
 import re
 import socket
 import sys
-try:
-    from xmlrpc.client import MultiCall, ServerProxy
-except ImportError:
-    from xmlrpclib import MultiCall, ServerProxy
+import uuid
+from xml.sax.saxutils import escape
+from xmlrpc.client import MultiCall, ServerProxy
 
 import rospkg
-
 import rosgraph
-import rosgraph.names 
+import rosgraph.names
 import rosgraph.network
 
-from xml.sax.saxutils import escape 
-try:
-    unicode
-except NameError:
-    # Python 3: for _xml_escape
-    basestring = unicode = str
-    
+basestring = unicode = str
+
+
 class RLException(Exception):
     """Base roslaunch exception type"""
     pass
 
+
 ## Phases allow executables to be assigned to a particular run period
-PHASE_SETUP    = 'setup'
-PHASE_RUN      = 'run'
+PHASE_SETUP = 'setup'
+PHASE_RUN = 'run'
 PHASE_TEARDOWN = 'teardown'
 
 _child_mode = False
+
+
 def is_child_mode():
     """
     :returns: ``True`` if roslaunch is running in remote child mode, ``bool``
     """
     return _child_mode
+
+
 def set_child_mode(child_mode):
     """
     :param child_mode: True if roslaunch is running in remote
@@ -83,44 +79,56 @@ def set_child_mode(child_mode):
     global _child_mode
     _child_mode = child_mode
 
+
 def is_machine_local(machine):
     """
     Check to see if machine is local. NOTE: a machine is not local if
     its user credentials do not match the current user.
     :param machine: Machine, ``Machine``
     :returns: True if machine is local and doesn't require remote login, ``bool``
-    """    
+    """
     try:
         # If Python has ipv6 disabled but machine.address can be resolved somehow to an ipv6 address, then host[4][0] will be int
-        machine_ips = [host[4][0] for host in socket.getaddrinfo(machine.address, 0, 0, 0, socket.SOL_TCP) if isinstance(host[4][0], str)]
+        machine_ips = [
+            host[4][0]
+            for host in socket.getaddrinfo(machine.address, 0, 0, 0,
+                                           socket.SOL_TCP)
+            if isinstance(host[4][0], str)
+        ]
     except socket.gaierror:
-        raise RLException("cannot resolve host address for machine [%s]"%machine.address)
+        raise RLException("cannot resolve host address for machine [%s]" %
+                          machine.address)
     local_addresses = ['localhost'] + rosgraph.network.get_local_addresses()
     # check 127/8 and local addresses
-    is_local = ([ip for ip in machine_ips if (ip.startswith('127.') or ip == '::1')] != []) or (set(machine_ips) & set(local_addresses) != set())
+    is_local = ([
+        ip for ip in machine_ips if (ip.startswith('127.') or ip == '::1')
+    ] != []) or (set(machine_ips) & set(local_addresses) != set())
 
     #491: override local to be ssh if machine.user != local user
     if is_local and machine.user:
-        import getpass
         is_local = machine.user == getpass.getuser()
     return is_local
-    
+
+
 _printlog_handlers = []
 _printerrlog_handlers = []
+
+
 def printlog(msg):
     """
     Core utility for printing message to stdout as well as printlog handlers
     :param msg: message to print, ``str``
     """
     for h in _printlog_handlers:
-        try: # don't let this bomb out the actual code
+        try:  # don't let this bomb out the actual code
             h(msg)
         except:
             pass
-    try: # don't let this bomb out the actual code        
+    try:  # don't let this bomb out the actual code
         print(msg)
     except:
         pass
+
 
 def printlog_bold(msg):
     """
@@ -128,34 +136,36 @@ def printlog_bold(msg):
     :param msg: message to print, ``str``
     """
     for h in _printlog_handlers:
-        try: # don't let this bomb out the actual code
+        try:  # don't let this bomb out the actual code
             h(msg)
         except:
             pass
-    try: # don't let this bomb out the actual code        
+    try:  # don't let this bomb out the actual code
         if sys.platform in ['win32']:
-            print('%s' % msg)  # windows console is terrifically boring 
+            print('%s' % msg)  # windows console is terrifically boring
         else:
             print('\033[1m%s\033[0m' % msg)
     except:
         pass
 
+
 def printerrlog(msg):
     """
     Core utility for printing message to stderr as well as printerrlog handlers
     :param msg: message to print, ``str``
-    """    
+    """
     for h in _printerrlog_handlers:
-        try: # don't let this bomb out the actual code
+        try:  # don't let this bomb out the actual code
             h(msg)
         except:
             pass
     # #1003: this has raised IOError (errno 104) in robot use. Better to
     # trap than let a debugging routine fault code.
-    try: # don't let this bomb out the actual code
+    try:  # don't let this bomb out the actual code
         print('\033[31m%s\033[0m' % msg, file=sys.stderr)
     except:
         pass
+
 
 def add_printlog_handler(h):
     """
@@ -163,11 +173,13 @@ def add_printlog_handler(h):
     """
     _printlog_handlers.append(h)
 
+
 def add_printerrlog_handler(h):
     """
     Register additional handler for printerrlog()
     """
     _printerrlog_handlers.append(h)
+
 
 def clear_printlog_handlers():
     """
@@ -175,12 +187,14 @@ def clear_printlog_handlers():
     """
     del _printlog_handlers[:]
 
+
 def clear_printerrlog_handlers():
     """
     Delete all printerrlog handlers. required for testing
     """
     del _printerrlog_handlers[:]
-    
+
+
 def setup_env(node, machine, master_uri, env=None):
     """
     Create dictionary of environment variables to set for launched
@@ -188,7 +202,7 @@ def setup_env(node, machine, master_uri, env=None):
 
     setup_env() will only set ROS_*, PYTHONPATH, and user-specified
     environment variables.
-    
+
     :param machine: machine being launched on, ``Machine``
     :param node: node that is being launched or None, ``Node``
     :param master_uri: ROS master URI, ``str``
@@ -205,7 +219,7 @@ def setup_env(node, machine, master_uri, env=None):
     if node:
         if rosgraph.ROS_NAMESPACE in d:
             del d[rosgraph.ROS_NAMESPACE]
-        ns = node.namespace 
+        ns = node.namespace
         if ns[-1] == '/':
             ns = ns[:-1]
         if ns:
@@ -215,23 +229,28 @@ def setup_env(node, machine, master_uri, env=None):
 
     return d
 
+
 def rle_wrapper(fn):
     """
     Wrap lower-level exceptions in RLException class
     :returns:: function wrapper that throws an RLException if the
         wrapped function throws an Exception, ``fn``
-    """    
+    """
+
     def wrapped_fn(*args):
         try:
             return fn(*args)
         except Exception as e:
             # we specifically catch RLExceptions and print their messages differently
-            raise RLException("ERROR: %s"%e)
+            raise RLException("ERROR: %s" % e)
+
     return wrapped_fn
-        
-get_ros_root         = rospkg.get_ros_root
-get_master_uri_env   = rle_wrapper(rosgraph.get_master_uri) 
+
+
+get_ros_root = rospkg.get_ros_root
+get_master_uri_env = rle_wrapper(rosgraph.get_master_uri)
 get_ros_package_path = rospkg.get_ros_package_path
+
 
 def remap_localhost_uri(uri, force_localhost=False):
     """
@@ -245,18 +264,20 @@ def remap_localhost_uri(uri, force_localhost=False):
     else:
         return uri
 
+
 ##################################################################
 # DATA STRUCTURES
 
+
 class Master(object):
     """
-    Data structure for representing and querying state of master 
+    Data structure for representing and querying state of master
     """
     __slots__ = ['type', 'auto', 'uri']
     ROSMASTER = 'rosmaster'
-    
+
     # deprecated
-    ZENMASTER = 'zenmaster'        
+    ZENMASTER = 'zenmaster'
 
     def __init__(self, type_=None, uri=None, auto=None):
         """
@@ -264,15 +285,15 @@ class Master(object):
         :param uri: master URI. Defaults to ROS_MASTER_URI environment variable, ``str``
         :param type_: Currently only support 'rosmaster', ``str``
         """
-        self.auto = None # no longer used
+        self.auto = None  # no longer used
         self.type = type_ or Master.ROSMASTER
         self.uri = uri or get_master_uri_env()
-        
+
     def get_host(self):
         # parse from the URI
         host, _ = rosgraph.network.parse_http_host_and_port(self.uri)
         return host
-    
+
     def get_port(self):
         """
         Get the port this master is configured for.
@@ -280,7 +301,7 @@ class Master(object):
         # parse from the URI
         _, urlport = rosgraph.network.parse_http_host_and_port(self.uri)
         return urlport
-            
+
     def __eq__(self, m2):
         if not isinstance(m2, Master):
             return False
@@ -292,38 +313,44 @@ class Master(object):
         :returns:: XMLRPC proxy for communicating with master, ``xmlrpc.client.ServerProxy``
         """
         return ServerProxy(self.uri)
-    
+
     def get_multi(self):
         """
         :returns:: multicall XMLRPC proxy for communicating with master, ``xmlrpc.client.MultiCall``
         """
         return MultiCall(self.get())
-    
+
     def is_running(self):
         """
-        Check if master is running. 
+        Check if master is running.
         :returns:: True if the master is running, ``bool``
         """
         try:
             try:
                 to_orig = socket.getdefaulttimeout()
-                # enable timeout 
+                # enable timeout
                 socket.setdefaulttimeout(5.0)
-                logging.getLogger('roslaunch').info('master.is_running[%s]'%self.uri)
+                logging.getLogger('roslaunch').info('master.is_running[%s]' %
+                                                    self.uri)
                 code, status, val = self.get().getPid('/roslaunch')
                 if code != 1:
-                    raise RLException("ERROR: master failed status check: %s"%msg)
-                logging.getLogger('roslaunch.core').debug('master.is_running[%s]: True'%self.uri)
+                    raise RLException("ERROR: master failed status check: %s" %
+                                      msg)
+                logging.getLogger('roslaunch.core').debug(
+                    'master.is_running[%s]: True' % self.uri)
                 return True
             finally:
-                socket.setdefaulttimeout(to_orig) 
+                socket.setdefaulttimeout(to_orig)
         except:
-            logging.getLogger('roslaunch.core').debug('master.is_running[%s]: False'%self.uri)
+            logging.getLogger('roslaunch.core').debug(
+                'master.is_running[%s]: False' % self.uri)
             return False
+
 
 ## number of seconds that a child machine is allowed to register with
 ## the parent before being considered failed
-_DEFAULT_REGISTER_TIMEOUT = 10.0 
+_DEFAULT_REGISTER_TIMEOUT = 10.0
+
 
 class Machine(object):
     """
@@ -331,11 +358,21 @@ class Machine(object):
     system.  Corresponds to the 'machine' tag in the launch
     specification.
     """
-    __slots__ = ['name', 'address', 'ssh_port', 'user', 'password', 'assignable',
-                 'env_loader', 'timeout']
-    def __init__(self, name, address,
-                 env_loader=None, ssh_port=22, user=None, password=None, 
-                 assignable=True, env_args=[], timeout=None):
+    __slots__ = [
+        'name', 'address', 'ssh_port', 'user', 'password', 'assignable',
+        'env_loader', 'timeout'
+    ]
+
+    def __init__(self,
+                 name,
+                 address,
+                 env_loader=None,
+                 ssh_port=22,
+                 user=None,
+                 password=None,
+                 assignable=True,
+                 env_args=[],
+                 timeout=None):
         """
         :param name: machine name, ``str``
         :param address: network address of machine, ``str``
@@ -352,25 +389,30 @@ class Machine(object):
         self.ssh_port = ssh_port
         self.assignable = assignable
         self.timeout = timeout or _DEFAULT_REGISTER_TIMEOUT
-        
+
     def __str__(self):
-        return "Machine(name[%s] env_loader[%s] address[%s] ssh_port[%s] user[%s] assignable[%s] timeout[%s])"%(self.name, self.env_loader, self.address, self.ssh_port, self.user, self.assignable, self.timeout)
+        return "Machine(name[%s] env_loader[%s] address[%s] ssh_port[%s] user[%s] assignable[%s] timeout[%s])" % (
+            self.name, self.env_loader, self.address, self.ssh_port, self.user,
+            self.assignable, self.timeout)
+
     def __eq__(self, m2):
         if not isinstance(m2, Machine):
             return False
         return self.name == m2.name and \
                self.assignable == m2.assignable and \
                self.config_equals(m2)
-    
+
     def config_key(self):
         """
         Get a key that represents the configuration of the
         machine. machines with identical configurations have identical
         keys
-    
+
         :returns:: configuration key, ``str``
         """
-        return "Machine(address[%s] env_loader[%s] ssh_port[%s] user[%s] password[%s] timeout[%s])"%(self.address, self.env_loader, self.ssh_port, self.user or '', self.password or '', self.timeout)
+        return "Machine(address[%s] env_loader[%s] ssh_port[%s] user[%s] password[%s] timeout[%s])" % (
+            self.address, self.env_loader, self.ssh_port, self.user or
+            '', self.password or '', self.timeout)
 
     def config_equals(self, m2):
         """
@@ -383,27 +425,36 @@ class Machine(object):
     def __ne__(self, m2):
         return not self.__eq__(m2)
 
+
 class Param(object):
     """
     Data structure for storing information about a desired parameter in
     the ROS system Corresponds to the 'param' tag in the launch
     specification.
     """
+
     def __init__(self, key, value):
         self.key = rosgraph.names.canonicalize_name(key)
         self.value = value
+
     def __eq__(self, p):
         if not isinstance(p, Param):
             return False
         return p.key == self.key and p.value == self.value
+
     def __ne__(self, p):
         return not self.__eq__(p)
+
     def __str__(self):
-        return "%s=%s"%(self.key, self.value)
+        return "%s=%s" % (self.key, self.value)
+
     def __repr__(self):
-        return "%s=%s"%(self.key, self.value)
-            
+        return "%s=%s" % (self.key, self.value)
+
+
 _local_m = None
+
+
 def local_machine():
     """
     :returns:: Machine instance representing the local machine, ``Machine``
@@ -412,6 +463,7 @@ def local_machine():
     if _local_m is None:
         _local_m = Machine('', 'localhost')
     return _local_m
+
 
 class Node(object):
     """
@@ -451,7 +503,7 @@ class Node(object):
         :param filename: name of file Node was parsed from, ``str``
 
         :raises: :exc:`ValueError` If parameters do not validate
-        """        
+        """
 
         self.package = package
         self.type = node_type
@@ -463,21 +515,21 @@ class Node(object):
         self.respawn_delay = respawn_delay
         self.args = args or ''
         self.remap_args = remap_args or []
-        self.env_args = env_args or []        
+        self.env_args = env_args or []
         self.output = output
         self.cwd = cwd
-        if self.cwd == 'ros_home': # be lenient on case
+        if self.cwd == 'ros_home':  # be lenient on case
             self.cwd = 'ROS_HOME'
-            
+
         self.launch_prefix = launch_prefix or None
         self.required = required
         self.filename = filename
 
         if self.respawn and self.required:
             raise ValueError("respawn and required cannot both be set to true")
-        
+
         # validation
-        if self.name and rosgraph.names.SEP in self.name: # #1821, namespaces in nodes need to be banned
+        if self.name and rosgraph.names.SEP in self.name:  # #1821, namespaces in nodes need to be banned
             raise ValueError("node name cannot contain a namespace")
         if not len(self.package.strip()):
             raise ValueError("package must be non-empty")
@@ -487,9 +539,9 @@ class Node(object):
             raise ValueError("output must be one of 'log', 'screen'")
         if not self.cwd in ['ROS_HOME', 'node', None]:
             raise ValueError("cwd must be one of 'ROS_HOME', 'node'")
-        
+
         # Extra slots for assigning later
-        
+
         # slot to store the process name in so that we can query the
         # associated process state
         self.process_name = None
@@ -500,11 +552,9 @@ class Node(object):
         # configuration property
         self.machine = None
 
-        
-        
     def xmltype(self):
         return 'node'
-    
+
     def xmlattrs(self):
         name_str = cwd_str = respawn_str = None
         if self.name:
@@ -519,13 +569,13 @@ class Node(object):
             ('ns', self.namespace),
             ('args', self.args),
             ('output', self.output),
-            ('cwd', cwd_str), 
-            ('respawn', self.respawn), #not valid on <test>
-            ('respawn_delay', self.respawn_delay), # not valid on <test>
+            ('cwd', cwd_str),
+            ('respawn', self.respawn),  #not valid on <test>
+            ('respawn_delay', self.respawn_delay),  # not valid on <test>
             ('name', name_str),
             ('launch-prefix', self.launch_prefix),
             ('required', self.required),
-            ]
+        ]
 
     #TODO: unify with to_remote_xml using a filter_fn
     def to_xml(self):
@@ -535,10 +585,16 @@ class Node(object):
         """
         t = self.xmltype()
         attrs = [(a, v) for a, v in self.xmlattrs() if v != None]
-        xmlstr = '<%s %s>\n'%(t, ' '.join(['%s="%s"'%(val[0], _xml_escape(val[1])) for val in attrs]))
-        xmlstr += ''.join(['  <remap from="%s" to="%s" />\n'%tuple(r) for r in self.remap_args])
-        xmlstr += ''.join(['  <env name="%s" value="%s" />\n'%tuple(e) for e in self.env_args])
-        xmlstr += "</%s>"%t
+        xmlstr = '<%s %s>\n' % (t, ' '.join(
+            ['%s="%s"' % (val[0], _xml_escape(val[1])) for val in attrs]))
+        xmlstr += ''.join([
+            '  <remap from="%s" to="%s" />\n' % tuple(r)
+            for r in self.remap_args
+        ])
+        xmlstr += ''.join([
+            '  <env name="%s" value="%s" />\n' % tuple(e) for e in self.env_args
+        ])
+        xmlstr += "</%s>" % t
         return xmlstr
 
     def to_remote_xml(self):
@@ -548,13 +604,22 @@ class Node(object):
         :returns:: XML representation for remote machine, ``str``
         """
         t = self.xmltype()
-        attrs = [(a, v) for a, v in self.xmlattrs() if v != None and a != 'machine']
-        xmlstr = '<%s %s>\n'%(t, ' '.join(['%s="%s"'%(val[0], _xml_escape(val[1])) for val in attrs]))
-        xmlstr += ''.join(['  <remap from="%s" to="%s" />\n'%tuple(r) for r in self.remap_args])
-        xmlstr += ''.join(['  <env name="%s" value="%s" />\n'%tuple(e) for e in self.env_args])
-        xmlstr += "</%s>"%t
+        attrs = [
+            (a, v) for a, v in self.xmlattrs() if v != None and a != 'machine'
+        ]
+        xmlstr = '<%s %s>\n' % (t, ' '.join(
+            ['%s="%s"' % (val[0], _xml_escape(val[1])) for val in attrs]))
+        xmlstr += ''.join([
+            '  <remap from="%s" to="%s" />\n' % tuple(r)
+            for r in self.remap_args
+        ])
+        xmlstr += ''.join([
+            '  <env name="%s" value="%s" />\n' % tuple(e) for e in self.env_args
+        ])
+        xmlstr += "</%s>" % t
         return xmlstr
-        
+
+
 def _xml_escape(s):
     """
     Escape string for XML
@@ -568,8 +633,9 @@ def _xml_escape(s):
     else:
         # don't escape non-string attributes
         return s
-    
-TEST_TIME_LIMIT_DEFAULT = 1 * 60 #seconds
+
+
+TEST_TIME_LIMIT_DEFAULT = 1 * 60  #seconds
 
 
 class Test(Node):
@@ -609,7 +675,7 @@ class Test(Node):
             pass
         if not type(time_limit) in number_types:
             raise ValueError("'time-limit' must be a number")
-        time_limit = float(time_limit) #force to floating point
+        time_limit = float(time_limit)  #force to floating point
         if time_limit <= 0:
             raise ValueError("'time-limit' must be a positive number")
 
@@ -617,7 +683,7 @@ class Test(Node):
 
     def xmltype(self):
         return 'test'
-    
+
     def xmlattrs(self):
         """
         NOTE: xmlattrs does not necessarily produce identical XML as
@@ -634,12 +700,12 @@ class Test(Node):
             attrs.append(('time-limit', self.time_limit))
         return attrs
 
-        
+
 class Executable(object):
     """
     Executable is a generic container for executable commands.
     """
-    
+
     def __init__(self, cmd, args, phase=PHASE_RUN):
         """
         :param cmd: name of command to run, ``str``
@@ -650,28 +716,32 @@ class Executable(object):
         self.command = cmd
         self.args = args
         self.phase = phase
+
     def __repr__(self):
-        return "%s %s"%(self.command, ' '.join(self.args))
+        return "%s %s" % (self.command, ' '.join(self.args))
+
     def __str__(self):
-        return "%s %s"%(self.command, ' '.join(self.args))
-        
+        return "%s %s" % (self.command, ' '.join(self.args))
+
+
 class RosbinExecutable(Executable):
     """
     RosbinExecutables are executables stored in ROS_ROOT/bin.
     """
+
     def __init__(self, cmd, args, phase=PHASE_RUN):
         super(RosbinExecutable, self).__init__(cmd, args, phase)
-    def __repr__(self):
-        return "ros/bin/%s %s"%(self.command, ' '.join(self.args))
-    def __str__(self):
-        return "ros/bin/%s %s"%(self.command, ' '.join(self.args))
 
-    
+    def __repr__(self):
+        return "ros/bin/%s %s" % (self.command, ' '.join(self.args))
+
+    def __str__(self):
+        return "ros/bin/%s %s" % (self.command, ' '.join(self.args))
+
+
 def generate_run_id():
     """
     Utility routine for generating run IDs (UUIDs)
     :returns: guid, ``str``
-    """    
-    import uuid
+    """
     return str(uuid.uuid1())
-

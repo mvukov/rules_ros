@@ -31,30 +31,28 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 """
 Process handler for launching ssh-based roslaunch child processes.
 """
 
+import logging
 import os
 import socket
 import traceback
-try:
-    from xmlrpc.client import ServerProxy
-except ImportError:
-    from xmlrpclib import ServerProxy
+from xmlrpc.client import ServerProxy
 
+import paramiko
 import rosgraph
-from roslaunch.core import printlog, printerrlog
-import roslaunch.pmon
-import roslaunch.server
-from roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
 
-import logging
+from third_party.legacy_roslaunch import server
+from third_party.legacy_roslaunch.core import printlog, printerrlog
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
+
 _logger = logging.getLogger("roslaunch.remoteprocess")
 
 # #1975 timeout for creating ssh connections
 TIMEOUT_SSH_CONNECT = 30.
+
 
 def ssh_check_known_hosts(ssh, address, port, username=None, logger=None):
     """
@@ -70,14 +68,14 @@ def ssh_check_known_hosts(ssh, address, port, username=None, logger=None):
     :param logger: (optional) logger to record tracebacks to, :class:`logging.Logger`
     :returns: error message if improperly configured, or ``None``. ``str``
     """
-    import paramiko
     try:
         try:
-            if os.path.isfile('/etc/ssh/ssh_known_hosts'): #default ubuntu location
+            if os.path.isfile(
+                    '/etc/ssh/ssh_known_hosts'):  #default ubuntu location
                 ssh.load_system_host_keys('/etc/ssh/ssh_known_hosts')
         except IOError:
             pass
-        ssh.load_system_host_keys() #default user location
+        ssh.load_system_host_keys()  #default user location
     except:
         if logger:
             logger.error(traceback.format_exc())
@@ -93,7 +91,8 @@ def ssh_check_known_hosts(ssh, address, port, username=None, logger=None):
         with open(os.path.join(os.path.expanduser('~'), '.ssh', 'config')) as f:
             ssh_config.parse(f)
             config_lookup = ssh_config.lookup(address)
-            resolved_address = config_lookup['hostname'] if 'hostname' in config_lookup else address
+            resolved_address = config_lookup[
+                'hostname'] if 'hostname' in config_lookup else address
     except:
         resolved_address = address
 
@@ -110,9 +109,9 @@ def ssh_check_known_hosts(ssh, address, port, username=None, logger=None):
     elif hk.lookup(resolved_address) is None:
         port_str = user_str = ''
         if port != 22:
-            port_str = "-p %s "%port
+            port_str = "-p %s " % port
         if username:
-            user_str = username+'@'
+            user_str = username + '@'
         return """%s is not in your SSH known_hosts file.
 
 Please manually:
@@ -121,13 +120,23 @@ Please manually:
 then try roslaunching again.
 
 If you wish to configure roslaunch to automatically recognize unknown
-hosts, please set the environment variable ROSLAUNCH_SSH_UNKNOWN=1"""%(resolved_address, port_str, user_str, resolved_address)
-        
-class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
+hosts, please set the environment variable ROSLAUNCH_SSH_UNKNOWN=1""" % (
+            resolved_address, port_str, user_str, resolved_address)
+
+
+class SSHChildROSLaunchProcess(server.ChildROSLaunchProcess):
     """
     Process wrapper for launching and monitoring a child roslaunch process over SSH
     """
-    def __init__(self, run_id, name, server_uri, machine, master_uri=None, sigint_timeout=DEFAULT_TIMEOUT_SIGINT, sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
+
+    def __init__(self,
+                 run_id,
+                 name,
+                 server_uri,
+                 machine,
+                 master_uri=None,
+                 sigint_timeout=DEFAULT_TIMEOUT_SIGINT,
+                 sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
         """
         :param machine: Machine instance. Must be fully configured.
             machine.env_loader is required to be set.
@@ -137,9 +146,15 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
         :type sigterm_timeout: float
         """
         if not machine.env_loader:
-            raise ValueError("machine.env_loader must have been assigned before creating ssh child instance")
-        args = [machine.env_loader, 'roslaunch', '-c', name, '-u', server_uri, '--run_id', run_id,
-                '--sigint-timeout', str(sigint_timeout), '--sigterm-timeout', str(sigterm_timeout)]
+            raise ValueError(
+                "machine.env_loader must have been assigned before creating ssh child instance"
+            )
+        args = [
+            machine.env_loader, 'roslaunch', '-c', name, '-u', server_uri,
+            '--run_id', run_id, '--sigint-timeout',
+            str(sigint_timeout), '--sigterm-timeout',
+            str(sigterm_timeout)
+        ]
         # env is always empty dict because we only use env_loader
         super(SSHChildROSLaunchProcess, self).__init__(name, args, {})
         self.machine = machine
@@ -150,26 +165,23 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
         self.started = False
         self.uri = None
         # self.is_dead is a flag set by is_alive that affects whether or not we
-        # log errors during a stop(). 
+        # log errors during a stop().
         self.is_dead = False
-        
+
     def _ssh_exec(self, command, address, port, username=None, password=None):
         """
         :returns: (ssh pipes, message).  If error occurs, returns (None, error message).
         """
         if self.master_uri:
-            env_command = 'env %s=%s' % (rosgraph.ROS_MASTER_URI, self.master_uri)
+            env_command = 'env %s=%s' % (rosgraph.ROS_MASTER_URI,
+                                         self.master_uri)
             command = '%s %s' % (env_command, command)
-        try:
-            import paramiko
-        except ImportError as e:
-            _logger.error("cannot use SSH: paramiko is not installed")
-            return None, "paramiko is not installed"
         #load user's ssh configuration
         config_block = {'hostname': None, 'user': None, 'identityfile': None}
         ssh_config = paramiko.SSHConfig()
         try:
-            with open(os.path.join(os.path.expanduser('~'), '.ssh','config')) as f:
+            with open(os.path.join(os.path.expanduser('~'), '.ssh',
+                                   'config')) as f:
                 ssh_config.parse(f)
                 config_block.update(ssh_config.lookup(address))
         except:
@@ -179,41 +191,61 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
         identity_file = None
         if config_block.get('identityfile', None):
             if isinstance(config_block['identityfile'], list):
-                identity_file = [os.path.expanduser(f) for f in config_block['identityfile']]
+                identity_file = [
+                    os.path.expanduser(f) for f in config_block['identityfile']
+                ]
             else:
                 identity_file = os.path.expanduser(config_block['identityfile'])
         #load ssh client and connect
         ssh = paramiko.SSHClient()
-        err_msg = ssh_check_known_hosts(ssh, address, port, username=username, logger=_logger)
-        
+        err_msg = ssh_check_known_hosts(ssh,
+                                        address,
+                                        port,
+                                        username=username,
+                                        logger=_logger)
+
         if not err_msg:
-            username_str = '%s@'%username if username else ''
+            username_str = '%s@' % username if username else ''
             try:
-                if password is None: #use SSH agent
-                    ssh.connect(address, port, username, timeout=TIMEOUT_SSH_CONNECT, key_filename=identity_file)
-                else: #use SSH with login/pass
-                    ssh.connect(address, port, username, password, timeout=TIMEOUT_SSH_CONNECT)
+                if password is None:  #use SSH agent
+                    ssh.connect(address,
+                                port,
+                                username,
+                                timeout=TIMEOUT_SSH_CONNECT,
+                                key_filename=identity_file)
+                else:  #use SSH with login/pass
+                    ssh.connect(address,
+                                port,
+                                username,
+                                password,
+                                timeout=TIMEOUT_SSH_CONNECT)
             except paramiko.BadHostKeyException:
                 _logger.error(traceback.format_exc())
-                err_msg =  "Unable to verify host key for remote computer[%s:%s]"%(address, port)
+                err_msg = "Unable to verify host key for remote computer[%s:%s]" % (
+                    address, port)
             except paramiko.AuthenticationException:
                 _logger.error(traceback.format_exc())
-                err_msg = "Authentication to remote computer[%s%s:%s] failed.\nA common cause of this error is a missing key in your authorized_keys file."%(username_str, address, port)
+                err_msg = "Authentication to remote computer[%s%s:%s] failed.\nA common cause of this error is a missing key in your authorized_keys file." % (
+                    username_str, address, port)
             except paramiko.SSHException as e:
                 _logger.error(traceback.format_exc())
                 if str(e).startswith("Unknown server"):
                     pass
-                err_msg = "Unable to establish ssh connection to [%s%s:%s]: %s"%(username_str, address, port, e)
+                err_msg = "Unable to establish ssh connection to [%s%s:%s]: %s" % (
+                    username_str, address, port, e)
             except socket.error as e:
                 # #1824
                 if e.args[0] == 111:
-                    err_msg = "network connection refused by [%s:%s]"%(address, port)
+                    err_msg = "network connection refused by [%s:%s]" % (
+                        address, port)
                 else:
-                    err_msg = "network error connecting to [%s:%s]: %s"%(address, port, str(e))
+                    err_msg = "network error connecting to [%s:%s]: %s" % (
+                        address, port, str(e))
         if err_msg:
             return None, err_msg
         else:
-            printlog("launching remote roslaunch child with command: [%s]"%(str(command)))
+            printlog("launching remote roslaunch child with command: [%s]" %
+                     (str(command)))
             sshin, sshout, ssherr = ssh.exec_command(command)
             return (ssh, sshin, sshout, ssherr), "executed remotely"
 
@@ -222,23 +254,29 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
         Start the remote process. This will create an SSH connection
         to the remote host.
         """
-        self.started = False #won't set to True until we are finished
-        self.ssh = self.sshin = self.sshout = self.ssherr = None        
+        self.started = False  #won't set to True until we are finished
+        self.ssh = self.sshin = self.sshout = self.ssherr = None
         with self.lock:
             name = self.name
             m = self.machine
             if m.user is not None:
-                printlog("remote[%s]: creating ssh connection to %s:%s, user[%s]"%(name, m.address, m.ssh_port, m.user))
+                printlog(
+                    "remote[%s]: creating ssh connection to %s:%s, user[%s]" %
+                    (name, m.address, m.ssh_port, m.user))
             else:
-                printlog("remote[%s]: creating ssh connection to %s:%s"%(name, m.address, m.ssh_port))
-            _logger.info("remote[%s]: invoking with ssh exec args [%s]"%(name, ' '.join(self.args)))
-            sshvals, msg = self._ssh_exec(' '.join(self.args), m.address, m.ssh_port, m.user, m.password)
+                printlog("remote[%s]: creating ssh connection to %s:%s" %
+                         (name, m.address, m.ssh_port))
+            _logger.info("remote[%s]: invoking with ssh exec args [%s]" %
+                         (name, ' '.join(self.args)))
+            sshvals, msg = self._ssh_exec(' '.join(self.args), m.address,
+                                          m.ssh_port, m.user, m.password)
             if sshvals is None:
-                printerrlog("remote[%s]: failed to launch on %s:\n\n%s\n\n"%(name, m.name, msg))
+                printerrlog("remote[%s]: failed to launch on %s:\n\n%s\n\n" %
+                            (name, m.name, msg))
                 return False
             self.ssh, self.sshin, self.sshout, self.ssherr = sshvals
-            printlog("remote[%s]: ssh connection created"%name)
-            self.started = True            
+            printlog("remote[%s]: ssh connection created" % name)
+            self.started = True
             return True
 
     def getapi(self):
@@ -249,7 +287,7 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
             return ServerProxy(self.uri)
         else:
             return None
-    
+
     def is_alive(self):
         """
         :returns: ``True`` if the process is alive. is_alive needs to be
@@ -258,7 +296,7 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
         if self.started and not self.ssh:
             return False
         elif not self.started:
-            return True #not started is equivalent to alive in our logic
+            return True  #not started is equivalent to alive in our logic
         s = self.ssherr
         s.channel.settimeout(0)
         try:
@@ -270,7 +308,7 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
             # #2012 il8n: ssh *should* be UTF-8, but often isn't
             # (e.g. Japan)
             data = data.decode('utf-8')
-            printerrlog("remote[%s]: %s"%(self.name, data))
+            printerrlog("remote[%s]: %s" % (self.name, data))
         except socket.timeout:
             pass
         except IOError:
@@ -316,22 +354,26 @@ class SSHChildROSLaunchProcess(roslaunch.server.ChildROSLaunchProcess):
                 # normal if process is already dead
                 address, port = self.machine.address, self.machine.ssh_port
                 if not self.is_dead:
-                    printerrlog("remote[%s]: unable to contact [%s] to shutdown remote processes!"%(self.name, address))
+                    printerrlog(
+                        "remote[%s]: unable to contact [%s] to shutdown remote processes!"
+                        % (self.name, address))
                 else:
-                    printlog("remote[%s]: unable to contact [%s] to shutdown cleanly. The remote roslaunch may have exited already."%(self.name, address))
+                    printlog(
+                        "remote[%s]: unable to contact [%s] to shutdown cleanly. The remote roslaunch may have exited already."
+                        % (self.name, address))
             except:
-                # temporary: don't really want to log here as this 
+                # temporary: don't really want to log here as this
                 # may occur during shutdown
                 traceback.print_exc()
 
             _logger.info("remote[%s]: closing ssh connection", self.name)
             self.sshin.close()
             self.sshout.close()
-            self.ssherr.close()                        
+            self.ssherr.close()
             self.ssh.close()
 
-            self.sshin  = None
+            self.sshin = None
             self.sshout = None
-            self.ssherr = None            
+            self.ssherr = None
             self.ssh = None
-            _logger.info("remote[%s]: ssh connection closed", self.name)            
+            _logger.info("remote[%s]: ssh connection closed", self.name)

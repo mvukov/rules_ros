@@ -31,38 +31,31 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
-from __future__ import print_function
-
 """
 Utility module of roslaunch that computes the command-line arguments
 for a node.
 """
 
-import logging
 import os
 import shlex
 import sys
-import time
 
-import rospkg
 import rosgraph
 import rosgraph.names
 from rosgraph.names import script_resolve_name
 
-import roslib.packages
+from third_party.legacy_roslaunch import substitution_args
+from third_party.legacy_roslaunch import xmlloader
+from third_party.legacy_roslaunch.config import load_config_default
+from third_party.legacy_roslaunch.core import setup_env, local_machine, RLException
 
-from . import substitution_args
-
-from roslaunch.core import setup_env, local_machine, RLException
-from roslaunch.config import load_config_default
-import roslaunch.xmlloader
 
 class NodeParamsException(Exception):
     """
     Exception to indicate that node parameters were invalid
     """
     pass
+
 
 def get_node_list(config):
     """
@@ -71,9 +64,11 @@ def get_node_list(config):
     @return: list of node names in config
     @rtype: [str]
     """
-    l = [_resolved_name(node) for node in config.nodes] + [_resolved_name(test) for test in config.tests]
+    l = [_resolved_name(node) for node in config.nodes
+        ] + [_resolved_name(test) for test in config.tests]
     # filter out unnamed nodes
     return [x for x in l if x]
+
 
 def print_node_list(roslaunch_files):
     """
@@ -84,20 +79,25 @@ def print_node_list(roslaunch_files):
     @type  roslaunch_files: str
     """
     try:
-        loader = roslaunch.xmlloader.XmlLoader(resolve_anon=False)
-        config = load_config_default(roslaunch_files, None, loader=loader, verbose=False, assign_machines=False)
+        loader = xmlloader.XmlLoader(resolve_anon=False)
+        config = load_config_default(roslaunch_files,
+                                     None,
+                                     loader=loader,
+                                     verbose=False,
+                                     assign_machines=False)
         node_list = get_node_list(config)
         print('\n'.join(node_list))
     except RLException as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
 
+
 def print_node_args(node_name, roslaunch_files):
     """
     Print arguments of node to screen. Will cause system exit if
     exception occurs. This is a subroutine for the roslaunch main
     handler.
-    
+
     @param node_name: node name
     @type  node_name: str
     @param roslaunch_files: list of launch files to load
@@ -115,7 +115,8 @@ def print_node_args(node_name, roslaunch_files):
     except RLException as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
-    
+
+
 def _resolved_name(node):
     if node.name:
         # $(anon id) passthrough
@@ -126,30 +127,41 @@ def _resolved_name(node):
     else:
         return None
 
+
 def print_node_filename(node_name, roslaunch_files):
     try:
         # #2309
         node_name = script_resolve_name('roslaunch', node_name)
-        
-        loader = roslaunch.xmlloader.XmlLoader(resolve_anon=False)
-        config = load_config_default(roslaunch_files, None, loader=loader, verbose=False, assign_machines=False)
+
+        loader = xmlloader.XmlLoader(resolve_anon=False)
+        config = load_config_default(roslaunch_files,
+                                     None,
+                                     loader=loader,
+                                     verbose=False,
+                                     assign_machines=False)
         nodes = [n for n in config.nodes if _resolved_name(n) == node_name] + \
             [t for t in config.tests if _resolved_name(t) == node_name]
 
         if len(nodes) > 1:
-            raise RLException("ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."%(node_name, ', '.join(roslaunch_files)))
+            raise RLException(
+                "ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."
+                % (node_name, ', '.join(roslaunch_files)))
         if not nodes:
-            print('ERROR: cannot find node named [%s]. Run \n\troslaunch --nodes <files>\nto see list of node names.' % (node_name), file=sys.stderr)
+            print(
+                'ERROR: cannot find node named [%s]. Run \n\troslaunch --nodes <files>\nto see list of node names.'
+                % (node_name),
+                file=sys.stderr)
         else:
             print(nodes[0].filename)
-        
+
     except RLException as e:
         print(str(e), file=sys.stderr)
         sys.exit(1)
 
+
 def get_node_args(node_name, roslaunch_files):
     """
-    Get the node arguments for a node in roslaunch_files. 
+    Get the node arguments for a node in roslaunch_files.
 
     @param node_name: name of node in roslaunch_files.
     @type  node_name: str
@@ -159,25 +171,35 @@ def get_node_args(node_name, roslaunch_files):
     @rtype: [str]
     @raise RLException: if node args cannot be retrieved
     """
-    
+
     # we have to create our own XmlLoader so that we can use the same
     # resolution context for substitution args
 
-    loader = roslaunch.xmlloader.XmlLoader(resolve_anon=False)
-    config = load_config_default(roslaunch_files, None, loader=loader, verbose=False, assign_machines=False)
-    (node_name) = substitution_args.resolve_args((node_name), resolve_anon=False)
-    node_name = script_resolve_name('roslaunch', node_name) if not node_name.startswith('$') else node_name
-    
+    loader = xmlloader.XmlLoader(resolve_anon=False)
+    config = load_config_default(roslaunch_files,
+                                 None,
+                                 loader=loader,
+                                 verbose=False,
+                                 assign_machines=False)
+    (node_name) = substitution_args.resolve_args((node_name),
+                                                 resolve_anon=False)
+    node_name = script_resolve_name(
+        'roslaunch', node_name) if not node_name.startswith('$') else node_name
+
     node = [n for n in config.nodes if _resolved_name(n) == node_name] + \
         [n for n in config.tests if _resolved_name(n) == node_name]
     if not node:
         node_list = get_node_list(config)
-        node_list_str = '\n'.join([" * %s"%x for x in node_list])
-        raise RLException("ERROR: Cannot find node named [%s] in [%s].\nNode names are:\n%s"%(node_name, ', '.join(roslaunch_files), node_list_str))
+        node_list_str = '\n'.join([" * %s" % x for x in node_list])
+        raise RLException(
+            "ERROR: Cannot find node named [%s] in [%s].\nNode names are:\n%s" %
+            (node_name, ', '.join(roslaunch_files), node_list_str))
     elif len(node) > 1:
-        raise RLException("ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."%(node_name, ', '.join(roslaunch_files)))
+        raise RLException(
+            "ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."
+            % (node_name, ', '.join(roslaunch_files)))
     node = node[0]
-    
+
     master_uri = rosgraph.get_master_uri()
     machine = local_machine()
     env = setup_env(node, machine, master_uri)
@@ -195,11 +217,12 @@ def get_node_args(node_name, roslaunch_files):
     if sys.platform == "win32":
         # set command can be used with environment variables that contain space without double quotes
         # https://ss64.com/nt/set.html
-        return ["set %s=%s&&"%(k, v) for k, v in env.items()] + args
+        return ["set %s=%s&&" % (k, v) for k, v in env.items()] + args
     else:
         # sys.platform.startswith('linux')
         # join environment vars are bash prefix args, wrap with double quotes for variables that contains space
-        return ['%s="%s"'%(k, v) for k, v in env.items()] + args
+        return ['%s="%s"' % (k, v) for k, v in env.items()] + args
+
 
 def _launch_prefix_args(node):
     if node.launch_prefix:
@@ -214,8 +237,6 @@ def _launch_prefix_args(node):
     else:
         return []
 
-_rospack = None
-
 
 def create_local_process_args(node, machine, env=None):
     """
@@ -227,56 +248,43 @@ def create_local_process_args(node, machine, env=None):
     :raises: :exc:`NodeParamsException` If args cannot be constructed for Node
       as specified (e.g. the node type does not exist)
     """
-    global _rospack
-    if not node.name:
-        raise ValueError("node name must be defined")
-    # create rospack instance if no cached value is available or for custom environments
-    if not _rospack or env is not None:
-        rospack = rospkg.RosPack(rospkg.get_ros_paths(env=env))
-        # cache rospack instance for default environment
-        if env is None:
-            _rospack = rospack
-    else:
-        rospack = _rospack
-    
+
     # - Construct rosrun command
-    remap_args = ["%s:=%s"%(src,dst) for src, dst in node.remap_args]
+    remap_args = ["%s:=%s" % (src, dst) for src, dst in node.remap_args]
     resolve_dict = {}
 
     #resolve args evaluates substitution commands
     #shlex parses a command string into a list of args
     # - for the local process args, we *do* resolve the anon tag so that the user can execute
     # - the node name and args must be resolved together in case the args refer to the anon node name
-    (node_name) = substitution_args.resolve_args((node.name), context=resolve_dict, resolve_anon=True)
+    (node_name) = substitution_args.resolve_args((node.name),
+                                                 context=resolve_dict,
+                                                 resolve_anon=True)
     node.name = node_name
-    remap_args.append('__name:=%s'%node_name)
-        
-    resolved = substitution_args.resolve_args(node.args, context=resolve_dict, resolve_anon=True)
+    remap_args.append('__name:=%s' % node_name)
+
+    resolved = substitution_args.resolve_args(node.args,
+                                              context=resolve_dict,
+                                              resolve_anon=True)
     try:
         if type(resolved) == unicode:
-            resolved = resolved.encode('UTF-8') #attempt to force to string for shlex/subprocess
+            resolved = resolved.encode(
+                'UTF-8')  #attempt to force to string for shlex/subprocess
     except NameError:
         pass
     os_posix = os.name == "posix"
     args = shlex.split(resolved, posix=os_posix) + remap_args
-    try:
-        #TODO:fuerte: pass through rospack and catkin cache
-        matches = roslib.packages.find_node(node.package, node.type, rospack=rospack)
-    except rospkg.ResourceNotFound as e:
-        # multiple nodes, invalid package
-        raise NodeParamsException(str(e))
-    if not matches:
-        raise NodeParamsException("Cannot locate node of type [%s] in package [%s]. Make sure file exists in package path and permission is set to executable (chmod +x)"%(node.type, node.package))
-    else:
-        # old behavior was to take first, do we want to change this in Fuerte-style?
-        cmd = matches[0]
+    cmd = node.type
     if not cmd:
-        raise NodeParamsException("Cannot locate node of type [%s] in package [%s]"%(node.type, node.package))
+        raise NodeParamsException(
+            "Cannot locate node of type [%s] in package [%s]" %
+            (node.type, node.package))
     cmd = [cmd]
 
     # Python scripts in ROS tend to omit .py extension since they could become executable
     # by adding a shebang line (#!/usr/bin/env python) in Linux environments
     # special handle this case by executing the script with the Python executable in Windows environment
-    if sys.platform in ['win32'] and os.path.splitext(cmd[0])[1].lower() in ['.py', '']:
+    if sys.platform in ['win32'] and os.path.splitext(
+            cmd[0])[1].lower() in ['.py', '']:
         cmd = ['python'] + cmd
     return _launch_prefix_args(node) + cmd + args
