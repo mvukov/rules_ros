@@ -109,6 +109,10 @@ cc_library(
     ],
 )
 
+exports_files([
+    "tools/rosgraph/conf/python_logging.conf",
+])
+
 py_library(
     name = "rosgraph",
     srcs = glob(["tools/rosgraph/src/**/*.py"]),
@@ -118,17 +122,29 @@ py_library(
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
+    data = ["tools/rosgraph/conf/python_logging.conf"],
     visibility = ["//visibility:public"],
 )
 
 py_library(
-    name = "rosmaster",
-    srcs = glob(["tools/rosmaster/src/**/*.py"]),
+    name = "rosmaster_lib",
+    srcs = glob(
+        ["tools/rosmaster/src/**/*.py"],
+        exclude = ["tools/rosmaster/src/rosmaster/main.py"]
+    ),
     imports = ["tools/rosmaster/src"],
     deps = [
         ":rosgraph",
         requirement("defusedxml"),
     ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "rosmaster",
+    srcs = ["tools/rosmaster/src/rosmaster/main.py"],
+    main = "tools/rosmaster/src/rosmaster/main.py",
+    deps = [":rosmaster_lib"],
     visibility = ["//visibility:public"],
 )
 

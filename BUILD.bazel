@@ -16,13 +16,13 @@ py_library(
 )
 
 alias(
-    name = "rosgraph",
-    actual = "//third_party:rosgraph",
+    name = "rosmaster",
+    actual = "@ros_comm//:rosmaster",
 )
 
 alias(
-    name = "rosmaster",
-    actual = "//third_party:rosmaster",
+    name = "rosgraph",
+    actual = "//third_party:rosgraph",
 )
 
 alias(

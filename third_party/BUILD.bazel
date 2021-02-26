@@ -9,14 +9,6 @@ py_binary(
 )
 
 py_binary(
-    name = "rosmaster",
-    srcs = ["rosmaster_app.py"],
-    main = "rosmaster_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosmaster"],
-)
-
-py_binary(
     name = "rosparam",
     srcs = ["rosparam_app.py"],
     main = "rosparam_app.py",
