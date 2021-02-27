@@ -32,6 +32,9 @@
 #
 # Revision $Id$
 
+# pylint: disable=bare-except,broad-except
+# pylint: disable=line-too-long
+
 import os
 import logging
 import socket

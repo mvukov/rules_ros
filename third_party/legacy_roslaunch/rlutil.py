@@ -35,12 +35,15 @@ Uncategorized utility routines for roslaunch.
 This API should not be considered stable.
 """
 
+# pylint: disable=bare-except,unnecessary-pass,invalid-name,global-statement
+# pylint: disable=line-too-long
+
 import os
 import platform
 import sys
 import time
 
-# import rosclean  # TODO!!!
+import rosclean
 import rospkg
 import rosgraph
 

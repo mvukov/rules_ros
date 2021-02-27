@@ -36,7 +36,9 @@ Top-level implementation of launching processes. Coordinates
 lower-level libraries.
 """
 
-import os
+# pylint: disable=bare-except,broad-except,unnecessary-pass,logging-not-lazy,raise-missing-from,
+# pylint: disable=line-too-long
+
 import logging
 import subprocess
 import sys
@@ -49,7 +51,7 @@ import rosgraph.network
 from rosmaster.master_api import NUM_WORKERS
 
 from third_party.legacy_roslaunch import node_args
-from third_party.legacy_roslaunch.core import *
+from third_party.legacy_roslaunch.core import RLException, printerrlog, is_machine_local, printlog, printlog_bold, setup_env, PHASE_SETUP, socket, get_ros_root
 from third_party.legacy_roslaunch.nodeprocess import create_master_process, create_node_process, DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
 from third_party.legacy_roslaunch.pmon import start_process_monitor, ProcessListener
 from third_party.legacy_roslaunch.rlutil import update_terminal_name
@@ -213,7 +215,7 @@ class _ROSLaunchListeners(ProcessListener):
         for l in self.process_listeners:
             try:
                 l.process_died(process_name, exit_code)
-            except Exception as e:
+            except Exception:
                 logging.getLogger('roslaunch').error(traceback.format_exc())
 
 
@@ -538,8 +540,8 @@ class ROSLaunchRunner(object):
             cmd = e.command
             cmd = "%s %s" % (cmd, ' '.join(e.args))
             print("running %s" % cmd)
-            local_machine = self.config.machines['']
-            env = setup_env(None, local_machine, self.config.master.uri)
+            env = setup_env(None, self.config.machines[''],
+                            self.config.master.uri)
             retcode = subprocess.call(cmd, shell=True, env=env)
             if retcode < 0:
                 raise RLException("command [%s] failed with exit code %s" %
@@ -583,7 +585,7 @@ class ROSLaunchRunner(object):
 
         for node in tolaunch:
             node_name = rosgraph.names.ns_join(node.namespace, node.name)
-            name, success = self.launch_node(node, core=True)
+            _, success = self.launch_node(node, core=True)
             if success:
                 print("started core service [%s]" % node_name)
             else:
@@ -754,7 +756,7 @@ class ROSLaunchRunner(object):
         """
         self.logger.info("... preparing to run test [%s] of type [%s/%s]",
                          test.test_name, test.package, test.type)
-        proc_h, success = self.launch_node(test)
+        _, success = self.launch_node(test)
         if not success:
             raise RLException("test [%s] failed to launch" % test.test_name)
 

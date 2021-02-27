@@ -33,6 +33,9 @@
 Core roslaunch model and lower-level utility routines.
 """
 
+# pylint: disable=invalid-name,unnecessary-pass,global-statement,bare-except,raise-missing-from,logging-not-lazy,dangerous-default-value,len-as-condition,singleton-comparison,useless-super-delegation
+# pylint: disable=line-too-long
+
 import getpass
 import logging
 import os
@@ -195,7 +198,7 @@ def clear_printerrlog_handlers():
     del _printerrlog_handlers[:]
 
 
-def setup_env(node, machine, master_uri, env=None):
+def setup_env(node, _machine, master_uri, env=None):
     """
     Create dictionary of environment variables to set for launched
     process.
@@ -279,7 +282,7 @@ class Master(object):
     # deprecated
     ZENMASTER = 'zenmaster'
 
-    def __init__(self, type_=None, uri=None, auto=None):
+    def __init__(self, type_=None, uri=None, _auto=None):
         """
         Create new Master instance.
         :param uri: master URI. Defaults to ROS_MASTER_URI environment variable, ``str``
@@ -332,10 +335,9 @@ class Master(object):
                 socket.setdefaulttimeout(5.0)
                 logging.getLogger('roslaunch').info('master.is_running[%s]' %
                                                     self.uri)
-                code, status, val = self.get().getPid('/roslaunch')
+                code, _, _ = self.get().getPid('/roslaunch')
                 if code != 1:
-                    raise RLException("ERROR: master failed status check: %s" %
-                                      msg)
+                    raise RLException("ERROR: master failed status check")
                 logging.getLogger('roslaunch.core').debug(
                     'master.is_running[%s]: True' % self.uri)
                 return True
@@ -371,7 +373,7 @@ class Machine(object):
                  user=None,
                  password=None,
                  assignable=True,
-                 env_args=[],
+                 _env_args=[],
                  timeout=None):
         """
         :param name: machine name, ``str``
@@ -550,7 +552,7 @@ class Node(object):
         return 'node'
 
     def xmlattrs(self):
-        name_str = cwd_str = respawn_str = None
+        name_str = cwd_str = None
         if self.name:
             name_str = self.name
 

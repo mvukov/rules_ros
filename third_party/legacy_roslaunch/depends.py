@@ -34,6 +34,9 @@ Utility module of roslaunch that extracts dependency information from
 roslaunch files, including calculating missing package dependencies.
 """
 
+# pylint: disable=unnecessary-pass,singleton-comparison,redefined-builtin,raise-missing-from,len-as-condition,dangerous-default-value
+# pylint: disable=line-too-long
+
 import os
 import re
 import sys
@@ -258,13 +261,12 @@ def rl_file_deps(file_deps, launch_file, verbose=False):
 
 
 def fullusage():
-    name = NAME
     print("""Usage:
-\t%(name)s [options] <file-or-package>
-""" % locals())
+\t{} [options] <file-or-package>
+""".format(NAME))
 
 
-def print_deps(base_pkg, file_deps, verbose):
+def print_deps(_base_pkg, file_deps, verbose):
     pkgs = []
 
     # for verbose output we print extra source information
@@ -289,7 +291,7 @@ def print_deps(base_pkg, file_deps, verbose):
     print(' '.join([p for p in set(pkgs)]))
 
 
-def calculate_missing(base_pkg, missing, file_deps, use_test_depends=False):
+def calculate_missing(_base_pkg, missing, file_deps, use_test_depends=False):
     """
     Calculate missing package dependencies in the manifest. This is
     mainly used as a subroutine of roslaunch_deps().

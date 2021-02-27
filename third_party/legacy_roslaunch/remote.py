@@ -35,6 +35,9 @@
 Integrates roslaunch remote process launching capabilities.
 """
 
+# pylint: disable=super-init-not-called,broad-except,logging-not-lazy,unpacking-non-sequence,attribute-defined-outside-init
+# pylint: disable=line-too-long
+
 import logging
 import socket
 import time
@@ -230,13 +233,13 @@ in your launch""" % '\n'.join([
                                 (child.name, child.uri, msg))
                     self._assume_failed(nodes, failed)
             except socket.error as e:
-                errno, msg = e
+                _, msg = e
                 printerrlog('error launching on [%s, uri %s]: %s' %
                             (child.name, child.uri, str(msg)))
                 self._assume_failed(nodes, failed)
 
             except socket.gaierror as e:
-                errno, msg = e
+                _, msg = e
                 # usually errno == -2. See #815.
                 child_host, _ = rosgraph.network.parse_http_host_and_port(
                     child.uri)

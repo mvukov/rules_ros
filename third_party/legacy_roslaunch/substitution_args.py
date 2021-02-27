@@ -36,6 +36,9 @@ Library for processing XML substitution args. This is currently used
 by roslaunch and xacro, but it is not yet a top-level ROS feature.
 """
 
+# pylint: disable=eval-used
+# pylint: disable=line-too-long
+
 import math
 import os
 from io import StringIO  # Python 3.x
@@ -65,7 +68,7 @@ def _eval_env(name):
                                     str(e)) from e
 
 
-def _env(resolved, a, args, context):
+def _env(resolved, a, args, _context):
     """
     process $(env) arg
     @return: updated resolved argument
@@ -84,7 +87,7 @@ def _eval_optenv(name, default=''):
     return default
 
 
-def _optenv(resolved, a, args, context):
+def _optenv(resolved, a, args, _context):
     """
     process $(optenv) arg
     @return: updated resolved argument
@@ -134,7 +137,7 @@ def _eval_dirname(filename):
     return os.path.abspath(os.path.dirname(filename))
 
 
-def _dirname(resolved, a, args, context):
+def _dirname(resolved, a, _args, context):
     """
     process $(dirname)
     @return: updated resolved argument
@@ -307,7 +310,7 @@ def _eval(s, context):
     return str(eval(s, {}, _DictWrapper(context['arg'], functions)))
 
 
-def resolve_args(arg_str, context=None, resolve_anon=True, filename=None):
+def resolve_args(arg_str, context=None, resolve_anon=True, _filename=None):
     """
     Resolves substitution args (see wiki spec U{http://ros.org/wiki/roslaunch}).
 
@@ -354,7 +357,7 @@ def resolve_args(arg_str, context=None, resolve_anon=True, filename=None):
     return resolved
 
 
-def _resolve_args(arg_str, context, resolve_anon, commands):
+def _resolve_args(arg_str, context, _resolve_anon, commands):
     valid = ['find', 'env', 'optenv', 'dirname', 'anon', 'arg']
     resolved = arg_str
     for a in _collect_args(arg_str):

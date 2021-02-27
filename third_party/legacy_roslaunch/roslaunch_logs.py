@@ -35,6 +35,8 @@
 Implementation for roslaunch-logs command-line utility.
 """
 
+# pylint: disable=bare-except
+
 import os
 import sys
 from optparse import OptionParser

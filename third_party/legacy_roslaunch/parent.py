@@ -44,6 +44,9 @@ process to launch remote processes, and the child can invoke methods
 on the parent to provide feedback.
 """
 
+# pylint: disable=bare-except
+# pylint: disable=line-too-long
+
 import logging
 
 from rosmaster.master_api import NUM_WORKERS

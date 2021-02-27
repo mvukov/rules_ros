@@ -35,18 +35,23 @@
 Local process implementation for running and monitoring nodes.
 """
 
+# pylint: disable=invalid-name,global-statement,logging-not-lazy,raise-missing-from,broad-except,subprocess-popen-preexec-fn,bare-except
+# pylint: disable=line-too-long
+
 import errno
 import logging
 import os
 import signal
 import subprocess
+import sys
 import time
 import traceback
 
-from rosmaster.master_api import NUM_WORKERS
+import rosgraph
 import rospkg
+from rosmaster.master_api import NUM_WORKERS
 
-from third_party.legacy_roslaunch.core import *
+from third_party.legacy_roslaunch.core import RLException, setup_env, is_child_mode, printerrlog, printlog_bold
 from third_party.legacy_roslaunch.node_args import create_local_process_args
 from third_party.legacy_roslaunch.pmon import Process, FatalProcessLaunch
 
@@ -318,7 +323,6 @@ class LocalProcess(Process):
                 logfileerr = open(errf, mode)
 
         # #986: pass in logfile name to node
-        node_log_file = log_dir
         if self.is_node:
             # #1595: on respawn, these keep appending
             self.args = _cleanup_remappings(self.args, '__log:=')
@@ -528,7 +532,7 @@ executable permission. This is often caused by a bad launch-prefix.""" %
         finally:
             self.popen = None
 
-    def _stop_win32(self, errors):
+    def _stop_win32(self, _errors):
         """
         Win32 implementation of process killing. In part, refer to
 

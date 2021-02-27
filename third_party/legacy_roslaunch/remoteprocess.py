@@ -35,6 +35,9 @@
 Process handler for launching ssh-based roslaunch child processes.
 """
 
+# pylint: disable=bare-except,protected-access,not-an-iterable,logging-not-lazy,len-as-condition
+# pylint: disable=line-too-long
+
 import logging
 import os
 import socket
@@ -352,7 +355,7 @@ class SSHChildROSLaunchProcess(server.ChildROSLaunchProcess):
                     api.shutdown()
             except socket.error:
                 # normal if process is already dead
-                address, port = self.machine.address, self.machine.ssh_port
+                address, _ = self.machine.address, self.machine.ssh_port
                 if not self.is_dead:
                     printerrlog(
                         "remote[%s]: unable to contact [%s] to shutdown remote processes!"

@@ -36,6 +36,9 @@ Defines the L{ROSLaunchConfig} object, which holds and the state of
 the roslaunch file.
 """
 
+# pylint: disable=raise-missing-from,logging-not-lazy,
+# pylint: disable=line-too-long
+
 import logging
 
 import rosgraph.names

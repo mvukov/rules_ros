@@ -35,6 +35,8 @@
 Convience methods for manipulating XML-RPC APIs
 """
 
+# pylint: disable=bare-except,
+
 from xmlrpc.client import ServerProxy
 
 import rosgraph
@@ -86,7 +88,7 @@ def list_processes(roslaunch_uris=None):
     for uri in roslaunch_uris:
         try:
             r = ServerProxy(uri)
-            code, msg, val = r.list_processes()
+            code, _, val = r.list_processes()
             if code == 1:
                 active, dead = val
                 procs.extend(

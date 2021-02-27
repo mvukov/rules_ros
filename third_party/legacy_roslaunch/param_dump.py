@@ -34,6 +34,8 @@
 Dumps parameters from ROSLaunch files to stdout as YAML.
 """
 
+# pylint: disable=broad-except
+
 import sys
 
 import yaml
@@ -51,19 +53,19 @@ def dump_params(files):
     @return: True if loaded parameters successfully
     @rtype: bool
     """
-    config = config.ROSLaunchConfig()
+    launch_config = config.ROSLaunchConfig()
     loader = xmlloader.XmlLoader()
 
     for f in files:
         try:
-            loader.load(f, config, verbose=False)
+            loader.load(f, launch_config, verbose=False)
         except Exception as e:
             sys.stderr.write("Unable to load file %s: %s" % (f, e))
             return False
 
     # Now print params in YAML format.
     params_dict = {}
-    for k, v in config.params.items():
+    for k, v in launch_config.params.items():
         params_dict[str(k)] = v.value
     sys.stdout.write(yaml.safe_dump(params_dict) + '\n')
     return True

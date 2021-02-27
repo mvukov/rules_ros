@@ -45,6 +45,9 @@ processes it launches in order to handle remote launching (or
 execution as a different user).
 """
 
+# pylint: disable=bare-except,broad-except,duplicate-except,logging-not-lazy,raise-missing-from
+# pylint: disable=line-too-long
+
 import errno
 import logging
 import os

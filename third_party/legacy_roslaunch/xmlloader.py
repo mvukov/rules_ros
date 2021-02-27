@@ -35,6 +35,9 @@
 Roslaunch XML file parser.
 """
 
+# pylint: disable=logging-not-lazy,raise-missing-from,unnecessary-pass
+# pylint: disable=line-too-long
+
 import itertools
 import logging
 import sys
@@ -329,7 +332,7 @@ class XmlLoader(loader.Loader):
     ARG_ATTRS = ('name', 'value', 'default', 'doc')
 
     @ifunless
-    def _arg_tag(self, tag, context, ros_config, verbose=True):
+    def _arg_tag(self, tag, context, ros_config, _verbose=True):
         """
         Process an <arg> tag.
         """
@@ -549,7 +552,7 @@ class XmlLoader(loader.Loader):
                      'password', 'default', 'timeout')
 
     @ifunless
-    def _machine_tag(self, tag, context, ros_config, verbose=True):
+    def _machine_tag(self, tag, context, ros_config, _verbose=True):
         try:
             # clone context as <machine> tag sets up its own env args
             context = context.child(None)
@@ -571,7 +574,7 @@ class XmlLoader(loader.Loader):
             attrs = self.opt_attrs(tag, context,
                                    ('env-loader', 'ssh-port', 'user',
                                     'password', 'default', 'timeout'))
-            env_loader, ssh_port, user, password, default, timeout = attrs
+            _, ssh_port, user, password, default, timeout = attrs
 
             ssh_port = int(ssh_port or '22')
 
@@ -612,12 +615,10 @@ class XmlLoader(loader.Loader):
 
             m = Machine(name,
                         address,
-                        env_loader=env_loader,
                         ssh_port=ssh_port,
                         user=user,
                         password=password,
                         assignable=assignable,
-                        env_args=context.env_args,
                         timeout=timeout)
             return (m, is_default)
         except KeyError as e:
@@ -637,7 +638,7 @@ class XmlLoader(loader.Loader):
         try:
             self._check_attrs(tag, context, ros_config, XmlLoader.REMAP_ATTRS)
             return self.reqd_attrs(tag, context, XmlLoader.REMAP_ATTRS)
-        except KeyError as e:
+        except KeyError:
             raise XmlParseException(
                 "<remap> tag is missing required from/to attributes: %s" %
                 tag.toxml())
@@ -762,7 +763,7 @@ class XmlLoader(loader.Loader):
             if tag_name == 'env':
                 self._env_tag(t, child_ns, ros_config)
             elif tag_name == 'arg':
-                self._arg_tag(t, child_ns, ros_config, verbose=verbose)
+                self._arg_tag(t, child_ns, ros_config)
             else:
                 print("WARN: unrecognized '%s' tag in <%s> tag" %
                       (t.tagName, tag.tagName),
@@ -806,7 +807,7 @@ class XmlLoader(loader.Loader):
         for tag in [t for t in tags if t.nodeType == DomNode.ELEMENT_NODE]:
             name = tag.tagName
             if name == 'arg':
-                self._arg_tag(tag, context, ros_config, verbose=verbose)
+                self._arg_tag(tag, context, ros_config)
             elif self.args_only:
                 # do not load other tags
                 continue
@@ -851,10 +852,7 @@ class XmlLoader(loader.Loader):
                         "Invalid <remap> tag: %s.\nXML is %s" %
                         (str(e), tag.toxml()))
             elif name == 'machine':
-                val = self._machine_tag(tag,
-                                        context,
-                                        ros_config,
-                                        verbose=verbose)
+                val = self._machine_tag(tag, context, ros_config)
                 if val is not None:
                     (m, is_default) = val
                     if is_default:

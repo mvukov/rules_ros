@@ -102,7 +102,8 @@ class ROSLaunch(object):
 
     def start(self):
         """
-        Start roslaunch. This will launch any pre-configured launches and spin up the process monitor thread.
+        Start roslaunch. This will launch any pre-configured launches and
+        spin up the process monitor thread.
         """
         self.parent.start(auto_terminate=False)
         self.started = True

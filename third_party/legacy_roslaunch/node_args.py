@@ -36,6 +36,9 @@ Utility module of roslaunch that computes the command-line arguments
 for a node.
 """
 
+# pylint: disable=unnecessary-pass,unidiomatic-typecheck,
+# pylint: disable=line-too-long
+
 import os
 import shlex
 import sys
@@ -238,7 +241,7 @@ def _launch_prefix_args(node):
         return []
 
 
-def create_local_process_args(node, machine, env=None):
+def create_local_process_args(node, _machine, _env=None):
     """
     Subroutine for creating node arguments.
 

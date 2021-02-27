@@ -35,6 +35,9 @@
 General routines and representations for loading roslaunch model.
 """
 
+# pylint: disable=broad-except,unnecessary-pass,raise-missing-from,unidiomatic-typecheck,
+# pylint: disable=line-too-long
+
 import errno
 import os
 import shlex
@@ -471,7 +474,7 @@ class Loader(object):
         else:
             raise ValueError("unknown command %s" % cmd)
 
-    def load_env(self, context, ros_config, name, value):
+    def load_env(self, context, _ros_config, name, value):
         """
         Load environment variable setting
 

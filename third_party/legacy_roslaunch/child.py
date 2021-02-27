@@ -42,6 +42,8 @@ this child process to launch remote processes, and the child can
 invoke methods on the parent to provide feedback.
 """
 
+# pylint: disable=line-too-long
+
 import logging
 import traceback
 
