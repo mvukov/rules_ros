@@ -108,7 +108,16 @@ def ros_repositories():
         http_archive,
         name = "ros_comm",
         build_file = "//repositories:ros_comm.BUILD.bazel",
-        sha256 = "80866101ada505115047d06d20637b60a4cc2828c046ccc78018343229da297b",
-        strip_prefix = "ros_comm-95be1d88ea1ed1352bda0ae66951ac91d60875cc",
-        urls = ["https://github.com/mvukov/ros_comm/archive/95be1d88ea1ed1352bda0ae66951ac91d60875cc.tar.gz"],
+        sha256 = "91ac044dd0abfdd1ae7a01795446c5f674c0bbee8a535796fb0d549ab367456e",
+        strip_prefix = "ros_comm-eeb8d32723092749b4a1be2bb1677ad5bbcb383b",
+        urls = ["https://github.com/mvukov/ros_comm/archive/eeb8d32723092749b4a1be2bb1677ad5bbcb383b.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "ros_ros",
+        build_file = "//repositories:ros.BUILD.bazel",
+        sha256 = "7a1e729de9be807862b6ed721475fec74583f6dc0c06b233b06b1b9fda31291e",
+        strip_prefix = "ros-1.15.7",
+        urls = ["https://github.com/ros/ros/archive/1.15.7.tar.gz"],
     )
