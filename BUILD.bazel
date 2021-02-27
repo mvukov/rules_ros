@@ -1,5 +1,7 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
+exports_files(["pylint.rc"])
+
 py_library(
     name = "py_roslib_slim",
     srcs = [
@@ -16,8 +18,8 @@ py_library(
 )
 
 alias(
-    name = "rosmaster",
-    actual = "@ros_comm//:rosmaster",
+    name = "roscore",
+    actual = "//third_party/legacy_roslaunch:roscore",
 )
 
 alias(

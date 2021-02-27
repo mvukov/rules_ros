@@ -1,3 +1,4 @@
+load("//ros:launch.bzl", "ros_launch")
 load(
     "//ros:message_generation.bzl",
     "cc_ros_msg_library",
@@ -63,6 +64,15 @@ py_binary(
     deps = [
         ":py_example_msgs",
         "@ros_comm//:rospy",
+    ],
+)
+
+ros_launch(
+    name = "chatter",
+    launch_files = ["//examples:chatter.launch"],
+    nodes = [
+        ":talker",
+        ":listener",
     ],
 )
 

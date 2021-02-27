@@ -1,3 +1,4 @@
 exports_files([
+    "launch.bzl",
     "message_generation.bzl",
 ])

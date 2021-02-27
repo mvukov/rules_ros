@@ -130,7 +130,7 @@ py_library(
     name = "rosmaster_lib",
     srcs = glob(
         ["tools/rosmaster/src/**/*.py"],
-        exclude = ["tools/rosmaster/src/rosmaster/main.py"]
+        exclude = ["tools/rosmaster/src/rosmaster/main.py"],
     ),
     imports = ["tools/rosmaster/src"],
     deps = [
