@@ -52,7 +52,6 @@ from third_party.legacy_roslaunch import param_dump
 from third_party.legacy_roslaunch import parent
 from third_party.legacy_roslaunch import rlutil
 from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.launch import ROSLaunchRunner
 from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
 
 NAME = 'roslaunch'
@@ -276,8 +275,6 @@ def _validate_args(parser, options, args):
         if args:
             parser.error("Input files are not allowed when run in child mode")
     elif options.core:
-        if args:
-            parser.error("Input files are not allowed when launching core")
         if options.run_id:
             parser.error(
                 "--run_id should only be set for child roslaunches (-c)")
@@ -317,7 +314,7 @@ def handle_exception(roslaunch_core, logger, msg, e):
     sys.exit(1)
 
 
-def main(argv=sys.argv):
+def main(argv):
     options = None
     logger = None
     try:
@@ -354,7 +351,7 @@ def main(argv=sys.argv):
         if options.wait_for_master:
             if options.core:
                 parser.error("--wait cannot be used with roscore")
-            rlutil._wait_for_master()
+            rlutil.wait_for_master()
 
         # write the pid to a file
         write_pid_file(options.pid_fn, options.core, options.port)
@@ -448,4 +445,4 @@ def main(argv=sys.argv):
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

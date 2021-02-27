@@ -46,7 +46,7 @@ import rosgraph
 
 from third_party.legacy_roslaunch import core
 from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.config import load_config_default, get_roscore_filename
+from third_party.legacy_roslaunch.config import load_config_default
 
 
 def check_log_disk_usage():
@@ -80,42 +80,10 @@ def resolve_launch_arguments(args):
 
     # strip remapping args for processing
     args = rosgraph.myargv(args)
-
-    # user can either specify:
-    #  - filename + launch args
-    #  - package + relative-filename + launch args
-    if not args:
-        return args
-    resolved_args = None
-
-    # try to resolve launch file in package first
-    if len(args) >= 2:
-        try:
-            resolved = [args[1]]
-            if len(resolved) > 1:
-                raise core.RLException(
-                    "multiple files named [%s] in package [%s]:%s\nPlease specify full path instead"
-                    % (args[1], args[0], ''.join(
-                        ['\n- %s' % r for r in resolved])))
-            if len(resolved) == 1:
-                resolved_args = [resolved[0]] + args[2:]
-        except rospkg.ResourceNotFound:
-            pass
-    # try to resolve launch file
-    if resolved_args is None and (args[0] == '-' or os.path.isfile(args[0])):
-        resolved_args = [args[0]] + args[1:]
-    # raise if unable to resolve
-    if resolved_args is None:
-        if len(args) >= 2:
-            raise core.RLException(
-                "[%s] is neither a launch file in package [%s] nor is [%s] a launch file name"
-                % (args[1], args[0], args[0]))
-        else:
-            raise core.RLException("[%s] is not a launch file name" % args[0])
-    return resolved_args
+    return list(set(args))
 
 
-def _wait_for_master():
+def wait_for_master():
     """
     Block until ROS Master is online
 
@@ -207,10 +175,7 @@ def print_file_list(roslaunch_files):
                                      loader=loader,
                                      verbose=False,
                                      assign_machines=False)
-        files = [
-            os.path.abspath(x)
-            for x in set(config.roslaunch_files) - set([get_roscore_filename()])
-        ]
+        files = [os.path.abspath(x) for x in set(config.roslaunch_files)]
         print('\n'.join(files))
     except core.RLException as e:
         print(str(e), file=sys.stderr)

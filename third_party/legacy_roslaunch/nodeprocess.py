@@ -65,7 +65,6 @@ def _next_counter():
 
 
 def create_master_process(run_id,
-                          type_,
                           ros_root,
                           port,
                           num_workers=NUM_WORKERS,
@@ -75,8 +74,6 @@ def create_master_process(run_id,
                           sigterm_timeout=DEFAULT_TIMEOUT_SIGTERM):
     """
     Launch a master
-    @param type_: name of master executable (currently just Master.ZENMASTER)
-    @type  type_: str
     @param ros_root: ROS_ROOT environment setting
     @type  ros_root: str
     @param port: port to launch master on
@@ -96,20 +93,19 @@ def create_master_process(run_id,
     if port < 1 or port > 65535:
         raise RLException("invalid port assignment: %s" % port)
 
-    _logger.info("create_master_process: %s, %s, %s, %s, %s, %s", type_,
-                 ros_root, port, num_workers, timeout, master_logger_level)
-    # catkin/fuerte: no longer use ROS_ROOT-relative executables, search path instead
-    master = type_
-    # zenmaster is deprecated and aliased to rosmaster
-    if type_ in [Master.ROSMASTER, Master.ZENMASTER]:
-        package = 'rosmaster'
-        args = [master, '--core', '-p', str(port), '-w', str(num_workers)]
-        if timeout is not None:
-            args += ['-t', str(timeout)]
-        if master_logger_level:
-            args += ['--master-logger-level', str(master_logger_level)]
-    else:
-        raise RLException("unknown master typ_: %s" % type_)
+    _logger.info("create_master_process: %s, %s, %s, %s, %s", ros_root, port,
+                 num_workers, timeout, master_logger_level)
+
+    package = ''
+    args = [
+        'external/ros_comm/rosmaster', '--core', '-p',
+        str(port), '-w',
+        str(num_workers)
+    ]
+    if timeout is not None:
+        args += ['-t', str(timeout)]
+    if master_logger_level:
+        args += ['--master-logger-level', str(master_logger_level)]
 
     _logger.info("process[master]: launching with args [%s]" % args)
     log_output = False
@@ -187,7 +183,7 @@ def create_node_process(run_id,
     _logger.debug('process[%s]: returning LocalProcess wrapper')
     return LocalProcess(run_id, node.package, name, args, env, log_output, \
             respawn=node.respawn, respawn_delay=node.respawn_delay, \
-            required=node.required, cwd=node.cwd, \
+            required=node.required, \
             sigint_timeout=sigint_timeout, sigterm_timeout=sigterm_timeout)
 
 
@@ -242,6 +238,8 @@ class LocalProcess(Process):
         super(LocalProcess, self).__init__(package, name, args, env, respawn,
                                            respawn_delay, required)
 
+        if cwd:
+            raise RLException("cwd usage is deprecated and should not be used!")
         if sigint_timeout <= 0:
             raise RLException(
                 "sigint_timeout must be a positive number, received %f" %
@@ -256,7 +254,6 @@ class LocalProcess(Process):
         self.log_output = log_output
         self.started = False
         self.stopped = False
-        self.cwd = cwd
         self.log_dir = None
         self.pid = -1
         self.is_node = is_node
@@ -273,8 +270,6 @@ class LocalProcess(Process):
         if self.run_id:
             info['run_id'] = self.run_id
         info['log_output'] = self.log_output
-        if self.cwd is not None:
-            info['cwd'] = self.cwd
         return info
 
     def _configure_logging(self):
@@ -362,24 +357,8 @@ class LocalProcess(Process):
                 # proper file.
                 logfileout, logfileerr = subprocess.PIPE, subprocess.PIPE
 
-            if self.cwd == 'node':
-                cwd = os.path.dirname(self.args[0])
-            elif self.cwd == 'cwd':
-                cwd = os.getcwd()
-            elif self.cwd == 'ros-root':
-                cwd = get_ros_root()
-            else:
-                cwd = rospkg.get_ros_home()
-            if not os.path.exists(cwd):
-                try:
-                    os.makedirs(cwd)
-                except OSError:
-                    # exist_ok=True
-                    pass
-
             _logger.info("process[%s]: start w/ args [%s]", self.name,
                          self.args)
-            _logger.info("process[%s]: cwd will be [%s]", self.name, cwd)
 
             try:
                 preexec_function = os.setsid
@@ -390,7 +369,6 @@ class LocalProcess(Process):
 
             try:
                 self.popen = subprocess.Popen(self.args,
-                                              cwd=cwd,
                                               stdout=logfileout,
                                               stderr=logfileerr,
                                               env=full_env,

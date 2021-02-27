@@ -36,11 +36,8 @@ Defines the L{ROSLaunchConfig} object, which holds and the state of
 the roslaunch file.
 """
 
-import os
 import logging
 
-import rospkg
-import rospkg.distro
 import rosgraph.names
 import rosgraph.network
 
@@ -69,51 +66,14 @@ def namespaces_of(name):
     return ['/'] + ['/' + '/'.join(splits[:i]) for i in range(1, len(splits))]
 
 
-def get_roscore_filename():
-    # precedence: look for version in /etc/ros.  If it's not there, fall back to roslaunch package
-    filename = os.path.join(rospkg.get_etc_ros_dir(), 'roscore.xml')
-    if os.path.isfile(filename):
-        return filename
-    r = rospkg.RosPack()
-    return os.path.join(r.get_path('roslaunch'), 'resources', 'roscore.xml')
-
-
-def load_roscore(loader_module, config, verbose=True):
-    """
-    Load roscore configuration into the ROSLaunchConfig using the specified XmlLoader
-    @param config ROSLaunchConfig
-    @param loader XmlLoader
-    """
-    f_roscore = get_roscore_filename()
-    logging.getLogger('roslaunch').info('loading roscore config file %s' %
-                                        f_roscore)
-    loader_module.load(f_roscore, config, core=True, verbose=verbose)
-
-
-def calculate_env_loader(env=None):
-    """
-    @raise RLException
-    """
-    if env is None:
-        env = os.environ
-    # guess the env loader based on distro name
-    distro_name = rospkg.distro.current_distro_codename()
-    # sanity check
-    if distro_name in ['electric', 'diamondback', 'cturtle']:
-        raise RLException(
-            "This version of roslaunch is not compatible with pre-Fuerte ROS distributions"
-        )
-    return '/opt/ros/%s/env.sh' % (distro_name)
-
-
 def _summary_name(node):
     """
     Generate summary label for node based on its package, type, and name
     """
     if node.name:
-        return "%s (%s/%s)" % (node.name, node.package, node.type)
+        return "%s (%s)" % (node.name, node.type)
     else:
-        return "%s/%s" % (node.package, node.type)
+        return node.type
 
 
 class ROSLaunchConfig(object):
@@ -351,10 +311,6 @@ class ROSLaunchConfig(object):
         @raises RLException: if cannot add machine as specified
         """
         name = m.name
-        # Fuerte: all machines must have an env loader. We can guess
-        # it from the distro name for easier migration.
-        if not m.env_loader:
-            m.env_loader = calculate_env_loader()
         if m.address == 'localhost':  #simplify address comparison
             address = rosgraph.network.get_local_address()
             self.logger.info(
@@ -372,7 +328,7 @@ class ROSLaunchConfig(object):
                 print("Added machine [%s]" % name)
             return True
 
-    def add_test(self, test, verbose=True):
+    def add_test(self, test, _verbose=True):
         """
         Add test declaration. Used by rostest
         @param test: test node instance to add to launch
@@ -486,11 +442,6 @@ def load_config_default(roslaunch_files,
 
     loader = loader or xmlloader.XmlLoader()
     loader.ignore_unset_args = ignore_unset_args
-
-    # load the roscore file first. we currently have
-    # last-declaration wins rules.  roscore is just a
-    # roslaunch file with special load semantics
-    load_roscore(loader, config, verbose=verbose)
 
     # load the roslaunch_files into the config
     for f in roslaunch_files:

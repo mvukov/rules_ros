@@ -217,10 +217,6 @@ class ROSLaunchParent(object):
             sigint_timeout=self.sigint_timeout,
             sigterm_timeout=self.sigterm_timeout)
 
-        # print runner info to user, put errors last to make the more visible
-        if self.is_core:
-            print("ros_comm version %s" %
-                  (self.config.params['/rosversion'].value))
         if self.show_summary:
             print(self.config.summary(local=self.remote_runner is None))
         if self.config:

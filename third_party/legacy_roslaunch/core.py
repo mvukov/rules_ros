@@ -504,6 +504,8 @@ class Node(object):
 
         :raises: :exc:`ValueError` If parameters do not validate
         """
+        if cwd:
+            raise ValueError('cwd is deprecated, should not be set!')
 
         self.package = package
         self.type = node_type
@@ -517,10 +519,6 @@ class Node(object):
         self.remap_args = remap_args or []
         self.env_args = env_args or []
         self.output = output
-        self.cwd = cwd
-        if self.cwd == 'ros_home':  # be lenient on case
-            self.cwd = 'ROS_HOME'
-
         self.launch_prefix = launch_prefix or None
         self.required = required
         self.filename = filename
@@ -537,8 +535,6 @@ class Node(object):
             raise ValueError("type must be non-empty")
         if not self.output in ['log', 'screen', None]:
             raise ValueError("output must be one of 'log', 'screen'")
-        if not self.cwd in ['ROS_HOME', 'node', None]:
-            raise ValueError("cwd must be one of 'ROS_HOME', 'node'")
 
         # Extra slots for assigning later
 
@@ -559,8 +555,6 @@ class Node(object):
         name_str = cwd_str = respawn_str = None
         if self.name:
             name_str = self.name
-        if self.cwd:
-            cwd_str = self.cwd
 
         return [
             ('pkg', self.package),

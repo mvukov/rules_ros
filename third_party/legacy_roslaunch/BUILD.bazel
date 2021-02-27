@@ -1,19 +1,45 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("//build_tools:pylint.bzl", "pylint")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "roslaunch",
-    srcs = glob(["*.py"]),
+    name = "legacy_roslaunch",
+    srcs = glob(
+        ["*.py"],
+        exclude = ["main.py"],
+    ),
+    visibility = ["//visibility:public"],
     deps = [
+        "//:py_roslib_slim",
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosparam",
         "@ros_comm_msgs//:py_rosgraph_msgs",
-        "//:py_roslib_slim",
         requirement("paramiko"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
+)
+
+exports_files([
+    "main.py",
+    "roscore.xml",
+])
+
+py_binary(
+    name = "roscore",
+    srcs = ["main.py"],
+    args = [
+        "--core",
+        "$(location :roscore.xml)",
+    ],
+    data = [
+        "roscore.xml",
+        "@ros_comm//:rosmaster",
+        "@ros_comm//:rosout",
+    ],
+    main = "main.py",
     visibility = ["//visibility:public"],
+    deps = [":legacy_roslaunch"],
 )
 
 pylint()

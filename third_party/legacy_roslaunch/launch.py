@@ -454,7 +454,6 @@ class ROSLaunchRunner(object):
             printlog("auto-starting new master")
             p = create_master_process(
                 self.run_id,
-                m.type,
                 get_ros_root(),
                 m.get_port(),
                 self.num_workers,
