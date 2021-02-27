@@ -1,5 +1,5 @@
 <launch>
   <group ns="/">
-    <node pkg="rosout" type="external/ros_comm/rosout" name="rosout" respawn="true"/>
+    <node type="external/ros_comm/rosout" name="rosout" respawn="true"/>
   </group>
 </launch>

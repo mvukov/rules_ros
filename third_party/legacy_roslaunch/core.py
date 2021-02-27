@@ -529,8 +529,6 @@ class Node(object):
         # validation
         if self.name and rosgraph.names.SEP in self.name:  # #1821, namespaces in nodes need to be banned
             raise ValueError("node name cannot contain a namespace")
-        if not len(self.package.strip()):
-            raise ValueError("package must be non-empty")
         if not len(self.type.strip()):
             raise ValueError("type must be non-empty")
         if not self.output in ['log', 'screen', None]:

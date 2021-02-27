@@ -445,7 +445,7 @@ class XmlLoader(loader.Loader):
             ]  # This is necessary because child() does not make a copy of the param list.
 
             # required attributes
-            pkg, node_type = self.reqd_attrs(tag, context, ('pkg', 'type'))
+            node_type = self.reqd_attrs(tag, context, ('type',))[0]
 
             # optional attributes
             machine, args, output, respawn, respawn_delay, cwd, launch_prefix, \
@@ -504,7 +504,7 @@ class XmlLoader(loader.Loader):
                 ros_config.add_param(Param(pkey, p.value), verbose=verbose)
 
             if not is_test:
-                return Node(pkg,
+                return Node('',
                             node_type,
                             name=name,
                             namespace=child_ns.ns,
@@ -521,7 +521,7 @@ class XmlLoader(loader.Loader):
                             filename=context.filename)
             else:
                 return Test(test_name,
-                            pkg,
+                            '',
                             node_type,
                             name=name,
                             namespace=child_ns.ns,
