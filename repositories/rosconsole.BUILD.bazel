@@ -8,14 +8,12 @@ cc_library(
         "src/rosconsole/rosconsole_backend.cpp",
     ],
     deps = [
+        "@boost//:regex",
+        "@boost//:system",
+        "@boost//:thread",
         "@com_github_google_glog//:glog",
         "@roscpp_core//:cpp_common",
         "@roscpp_core//:rostime",
-    ],
-    linkopts = [
-        "-lboost_regex",
-        "-lboost_system",
-        "-lboost_thread",
     ],
     visibility = ["//visibility:public"],
 )

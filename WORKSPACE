@@ -14,5 +14,4 @@ ros_deps(
 )
 
 # Install via apt:
-# For roscpp: libboost-dev-all
 # For rosbag: libbz2-dev liblz4-dev

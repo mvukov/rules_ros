@@ -11,10 +11,10 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:py_roslib_slim",
-        "@ros_ros//:rosclean",
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosparam",
         "@ros_comm_msgs//:py_rosgraph_msgs",
+        "@ros_ros//:rosclean",
         requirement("paramiko"),
         requirement("pyyaml"),
         requirement("rospkg"),

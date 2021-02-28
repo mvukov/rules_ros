@@ -22,10 +22,10 @@ cc_library(
     srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
     deps = [
         ":libb64",
+        "@boost//:thread",
         "@roscpp_core//:cpp_common",
         "@roscpp_core//:rostime",
     ],
-    linkopts = ["-lboost_thread"],
     visibility = ["//visibility:public"],
 )
 
@@ -94,6 +94,9 @@ cc_library(
     deps = [
         ":cc_roscpp_msgs_srvs",
         ":xmlrpcpp",
+        "@boost//:chrono",
+        "@boost//:filesystem",
+        "@boost//:system",
         "@rosconsole//:rosconsole",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
@@ -102,11 +105,6 @@ cc_library(
         "@ros_std_msgs//:cc_std_msgs",
     ],
     visibility = ["//visibility:public"],
-    linkopts = [
-        "-lboost_chrono",
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
 )
 
 exports_files([
@@ -182,12 +180,15 @@ cc_library(
     ],
     deps = [
         ":roslz4",
+        "@boost//:filesystem",
         "@console_bridge//:console_bridge",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
     ],
-    linkopts = ["-lboost_filesystem", "-lbz2"],
+    linkopts = [
+        "-lbz2",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -233,13 +234,11 @@ cc_library(
         ":roscpp",
         ":rosbag_storage",
         ":topic_tools",
+        "@boost//:date_time",
+        "@boost//:filesystem",
+        "@boost//:regex",
+        "@boost//:thread",
         "@ros_comm_msgs//:cc_std_srvs",
-    ],
-    linkopts = [
-        "-lboost_date_time",
-        "-lboost_filesystem",
-        "-lboost_regex",
-        "-lboost_thread",
     ],
     visibility = ["//visibility:public"],
 )
@@ -247,16 +246,20 @@ cc_library(
 cc_binary(
     name = "rosbag_record",
     srcs = ["tools/rosbag/src/record.cpp"],
-    deps = [":rosbag"],
-    linkopts = ["-lboost_program_options"],
+    deps = [
+        ":rosbag",
+        "@boost//:program_options",
+    ],
     visibility = ["//visibility:public"],
 )
 
 cc_binary(
     name = "rosbag_play",
     srcs = ["tools/rosbag/src/play.cpp"],
-    deps = [":rosbag"],
-    linkopts = ["-lboost_program_options"],
+    deps = [
+        ":rosbag",
+        "@boost//:program_options",
+    ],
     visibility = ["//visibility:public"],
 )
 

@@ -33,6 +33,24 @@ def ros_repositories():
 
     maybe(
         http_archive,
+        name = "rules_foreign_cc",
+        sha256 = "9dcf6f79c37e2e71a02ebcf21eea29f39099f9a779ef81674b1010acd744abba",
+        strip_prefix = "rules_foreign_cc-e285764b78cc91e97cfead87f48d06b9c4d83a81",
+        urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/e285764b78cc91e97cfead87f48d06b9c4d83a81.zip"],
+    )
+
+    maybe(
+        http_archive,
+        name = "com_github_nelhage_rules_boost",
+        strip_prefix = "rules_boost-98495a618246683c9058dd87c2c78a2c06087999",
+        sha256 = "fc2b63b293d0d5eebe7a6b3328bec8a13f4b0bc2b532f4e117b51c7f4e5d421b",
+        urls = [
+            "https://github.com/nelhage/rules_boost/archive/98495a618246683c9058dd87c2c78a2c06087999.zip",
+        ],
+    )
+
+    maybe(
+        http_archive,
         name = "console_bridge",
         build_file = "//repositories:console_bridge.BUILD.bazel",
         sha256 = "2ff175a9bb2b1849f12a6bf972ce7e4313d543a2bbc83b60fdae7db6e0ba353f",
