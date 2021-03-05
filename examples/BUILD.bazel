@@ -1,3 +1,4 @@
+load("//docker:image.bzl", "container_image")
 load("//ros:launch.bzl", "ros_launch")
 load(
     "//ros:message_generation.bzl",
@@ -5,6 +6,7 @@ load(
     "py_ros_msg_library",
     "ros_msg_library",
 )
+load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 
@@ -74,6 +76,22 @@ ros_launch(
         ":talker",
         ":listener",
     ],
+)
+
+container_image(
+    name = "chatter_image",
+    base = "@ros_deploy_base//image",
+    binary = ":chatter",
+    docker_run_flags = "-it --rm --network=host",
+)
+
+container_push(
+    name = "chatter_publish",
+    format = "Docker",
+    image = ":chatter_image",
+    registry = "docker.io",
+    repository = "mvukov/chatter",
+    tag = "demo",
 )
 
 # catkin workflow gives to rostopic app ability to handle all messages that
