@@ -44,6 +44,7 @@ import logging
 import rosgraph.names
 import rosgraph.network
 
+from third_party.legacy_roslaunch import deps
 from third_party.legacy_roslaunch import xmlloader
 from third_party.legacy_roslaunch.core import Master, local_machine, is_machine_local, RLException
 
@@ -445,6 +446,11 @@ def load_config_default(roslaunch_files,
 
     loader = loader or xmlloader.XmlLoader()
     loader.ignore_unset_args = ignore_unset_args
+
+    # load the roscore file first. we currently have
+    # last-declaration wins rules.  roscore is just a
+    # roslaunch file with special load semantics
+    loader.load(deps.ROSCORE_XML_PATH, config, core=True, verbose=verbose)
 
     # load the roslaunch_files into the config
     for f in roslaunch_files:

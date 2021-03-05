@@ -1,10 +1,24 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("//build_tools:pylint.bzl", "pylint")
+load("//third_party:expand_template.bzl", "expand_template")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+
+expand_template(
+    name = "deps",
+    out = "deps.py",
+    data = ["roscore.xml"],
+    substitutions = {"{roscore_xml_path}": "$(location roscore.xml)"},
+    template = "deps.py.tpl",
+)
 
 py_library(
     name = "legacy_roslaunch",
-    srcs = glob(["*.py"]),
+    srcs = glob(["*.py"]) + ["deps"],
+    data = [
+        "roscore.xml",
+        "@ros_comm//:rosmaster",
+        "@ros_comm//:rosout",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//:py_roslib_slim",
@@ -18,15 +32,10 @@ py_library(
     ],
 )
 
-exports_files([
-    "roscore.xml",
-])
-
 py_binary(
     name = "roscore",
     srcs = ["main.py"],
     args = ["--core"],
-    data = ["@ros_comm//:rosmaster"],
     main = "main.py",
     visibility = ["//visibility:public"],
     deps = [":legacy_roslaunch"],

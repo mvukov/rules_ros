@@ -51,6 +51,7 @@ import rosgraph
 import rospkg
 from rosmaster.master_api import NUM_WORKERS
 
+from third_party.legacy_roslaunch import deps
 from third_party.legacy_roslaunch.core import RLException, setup_env, is_child_mode, printerrlog, printlog_bold
 from third_party.legacy_roslaunch.node_args import create_local_process_args
 from third_party.legacy_roslaunch.pmon import Process, FatalProcessLaunch
@@ -103,7 +104,7 @@ def create_master_process(run_id,
 
     package = ''
     args = [
-        'external/ros_comm/rosmaster', '--core', '-p',
+        deps.ROSMASTER_PATH, '--core', '-p',
         str(port), '-w',
         str(num_workers)
     ]
