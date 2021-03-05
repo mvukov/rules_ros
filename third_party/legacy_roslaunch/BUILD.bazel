@@ -4,10 +4,7 @@ load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 py_library(
     name = "legacy_roslaunch",
-    srcs = glob(
-        ["*.py"],
-        exclude = ["main.py"],
-    ),
+    srcs = glob(["*.py"]),
     visibility = ["//visibility:public"],
     deps = [
         "//:py_roslib_slim",
@@ -22,7 +19,6 @@ py_library(
 )
 
 exports_files([
-    "main.py",
     "roscore.xml",
 ])
 

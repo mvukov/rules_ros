@@ -17,5 +17,6 @@ py_binary(
 )
 
 exports_files([
+    "expand_teplate.bzl",
     "rostopic_app.py",
 ])
