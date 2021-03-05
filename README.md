@@ -11,7 +11,7 @@ You will need to install Bazel, see [here](https://docs.bazel.build/versions/mas
 Besides Bazel, you will need some additional deps:
 
 ```sh
-sudo apt install libboost-dev-all libbz2-dev liblz4-dev
+sudo apt install libbz2-dev liblz4-dev
 ```
 
 plus a C++ compiler and a Python 3.8 interpreter. At least on Ubuntu 20.04,
@@ -31,10 +31,10 @@ So far a subset of ros-core packages can be built.
 
 Here is an example.
 
-Let's begin with starting ROS master:
+Let's begin with starting `roscore`:
 
 ```sh
-bazel run //:rosmaster
+bazel run //:roscore
 ```
 
 In a separate terminal, let's start a (C++) talker node:
@@ -68,34 +68,24 @@ bazel run //examples:rostopic -- echo /chatter
 
 Not too shabby.
 
-## What about `roslaunch`?
+Now let's start a deployment with the talker and the listener nodes:
+```sh
+bazel run //example:chatter
 
-Getting `roscpp` `rosmaster`, and `rosbag` up-n-running wasn't a lot of work.
-`rospy`and `rostopic` required some hacking of `roslib`, but this was still
-not a big effort.
+```
+This command will build the necessary nodes and launch them. This is similar
+to executing good-ol' `roslaunch`, but, running the chatter `ros_launch` target
+using Bazel ensures all necessary dependencies are (re-)built.
 
-Naturally, for me at least, was to try to get `roslaunch` working. After "a bit"
-I figured out that `roslaunch` is so tightly coupled with catkin/ROS package
-management that I put those developments on hold. It will probably be the best
-to write something similar that can work with Bazel with some custom rules.
+How about executing the chatter deployment within a Docker container?
+Just run
+```sh
+bazel run //example:chatter_image
+```
+FYI, the size of a compressed image made with `--config=opt` is less than
+50MB -- check [here](https://hub.docker.com/repository/docker/mvukov/chatter).
+A very simple base image can be found in `docker/base`.
 
-## Where is this heading?
-
-I have no solid plans. I did this for fun to learn more about Bazel. Before I
-started working on this I saw a yet another effort to use ROS from Bazel in
-https://github.com/nicolov/ros-bazel and was not too happy how message
-generation was implemented. So I decided to make an alternative implementation
-on my own -- I wanted it to look and feel more like exisiting protobuf rules for
-Bazel. In addition, I wanted to see how difficult would it be to get rid of
-`catkin` :) `catkin`+`CMake` do a great job FWIW. However, Bazel workflow is
-simpler, at least from the perspective of roboticists who "just" want to develop
-robotics software (including me).
-
-I think it would be cool if we would have a single e.g. `ros_launch`
-Bazel rule that can (build and) run a whole deployment of ROS nodes. That way it
-would be fairly easy, I believe, to pack the deployment in an archive or a
-Docker image (using convenient Bazel rules from [rules_docker](https://github.com/bazelbuild/rules_docker)).
-Deployment of binaries to robots would be simplified this way, I believe.
 
 ## Additional
 
