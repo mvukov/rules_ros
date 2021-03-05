@@ -25,15 +25,8 @@ exports_files([
 py_binary(
     name = "roscore",
     srcs = ["main.py"],
-    args = [
-        "--core",
-        "$(location :roscore.xml)",
-    ],
-    data = [
-        "roscore.xml",
-        "@ros_comm//:rosmaster",
-        "@ros_comm//:rosout",
-    ],
+    args = ["--core"],
+    data = ["@ros_comm//:rosmaster"],
     main = "main.py",
     visibility = ["//visibility:public"],
     deps = [":legacy_roslaunch"],
