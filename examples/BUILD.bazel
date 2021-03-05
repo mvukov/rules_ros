@@ -69,6 +69,9 @@ py_binary(
     ],
 )
 
+# Defines a launch target with talker and listener. Just run as
+# `bazel run //examples:chatter`. This will build the two nodes, the deployment
+# and start the launcher.
 ros_launch(
     name = "chatter",
     launch_files = ["//examples:chatter.launch"],
@@ -78,6 +81,9 @@ ros_launch(
     ],
 )
 
+# Define a Docker image target with chatter deployment. Just run as
+# `bazel run //examples:chatter_image`. This will build the nodes, the Docker
+# image, and start execution of the deployment inside a container.
 container_image(
     name = "chatter_image",
     base = "@ros_deploy_base//image",
@@ -85,6 +91,7 @@ container_image(
     docker_run_flags = "-it --rm --network=host",
 )
 
+# Here is how a chatter image can be published to a remote repo.
 container_push(
     name = "chatter_publish",
     format = "Docker",
