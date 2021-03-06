@@ -14,13 +14,15 @@ Besides Bazel, you will need some additional deps:
 sudo apt install libbz2-dev liblz4-dev
 ```
 
-plus a C++ compiler and a Python 3.8 interpreter. At least on Ubuntu 20.04,
-you'll need to also do the following:
+plus a C++ compiler and a Python 3.8 interpreter. If you want to run ROS
+deployments in Docker containers, [install Docker](https://docs.docker.com/engine/install/ubuntu/)
+as well.
+
+At least on Ubuntu 20.04, you'll need to also do the following:
 
 ```sh
 sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
-
 Bazel-generated driver scripts for Python binaries still use `/usr/bin/python`.
 
 And no, you don't have to install any ROS packages via `apt`.
@@ -68,11 +70,12 @@ bazel run //examples:rostopic -- echo /chatter
 
 Not too shabby.
 
-Now let's start a deployment with the talker and the listener nodes:
+Next, let's start a deployment with the talker and the listener nodes. You can
+stop the nodes you started with the above commands. Now execute
 ```sh
 bazel run //example:chatter
-
 ```
+
 This command will build the necessary nodes and launch them. This is similar
 to executing good-ol' `roslaunch`, but, running the chatter `ros_launch` target
 using Bazel ensures all necessary dependencies are (re-)built.
@@ -82,10 +85,11 @@ Just run
 ```sh
 bazel run //example:chatter_image
 ```
-FYI, the size of a compressed image made with `--config=opt` is less than
-50MB -- check [here](https://hub.docker.com/repository/docker/mvukov/chatter).
-A very simple base image can be found in `docker/base`.
 
+FYI, the size of a compressed image made in release mode (with `--config=opt`)
+is less than 50MB -- check [here](https://hub.docker.com/repository/docker/mvukov/chatter).
+A very simple base image used for the example chatter image can be found in
+`docker/base`.
 
 ## Additional
 
