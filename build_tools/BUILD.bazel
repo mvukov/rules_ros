@@ -1,1 +1,4 @@
-exports_files(["run_pylint.py"])
+exports_files([
+    "pylint.bzl",
+    "run_pylint.py",
+])

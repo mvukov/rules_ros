@@ -25,7 +25,7 @@ def ros_launch(name, nodes, launch_files):
     launch_script = "{}_launch.py".format(name)
     expand_template(
         name = "{}_launch_gen".format(name),
-        template = "//ros:launch.py.tpl",
+        template = "@com_github_mvukov_rules_ros//ros:launch.py.tpl",
         substitutions = substitutions,
         out = launch_script,
         data = [DEFAULT_PYTHON_LOGGING_CONF] + launch_files,
@@ -37,5 +37,5 @@ def ros_launch(name, nodes, launch_files):
         data = nodes + launch_files,
         main = launch_script,
         visibility = ["//visibility:public"],
-        deps = ["//third_party/legacy_roslaunch"],
+        deps = ["@com_github_mvukov_rules_ros//third_party/legacy_roslaunch"],
     )
