@@ -155,8 +155,10 @@ cc_library(
         "utilities/roslz4/src/xxhash.c",
         "utilities/roslz4/src/xxhash.h",
     ],
-    deps = ["@roscpp_core//:cpp_common"],
-    linkopts = ["-llz4"],
+    deps = [
+        "@lz4//:lz4",
+        "@roscpp_core//:cpp_common",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -181,13 +183,11 @@ cc_library(
     deps = [
         ":roslz4",
         "@boost//:filesystem",
+        "@bzip2//:bzip2",
         "@console_bridge//:console_bridge",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-    ],
-    linkopts = [
-        "-lbz2",
     ],
     visibility = ["//visibility:public"],
 )

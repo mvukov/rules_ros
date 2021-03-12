@@ -7,15 +7,8 @@ This repo aims to build ROS (1) from scratch.
 The code is developed and tested on Ubuntu 20.04 with Python 3.8.
 
 You will need to install Bazel, see [here](https://docs.bazel.build/versions/master/install.html).
-
-Besides Bazel, you will need some additional deps:
-
-```sh
-sudo apt install libbz2-dev liblz4-dev
-```
-
-plus a C++ compiler and a Python 3.8 interpreter. If you want to run ROS
-deployments in Docker containers, [install Docker](https://docs.docker.com/engine/install/ubuntu/)
+Besides Bazel, you will need a C++ compiler and a Python 3.8 interpreter. If you
+want to run ROS deployments in Docker containers, [install Docker](https://docs.docker.com/engine/install/ubuntu/)
 as well.
 
 At least on Ubuntu 20.04, you'll need to also do the following:

@@ -34,9 +34,9 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "rules_foreign_cc",
-        sha256 = "9dcf6f79c37e2e71a02ebcf21eea29f39099f9a779ef81674b1010acd744abba",
-        strip_prefix = "rules_foreign_cc-e285764b78cc91e97cfead87f48d06b9c4d83a81",
-        urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/e285764b78cc91e97cfead87f48d06b9c4d83a81.zip"],
+        sha256 = "4f2207a83c500a16c9095a224acc4ec8c1406c6febd0a042b3ac15ef6ff0c640",
+        strip_prefix = "rules_foreign_cc-83e6cf48cf00214bb4348691beecef8f3bc42f7d",
+        urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/83e6cf48cf00214bb4348691beecef8f3bc42f7d.zip"],
     )
 
     maybe(
@@ -119,6 +119,24 @@ def ros_repositories():
         sha256 = "5b8b91e8671d03ea84ba32a3ea7360bc4594655e7ba3ec6677a984f393aaafbd",
         strip_prefix = "ros_comm_msgs-1.11.3",
         urls = ["https://github.com/ros/ros_comm_msgs/archive/1.11.3.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "lz4",
+        build_file = "@com_github_mvukov_rules_ros//repositories:lz4.BUILD.bazel",
+        sha256 = "030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ffe2c1",
+        strip_prefix = "lz4-1.9.3",
+        urls = ["https://github.com/lz4/lz4/archive/v1.9.3.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "bzip2",
+        build_file = "@com_github_mvukov_rules_ros//repositories:bzip2.BUILD.bazel",
+        sha256 = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+        strip_prefix = "bzip2-1.0.8",
+        urls = ["https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"],
     )
 
     # Branched off ros_comm 1.15.9. Changes are in branch feature/rules_ros.

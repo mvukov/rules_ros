@@ -13,9 +13,6 @@ ros_deps(
     python_requirements = "//:requirements.txt",
 )
 
-# Install via apt:
-# For rosbag: libbz2-dev liblz4-dev
-
 ################################################################################
 #
 # Below are handled deps for internal development and/or examples.
