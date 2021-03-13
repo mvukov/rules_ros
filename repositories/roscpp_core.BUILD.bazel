@@ -39,6 +39,7 @@ cc_library(
     hdrs = glob(["roscpp_serialization/include/ros/*.h"]),
     includes = ["roscpp_serialization/include"],
     srcs = glob(["roscpp_serialization/src/*.cpp"]),
+    defines = ["BOOST_BIND_GLOBAL_PLACEHOLDERS"],
     deps = [":cpp_common", ":rostime", ":roscpp_traits"],
     visibility = ["//visibility:public"],
 )

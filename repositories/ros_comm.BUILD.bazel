@@ -91,6 +91,7 @@ cc_library(
     hdrs = glob(["clients/roscpp/include/**/*.h"]) + [":ros_common_h"],
     includes = ["clients/roscpp/include"],
     srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [":config_h"],
+    defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
     deps = [
         ":cc_roscpp_msgs_srvs",
         ":xmlrpcpp",
