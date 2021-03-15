@@ -157,3 +157,12 @@ def ros_repositories():
         strip_prefix = "ros-1.15.7",
         urls = ["https://github.com/ros/ros/archive/1.15.7.tar.gz"],
     )
+
+    maybe(
+        http_archive,
+        name = "common_msgs",
+        build_file = "@com_github_mvukov_rules_ros//repositories:common_msgs.BUILD.bazel",
+        sha256 = "74af8cc88bdc9c23cbc270d322e50562857e2c877359423f389d51c0735ee230",
+        strip_prefix = "common_msgs-1.13.1",
+        urls = ["https://github.com/ros/common_msgs/archive/1.13.1.tar.gz"],
+    )

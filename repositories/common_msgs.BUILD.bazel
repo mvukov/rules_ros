@@ -1,0 +1,60 @@
+load(
+    "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
+    "ros_msg_library",
+)
+load(
+    "@com_github_mvukov_rules_ros//ros:action_generation.bzl",
+    "cc_ros_action_library",
+    "py_ros_action_library",
+    "ros_action_library",
+)
+
+ros_msg_library(
+    name = "actionlib_msgs",
+    srcs = glob(["actionlib_msgs/msg/*.msg"]),
+    deps = ["@ros_std_msgs//:std_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "genaction",
+    srcs = ["actionlib_msgs/scripts/genaction.py"],
+    visibility = ["//visibility:public"],
+)
+
+ros_msg_library(
+    name = "nav_msgs",
+    srcs = glob(["nav_msgs/msg/*.msg"]),
+    deps = [
+        ":geometry_msgs",
+        "@ros_std_msgs//:std_msgs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+ros_action_library(
+    name = "nav_actions",
+    srcs = glob(["nav_msgs/action/*.action"]),
+    deps = [":nav_msgs"],
+    package_name = "nav_msgs",
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_action_library(
+    name = "cc_nav_actions",
+    action_library = ":nav_actions",
+    visibility = ["//visibility:public"],
+)
+
+py_ros_action_library(
+    name = "py_nav_actions",
+    action_library = ":nav_actions",
+    visibility = ["//visibility:public"],
+)
+
+ros_msg_library(
+    name = "geometry_msgs",
+    srcs = glob(["geometry_msgs/msg/*.msg"]),
+    deps = ["@ros_std_msgs//:std_msgs"],
+    visibility = ["//visibility:public"],
+)
