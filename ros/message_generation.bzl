@@ -215,12 +215,20 @@ def _py_ros_msg_compile_impl(ctx):
     include_flags = _get_include_flags(deps)
     all_srcs = _get_all_srcs(deps)
 
-    all_py_files = []
+    package_names_to_srcs = {}
     for dep in deps:
-        package_name = dep.package_name
+        if dep.package_name not in package_names_to_srcs:
+            package_names_to_srcs[dep.package_name] = dep.srcs
+        else:
+            package_names_to_srcs[dep.package_name] = (
+                package_names_to_srcs[dep.package_name] + dep.srcs
+            )
+
+    all_py_files = []
+    for package_name, srcs in package_names_to_srcs.items():
         rel_output_dir = "{}/{}".format(ctx.label.name, package_name)
 
-        msgs = [src for src in dep.srcs if src.extension == "msg"]
+        msgs = [src for src in srcs if src.extension == "msg"]
         py_msg_files = _py_generate(
             ctx,
             include_flags,
@@ -231,7 +239,7 @@ def _py_ros_msg_compile_impl(ctx):
         )
         all_py_files.extend(py_msg_files)
 
-        srvs = [src for src in dep.srcs if src.extension == "srv"]
+        srvs = [src for src in srcs if src.extension == "srv"]
         py_srv_files = _py_generate(
             ctx,
             include_flags,
