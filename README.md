@@ -43,8 +43,8 @@ This single command will compile and run the talker node.
 In a yet another terminal we can start a listener node:
 
 ```sh
-bazel run //example/chatter:listener  # C++ version or
-bazel run //example/chatter:py_listener  # Python version
+bazel run //examples/chatter:listener  # C++ version or
+bazel run //examples/chatter:py_listener  # Python version
 ```
 
 Rosbag recording & playing works as well:
