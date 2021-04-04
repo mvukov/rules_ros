@@ -1,0 +1,48 @@
+"""Implements an example to demonstrate simple actionlib client-server
+interaction.
+"""
+
+load("//ros:launch.bzl", "ros_launch")
+load(
+    "//ros:action_generation.bzl",
+    "cc_ros_action_library",
+    "ros_action_library",
+)
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+ros_action_library(
+    name = "dishwasher_actions",
+    srcs = ["action/DoDishes.action"],
+)
+
+cc_ros_action_library(
+    name = "cc_dishwasher_actions",
+    action_library = ":dishwasher_actions",
+)
+
+cc_binary(
+    name = "server",
+    srcs = ["server.cc"],
+    deps = [
+        "@ros_actionlib//:actionlib",
+        ":cc_dishwasher_actions",
+    ],
+)
+
+cc_binary(
+    name = "client",
+    srcs = ["client.cc"],
+    deps = [
+        "@ros_actionlib//:actionlib",
+        ":cc_dishwasher_actions",
+    ],
+)
+
+ros_launch(
+    name = "dishwasher",
+    launch_files = [":dishwasher.launch"],
+    nodes = [
+        ":client",
+        ":server",
+    ],
+)

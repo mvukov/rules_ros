@@ -1,3 +1,13 @@
+"""Implements an example to demonstrate:
+
+- Defining ROS messages.
+- Generating C++ and Python ROS message definitions.
+- Defining C++ and Python ROS nodes.
+- Defining a ROS deployment -- i.e. a ROS-launch Bazel target.
+- Defining a Docker images for the example ROS deployment.
+- Defining a Bazel target for running ROS-topic introspection functionality.
+"""
+
 load("//docker:image.bzl", "container_image")
 load("//ros:launch.bzl", "ros_launch")
 load(

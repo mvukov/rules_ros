@@ -84,6 +84,9 @@ is less than 50MB -- check [here](https://hub.docker.com/repository/docker/mvuko
 A very simple base image used for the example chatter image can be found in
 `docker/base`.
 
+In `//examples/dishwasher` you can find another example that demonstrates
+defining and usage of ROS actions (and actionlib).
+
 ## Additional
 
 Optionally you can install `poetry` for resolving/updating Python deps:

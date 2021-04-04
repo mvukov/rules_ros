@@ -1,0 +1,4 @@
+<launch>
+  <node type="examples/dishwasher/server" name="server" />
+  <node type="examples/dishwasher/client" name="client" output="screen" />
+</launch>
