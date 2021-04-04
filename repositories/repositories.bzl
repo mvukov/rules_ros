@@ -160,9 +160,18 @@ def ros_repositories():
 
     maybe(
         http_archive,
-        name = "common_msgs",
+        name = "ros_common_msgs",
         build_file = "@com_github_mvukov_rules_ros//repositories:common_msgs.BUILD.bazel",
         sha256 = "74af8cc88bdc9c23cbc270d322e50562857e2c877359423f389d51c0735ee230",
         strip_prefix = "common_msgs-1.13.1",
         urls = ["https://github.com/ros/common_msgs/archive/1.13.1.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "ros_actionlib",
+        build_file = "@com_github_mvukov_rules_ros//repositories:actionlib.BUILD.bazel",
+        sha256 = "b741755881e30b9aea6bcdd9831e3f0932a8bbba02fa59e5c0e5970280024055",
+        strip_prefix = "actionlib-1.13.2",
+        urls = ["https://github.com/ros/actionlib/archive/1.13.2.tar.gz"],
     )

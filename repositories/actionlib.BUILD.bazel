@@ -1,0 +1,25 @@
+cc_library(
+    name = "actionlib",
+    hdrs = glob(["actionlib/include/actionlib/**/*.h"]),
+    includes = ["actionlib/include"],
+    srcs = glob(["actionlib/src/*.cpp"]),
+    deps = [
+        "@boost//:thread",
+        "@ros_comm//:roscpp",
+        "@ros_common_msgs//:cc_actionlib_msgs",
+        "@ros_std_msgs//:cc_std_msgs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "py_actionlib",
+    srcs = glob(["actionlib/src/actionlib/*.py"]),
+    imports = ["actionlib/src"],
+    deps = [
+        "@ros_comm//:rospy",
+        "@ros_common_msgs//:py_actionlib_msgs",
+        "@ros_std_msgs//:py_std_msgs",
+    ],
+    visibility = ["//visibility:public"],
+)

@@ -104,7 +104,7 @@ ros_action_msgs_library = rule(
             providers = [RosActionInfo, RosMsgInfo],
         ),
         "_genaction": attr.label(
-            default = Label("@common_msgs//:genaction"),
+            default = Label("@ros_common_msgs//:genaction"),
             executable = True,
             cfg = "host",
         ),
@@ -119,7 +119,7 @@ def cc_ros_action_library(name, action_library, visibility = None):
     )
     cc_ros_msg_library(
         name = name,
-        deps = [name_msgs, "@common_msgs//:actionlib_msgs"],
+        deps = [name_msgs, "@ros_common_msgs//:actionlib_msgs"],
         visibility = visibility,
     )
 
@@ -131,6 +131,6 @@ def py_ros_action_library(name, action_library, visibility = None):
     )
     py_ros_msg_library(
         name = name,
-        deps = [name_msgs, "@common_msgs//:actionlib_msgs"],
+        deps = [name_msgs, "@ros_common_msgs//:actionlib_msgs"],
         visibility = visibility,
     )

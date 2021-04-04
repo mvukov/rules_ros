@@ -19,6 +19,18 @@ ros_msg_library(
     visibility = ["//visibility:public"],
 )
 
+cc_ros_msg_library(
+    name = "cc_actionlib_msgs",
+    deps = [":actionlib_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+py_ros_msg_library(
+    name = "py_actionlib_msgs",
+    deps = [":actionlib_msgs"],
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
     name = "genaction",
     srcs = ["actionlib_msgs/scripts/genaction.py"],
