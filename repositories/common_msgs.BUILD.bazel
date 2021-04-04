@@ -1,6 +1,9 @@
 load(
     "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
+    "cc_ros_msg_library",
+    "py_ros_msg_library",
     "ros_msg_library",
+    "ros_srv_library",
 )
 load(
     "@com_github_mvukov_rules_ros//ros:action_generation.bzl",
@@ -23,12 +26,46 @@ py_binary(
 )
 
 ros_msg_library(
+    name = "diagnostic_msgs",
+    srcs = glob(["diagnostic_msgs/msg/*.msg"]),
+    deps = ["@ros_std_msgs//:std_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+ros_srv_library(
+    name = "diagnostic_srvs",
+    srcs = glob(["diagnostic_msgs/srv/*.srv"]),
+    deps = [":diagnostic_msgs"],
+    package_name = "diagnostic_msgs",
+    visibility = ["//visibility:public"],
+)
+
+ros_msg_library(
+    name = "geometry_msgs",
+    srcs = glob(["geometry_msgs/msg/*.msg"]),
+    deps = ["@ros_std_msgs//:std_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+ros_msg_library(
     name = "nav_msgs",
     srcs = glob(["nav_msgs/msg/*.msg"]),
     deps = [
         ":geometry_msgs",
         "@ros_std_msgs//:std_msgs",
     ],
+    visibility = ["//visibility:public"],
+)
+
+ros_srv_library(
+    name = "nav_srvs",
+    srcs = glob(["nav_msgs/srv/*.srv"]),
+    deps = [
+        ":geometry_msgs",
+        ":nav_msgs",
+        "@ros_std_msgs//:std_msgs",
+    ],
+    package_name = "nav_msgs",
     visibility = ["//visibility:public"],
 )
 
@@ -53,8 +90,51 @@ py_ros_action_library(
 )
 
 ros_msg_library(
-    name = "geometry_msgs",
-    srcs = glob(["geometry_msgs/msg/*.msg"]),
-    deps = ["@ros_std_msgs//:std_msgs"],
+    name = "sensor_msgs",
+    srcs = glob(["sensor_msgs/msg/*.msg"]),
+    deps = [
+        ":geometry_msgs",
+        "@ros_std_msgs//:std_msgs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+ros_srv_library(
+    name = "sensor_srvs",
+    srcs = glob(["sensor_msgs/srv/*.srv"]),
+    deps = [
+        ":geometry_msgs",
+        ":sensor_msgs",
+        "@ros_std_msgs//:std_msgs",
+    ],
+    package_name = "sensor_msgs",
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_msg_library(
+    name = "cc_sensor_msgs",
+    deps = [":sensor_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+py_ros_msg_library(
+    name = "py_sensor_msgs",
+    deps = [":sensor_msgs"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "cc_sensor_msgs_lib",
+    hdrs = glob(["sensor_msgs/include/sensor_msgs/**/*.h"]),
+    deps = [":cc_sensor_msgs"],
+    includes = ["sensor_msgs/include"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "py_sensor_msgs_lib",
+    srcs = glob(["sensor_msgs/src/sensor_msgs/*.py"]),
+    deps = [":py_sensor_msgs"],
+    imports = ["sensor_msgs/src"],
     visibility = ["//visibility:public"],
 )
