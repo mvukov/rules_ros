@@ -1,0 +1,4 @@
+<launch>
+  <node type="examples/chatter/talker" name="talker" />
+  <node type="examples/chatter/listener" name="listener" output="screen" />
+</launch>

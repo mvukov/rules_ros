@@ -22,7 +22,7 @@ And no, you don't have to install any ROS packages via `apt`.
 
 ## What works?
 
-So far a subset of ros-core packages can be built.
+So far a subset of ros-base packages can be built.
 
 Here is an example.
 
@@ -35,7 +35,7 @@ bazel run //:roscore
 In a separate terminal, let's start a (C++) talker node:
 
 ```sh
-bazel run //examples:talker
+bazel run //examples/chatter:talker
 ```
 
 This single command will compile and run the talker node.
@@ -43,8 +43,8 @@ This single command will compile and run the talker node.
 In a yet another terminal we can start a listener node:
 
 ```sh
-bazel run //example:listener  # C++ version or
-bazel run //example:py_listener  # Python version
+bazel run //example/chatter:listener  # C++ version or
+bazel run //example/chatter:py_listener  # Python version
 ```
 
 Rosbag recording & playing works as well:
@@ -54,11 +54,11 @@ bazel run //:rosbag_record -- /chatter -o /tmp/foo.bag  # to record a bag or
 bazel run //:rosbag_play -- /tmp/foo_<timestamp>.bag  # to play a bag
 ```
 
-`rostopic`, tied to this example (see `examples/BUILD.bazel` for more info) can
-be used as
+`rostopic`, tied to this example (see `examples/chatter/BUILD.bazel` for more
+info) can be used as
 
 ```sh
-bazel run //examples:rostopic -- echo /chatter
+bazel run //examples/chatter:rostopic -- echo /chatter
 ```
 
 Not too shabby.
@@ -66,7 +66,7 @@ Not too shabby.
 Next, let's start a deployment with the talker and the listener nodes. You can
 stop the nodes you started with the above commands. Now execute
 ```sh
-bazel run //example:chatter
+bazel run //examples/chatter:chatter
 ```
 
 This command will build the necessary nodes and launch them. This is similar
@@ -76,7 +76,7 @@ using Bazel ensures all necessary dependencies are (re-)built.
 How about executing the chatter deployment within a Docker container?
 Just run
 ```sh
-bazel run //example:chatter_image
+bazel run //examples/chatter:chatter_image
 ```
 
 FYI, the size of a compressed image made in release mode (with `--config=opt`)
