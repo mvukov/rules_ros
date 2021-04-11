@@ -50,3 +50,13 @@ container_pull(
     registry = "docker.io",
     repository = "mvukov/ros-deploy-base",
 )
+
+load(
+    "//build_tools/toolchains:toolchains.bzl",
+    "register_all_toolchains",
+    "toolchain_repositories",
+)
+
+toolchain_repositories()
+
+register_all_toolchains()

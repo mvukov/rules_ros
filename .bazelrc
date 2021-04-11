@@ -1,4 +1,11 @@
+# We need this since Bazel 4.0.0 release.
+# TODO(mvukov) Update rules_docker and see whether we can remove this.
+build --incompatible_restrict_string_escapes=false
+
 build:opt -c opt
 build:opt --copt=-O3
+
+build:platform_build --incompatible_enable_cc_toolchain_resolution
+build:jetson --config=platform_build --platforms=//build_tools/platforms:aarch64_linux
 
 test --test_output=errors
