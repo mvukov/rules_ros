@@ -97,6 +97,8 @@ cc_library(
         ":xmlrpcpp",
         "@boost//:chrono",
         "@boost//:filesystem",
+        "@boost//:scope_exit",
+        "@boost//:signals2",
         "@boost//:system",
         "@rosconsole//:rosconsole",
         "@roscpp_core//:roscpp_serialization",
@@ -184,6 +186,7 @@ cc_library(
     deps = [
         ":roslz4",
         "@boost//:filesystem",
+        "@boost//:format",
         "@bzip2//:bzip2",
         "@console_bridge//:console_bridge",
         "@roscpp_core//:roscpp_serialization",
