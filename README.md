@@ -80,7 +80,7 @@ bazel run //examples/chatter:chatter_image
 ```
 
 FYI, the size of a compressed image made in release mode (with `--config=opt`)
-is less than 50MB -- check [here](https://hub.docker.com/repository/docker/mvukov/chatter).
+is less than 50MB -- check [here](https://hub.docker.com/r/mvukov/chatter/tags?page=1&ordering=last_updated).
 A very simple base image used for the example chatter image can be found in
 `docker/base`.
 
