@@ -10,8 +10,15 @@ PYTHON_INTERPRETER = "python3.8"
 
 ros_deps(
     python_interpreter = PYTHON_INTERPRETER,
-    python_requirements = "//:requirements.txt",
+    python_requirements_lock = "//:requirements.txt",
 )
+
+load(
+    "@rules_ros_pip_deps//:requirements.bzl",
+    install_rules_ros_pip_deps = "install_deps",
+)
+
+install_rules_ros_pip_deps()
 
 ################################################################################
 #
