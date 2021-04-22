@@ -1,7 +1,7 @@
 defusedxml
 empy
 gnupg
-netifaces  # Compiled, could be replaced with ifaddr.
+ifaddr
 numpy  # Compiled, only one file in rospy needs it.
 pycryptodomex
 rospkg
