@@ -5,5 +5,11 @@ set -e
 PYTHON_INTERPRETER="python3.8"
 
 cd "$(bazel info workspace)"
-${PYTHON_INTERPRETER} -m poetry update
-${PYTHON_INTERPRETER} -m poetry export --format requirements.txt --dev --output requirements.txt
+rm requirements_lock.txt
+
+_ARGS=(
+  --generate-hashes
+  --output-file=requirements_lock.txt
+  requirements.txt
+)
+${PYTHON_INTERPRETER} -m piptools compile ${_ARGS[@]}

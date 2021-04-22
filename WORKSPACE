@@ -10,7 +10,7 @@ PYTHON_INTERPRETER = "python3.8"
 
 ros_deps(
     python_interpreter = PYTHON_INTERPRETER,
-    python_requirements_lock = "//:requirements.txt",
+    python_requirements_lock = "//:requirements_lock.txt",
 )
 
 load(
