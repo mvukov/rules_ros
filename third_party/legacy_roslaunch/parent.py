@@ -54,7 +54,6 @@ from rosmaster.master_api import NUM_WORKERS
 from third_party.legacy_roslaunch import config
 from third_party.legacy_roslaunch import launch
 from third_party.legacy_roslaunch import pmon
-from third_party.legacy_roslaunch import remote
 from third_party.legacy_roslaunch import server
 from third_party.legacy_roslaunch.core import printlog_bold, printerrlog, RLException
 from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
@@ -255,13 +254,7 @@ class ROSLaunchParent(object):
             raise RLException("server is not initialized")
 
         if not self.local_only and self.config.has_remote_nodes():
-            self.remote_runner = remote.ROSRemoteRunner(
-                self.run_id,
-                self.config,
-                self.pm,
-                self.server,
-                sigint_timeout=self.sigint_timeout,
-                sigterm_timeout=self.sigterm_timeout)
+            raise RuntimeError("Running without support for remote ROS runner!")
         elif self.local_only:
             printlog_bold(
                 "LOCAL\nlocal only launch specified, will not launch remote nodes\nLOCAL\n"

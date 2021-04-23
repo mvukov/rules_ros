@@ -10,8 +10,15 @@ PYTHON_INTERPRETER = "python3.8"
 
 ros_deps(
     python_interpreter = PYTHON_INTERPRETER,
-    python_requirements = "//:requirements.txt",
+    python_requirements_lock = "//:requirements_lock.txt",
 )
+
+load(
+    "@rules_ros_pip_deps//:requirements.bzl",
+    install_rules_ros_pip_deps = "install_deps",
+)
+
+install_rules_ros_pip_deps()
 
 ################################################################################
 #
@@ -23,9 +30,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "1698624e878b0607052ae6131aa216d45ebb63871ec497f26c67455b34119c80",
-    strip_prefix = "rules_docker-0.15.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.15.0/rules_docker-v0.15.0.tar.gz"],
+    sha256 = "95d39fd84ff4474babaf190450ee034d958202043e366b9fc38f438c9e6c3334",
+    strip_prefix = "rules_docker-0.16.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.16.0/rules_docker-v0.16.0.tar.gz"],
 )
 
 load(

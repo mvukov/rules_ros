@@ -13,7 +13,7 @@ expand_template(
 
 py_library(
     name = "legacy_roslaunch",
-    srcs = glob(["*.py"]) + ["deps"],
+    srcs = glob(["*.py"]) + [":deps"],
     data = [
         "roscore.xml",
         "@ros_comm//:rosmaster",
@@ -26,7 +26,6 @@ py_library(
         "@ros_comm//:rosparam",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_ros//:rosclean",
-        requirement("paramiko"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],

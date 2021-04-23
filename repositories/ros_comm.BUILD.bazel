@@ -119,7 +119,7 @@ py_library(
     srcs = glob(["tools/rosgraph/src/**/*.py"]),
     imports = ["tools/rosgraph/src"],
     deps = [
-        requirement("netifaces"),
+        requirement("ifaddr"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],

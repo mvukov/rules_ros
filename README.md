@@ -89,10 +89,10 @@ defining and usage of ROS actions (and actionlib).
 
 ## Additional
 
-Optionally you can install `poetry` for resolving/updating Python deps:
+Optionally you can install `pip-tools` for resolving/updating Python deps:
 
 ```sh
-sudo python3.8 -m pip install poetry
+sudo python3.8 -m pip install pip-tools
 ```
 
 Then you can run the script `./generate_python_requirements.sh` to update

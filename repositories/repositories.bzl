@@ -11,8 +11,8 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "rules_python",
-        sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
-        url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+        sha256 = "778197e26c5fbeb07ac2a2c5ae405b30f6cb7ad1f5510ea6fdac03bded96cc6f",
+        urls = ["https://github.com/bazelbuild/rules_python/releases/download/0.2.0/rules_python-0.2.0.tar.gz"],
     )
 
     maybe(
@@ -44,9 +44,7 @@ def ros_repositories():
         name = "com_github_nelhage_rules_boost",
         strip_prefix = "rules_boost-98495a618246683c9058dd87c2c78a2c06087999",
         sha256 = "fc2b63b293d0d5eebe7a6b3328bec8a13f4b0bc2b532f4e117b51c7f4e5d421b",
-        urls = [
-            "https://github.com/nelhage/rules_boost/archive/98495a618246683c9058dd87c2c78a2c06087999.zip",
-        ],
+        urls = ["https://github.com/nelhage/rules_boost/archive/98495a618246683c9058dd87c2c78a2c06087999.zip"],
     )
 
     maybe(
@@ -144,9 +142,9 @@ def ros_repositories():
         http_archive,
         name = "ros_comm",
         build_file = "@com_github_mvukov_rules_ros//repositories:ros_comm.BUILD.bazel",
-        sha256 = "91ac044dd0abfdd1ae7a01795446c5f674c0bbee8a535796fb0d549ab367456e",
-        strip_prefix = "ros_comm-eeb8d32723092749b4a1be2bb1677ad5bbcb383b",
-        urls = ["https://github.com/mvukov/ros_comm/archive/eeb8d32723092749b4a1be2bb1677ad5bbcb383b.tar.gz"],
+        sha256 = "a9dc58e6001f839c4c54f0a3d63c1272a7b800ae142baa048201ff59c9d17833",
+        strip_prefix = "ros_comm-38549f0fe9a85a62b8ca5b46f82a9bae40eca2e0",
+        urls = ["https://github.com/mvukov/ros_comm/archive/38549f0fe9a85a62b8ca5b46f82a9bae40eca2e0.tar.gz"],
     )
 
     maybe(
