@@ -1,7 +1,3 @@
-# We need this since Bazel 4.0.0 release.
-# TODO(mvukov) Update rules_docker and see whether we can remove this.
-build --incompatible_restrict_string_escapes=false
-
 build:opt -c opt
 build:opt --copt=-O3
 
