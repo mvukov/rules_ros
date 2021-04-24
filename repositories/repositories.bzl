@@ -17,6 +17,13 @@ def ros_repositories():
 
     maybe(
         http_archive,
+        name = "bazel_skylib",
+        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz"],
+        sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
+    )
+
+    maybe(
+        http_archive,
         name = "com_github_gflags_gflags",
         sha256 = "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf",
         strip_prefix = "gflags-2.2.2",
