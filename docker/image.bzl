@@ -14,5 +14,5 @@ def container_image(name, binary, base, **kwargs):
         name = name,
         binary = binary,
         base = base,
-        **kwargs,
+        **kwargs
     )
