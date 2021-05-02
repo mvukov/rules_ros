@@ -16,6 +16,8 @@ load(
     "py_ros_msg_library",
     "ros_msg_library",
 )
+load("//ros:topic.bzl", "ros_topic")
+load("//third_party:packaging.bzl", "binary_pkg_tar")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
@@ -80,7 +82,7 @@ py_binary(
 )
 
 # Defines a launch target with talker and listener. Just run as
-# `bazel run //examples:chatter`. This will build the two nodes, the deployment
+# `bazel run //examples/chatter:chatter`. This will build the two nodes, the deployment
 # and start the launcher.
 ros_launch(
     name = "chatter",
@@ -92,8 +94,8 @@ ros_launch(
 )
 
 # Define a Docker image target with chatter deployment. Just run as
-# `bazel run //examples:chatter_image`. This will build the nodes, the Docker
-# image, and start execution of the deployment inside a container.
+# `bazel run //examples/chatter:chatter_image`. This will build the nodes,
+# the Docker image, and start execution of the deployment inside a container.
 container_image(
     name = "chatter_image",
     base = "@ros_deploy_base//image",
@@ -113,17 +115,14 @@ container_push(
 
 # catkin workflow gives to rostopic app ability to handle all messages that
 # live the devel/install workspace. With Bazel workflow we don't have that.
-# Here, rostopic is deployment-specific -> we need to add our custom message
-# to the list of deps such that rostopic handle it. In particular,
-# py_example_msgs must be added to the deps of the local rostopic target.
-# This example target is purely for illustrational purpose.
-py_binary(
+# Here, rostopic is deployment-specific.
+# Example usage: `bazel run //examples/chatter:rostopic -- echo /chatter`
+ros_topic(
     name = "rostopic",
-    srcs = ["//third_party:rostopic_app.py"],
-    main = "//third_party:rostopic_app.py",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":py_example_msgs",
-        "@ros_comm//:rostopic",
-    ],
+    deps = [":chatter"],
+)
+
+binary_pkg_tar(
+    name = "chatter_pkg",
+    binary = ":chatter",
 )
