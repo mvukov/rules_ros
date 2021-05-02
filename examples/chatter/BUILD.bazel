@@ -17,6 +17,7 @@ load(
     "ros_msg_library",
 )
 load("//ros:topic.bzl", "ros_topic")
+load("//third_party:packaging.bzl", "binary_pkg_tar")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
@@ -119,4 +120,9 @@ container_push(
 ros_topic(
     name = "rostopic",
     deps = [":chatter"],
+)
+
+binary_pkg_tar(
+    name = "chatter_pkg",
+    binary = ":chatter",
 )
