@@ -1,3 +1,4 @@
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
     "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
@@ -64,38 +65,46 @@ ROS_VERSION_MAJOR = 1
 ROS_VERSION_MINOR = 15
 ROS_VERSION_PATCH = 9
 
-genrule(
+_ROS_COMMON_H = "ros/common.h"
+
+expand_template(
     name = "ros_common_h",
-    srcs = ["clients/roscpp/include/ros/common.h.in"],
-    outs = ["ros/common.h"],
-    cmd = "\n".join([
-        "cp $< $@",
-        "sed -i 's/@roscpp_VERSION_MAJOR@/{}/g' $@".format(ROS_VERSION_MAJOR),
-        "sed -i 's/@roscpp_VERSION_MINOR@/{}/g' $@".format(ROS_VERSION_MINOR),
-        "sed -i 's/@roscpp_VERSION_PATCH@/{}/g' $@".format(ROS_VERSION_PATCH),
-    ]),
+    out = _ROS_COMMON_H,
+    substitutions = {
+        "@roscpp_VERSION_MAJOR@": str(ROS_VERSION_MAJOR),
+        "@roscpp_VERSION_MINOR@": str(ROS_VERSION_MINOR),
+        "@roscpp_VERSION_PATCH@": str(ROS_VERSION_PATCH),
+    },
+    template = "clients/roscpp/include/ros/common.h.in",
 )
 
-# This is an internal header.
-genrule(
+_CONFIG_H = "config.h"
+_CONFIG_COMMON_SUBSTITUTIONS = {
+    "#cmakedefine HAVE_TRUNC": "#define HAVE_TRUNC",
+    "#cmakedefine HAVE_IFADDRS_H": "#define HAVE_IFADDRS_H",
+}
+
+expand_template(
     name = "config_h",
-    visibility = ["//visibility:private"],
-    outs = [
-        "config.h",
-    ],
-    cmd = """cat > $@ << EOL
-#define HAVE_TRUNC
-#define HAVE_IFADDRS_H
-#define HAVE_EPOLL
-EOL
-""",
+    out = _CONFIG_H,
+    substitutions = select({
+        "@platforms//os:linux": dicts.add(
+            _CONFIG_COMMON_SUBSTITUTIONS,
+            {"#cmakedefine HAVE_EPOLL": "#define HAVE_EPOLL"},
+        ),
+        "@platforms//os:macos": dicts.add(
+            _CONFIG_COMMON_SUBSTITUTIONS,
+            {"#cmakedefine HAVE_EPOLL": "/*#cmakedefine HAVE_EPOLL*/"},
+        ),
+    }, no_match_error = "Only Linux and macOS are supported!"),
+    template = "clients/roscpp/src/libros/config.h.in",
 )
 
 cc_library(
     name = "roscpp",
-    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [":ros_common_h"],
+    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
     includes = ["clients/roscpp/include"],
-    srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [":config_h"],
+    srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [_CONFIG_H],
     defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
     deps = [
         ":cc_roscpp_msgs_srvs",
@@ -141,18 +150,18 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-_ROSGRAPH_APP = "rosgraph_app.py"
+_ROSGRAPH_APP_PY = "rosgraph_app.py"
 
 copy_file(
     name = "rosgraph_app",
     src = "tools/rosgraph/scripts/rosgraph",
-    out = _ROSGRAPH_APP,
+    out = _ROSGRAPH_APP_PY,
 )
 
 py_binary(
     name = "rosgraph",
-    srcs = [_ROSGRAPH_APP],
-    main = _ROSGRAPH_APP,
+    srcs = [_ROSGRAPH_APP_PY],
+    main = _ROSGRAPH_APP_PY,
     deps = [":rosgraph_lib"],
     visibility = ["//visibility:public"],
 )
@@ -341,12 +350,12 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-_ROSTOPIC_APP = "rostopic_app.py"
+_ROSTOPIC_APP_PY = "rostopic_app.py"
 
 copy_file(
     name = "rostopic_app",
     src = "tools/rostopic/scripts/rostopic",
-    out = _ROSTOPIC_APP,
+    out = _ROSTOPIC_APP_PY,
     visibility = ["//visibility:public"],
 )
 
@@ -361,18 +370,18 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-_ROSPARAM_APP = "rosparam_app.py"
+_ROSPARAM_APP_PY = "rosparam_app.py"
 
 copy_file(
     name = "rosparam_app",
     src = "tools/rosparam/scripts/rosparam",
-    out = _ROSPARAM_APP,
+    out = _ROSPARAM_APP_PY,
 )
 
 py_binary(
     name = "rosparam",
-    srcs = [_ROSPARAM_APP],
-    main = _ROSPARAM_APP,
+    srcs = [_ROSPARAM_APP_PY],
+    main = _ROSPARAM_APP_PY,
     deps = [":rosparam_lib"],
     visibility = ["//visibility:public"],
 )
