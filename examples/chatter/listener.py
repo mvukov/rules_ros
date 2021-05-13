@@ -3,7 +3,7 @@ import rospy
 
 
 def callback(msg):
-    print(msg)
+    rospy.loginfo(msg)
 
 
 def main():
