@@ -8,6 +8,6 @@ filegroup(
 make(
     name = "bzip2",
     lib_source = "//:all_srcs",
-    static_libraries = ["libbz2.a"],
+    out_static_libs = ["libbz2.a"],
     visibility = ["//visibility:public"],
 )

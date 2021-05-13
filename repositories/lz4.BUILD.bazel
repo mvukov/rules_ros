@@ -8,6 +8,6 @@ filegroup(
 make(
     name = "lz4",
     lib_source = "//:all_srcs",
-    static_libraries = ["liblz4.a"],
+    out_static_libs = ["liblz4.a"],
     visibility = ["//visibility:public"],
 )
