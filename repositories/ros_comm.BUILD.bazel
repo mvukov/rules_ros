@@ -394,3 +394,24 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "message_filters",
+    hdrs = glob(["utilities/message_filters/include/**/*.h"]),
+    includes = ["utilities/message_filters/include"],
+    srcs = glob(["utilities/message_filters/src/*.cpp"]),
+    deps = [
+        ":roscpp",
+        "@boost//:thread",
+        "@rosconsole//:rosconsole",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "py_message_filters",
+    srcs = glob(["utilities/message_filters/src/message_filters/*.py"]),
+    imports = ["utilities/message_filters/src/"],
+    deps = [":rospy"],
+    visibility = ["//visibility:public"],
+)
