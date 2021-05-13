@@ -4,6 +4,7 @@ cc_library(
     includes = ["actionlib/include"],
     srcs = glob(["actionlib/src/*.cpp"]),
     deps = [
+        "@boost//:interprocess",
         "@boost//:thread",
         "@ros_comm//:roscpp",
         "@ros_common_msgs//:cc_actionlib_msgs",
