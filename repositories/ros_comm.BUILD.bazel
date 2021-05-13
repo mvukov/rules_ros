@@ -5,6 +5,10 @@ load(
     "ros_msg_library",
     "ros_srv_library",
 )
+load(
+    "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
+    "expand_template",
+)
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 cc_library(
@@ -110,20 +114,29 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-exports_files([
-    "tools/rosgraph/conf/python_logging.conf",
-])
+_DEFAULT_PYTHON_LOGGING_CONFIG = "tools/rosgraph/conf/python_logging.conf"
+_LOGGING_CONFIG_PY = "tools/rosgraph/src/rosgraph/ros_logging_config.py"
+
+expand_template(
+    name = "ros_logging_config",
+    out = _LOGGING_CONFIG_PY,
+    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
+    substitutions = {
+        "{default_python_logging_conf}": "$(location {})".format(_DEFAULT_PYTHON_LOGGING_CONFIG),
+    },
+    template = "@com_github_mvukov_rules_ros//repositories:ros_logging_config.py.tpl",
+)
 
 py_library(
     name = "rosgraph",
-    srcs = glob(["tools/rosgraph/src/**/*.py"]),
+    srcs = glob(["tools/rosgraph/src/**/*.py"]) + [_LOGGING_CONFIG_PY],
     imports = ["tools/rosgraph/src"],
     deps = [
         requirement("ifaddr"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
-    data = ["tools/rosgraph/conf/python_logging.conf"],
+    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
     visibility = ["//visibility:public"],
 )
 
