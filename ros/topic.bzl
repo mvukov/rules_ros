@@ -16,10 +16,10 @@ def ros_topic(name, deps):
     )
     py_binary(
         name = name,
-        srcs = ["//third_party:rostopic_app.py"],
-        main = "//third_party:rostopic_app.py",
+        srcs = ["@ros_comm//:rostopic_app.py"],
+        main = "@ros_comm//:rostopic_app.py",
         deps = [
             py_lib,
-            "@ros_comm//:rostopic",
+            "@ros_comm//:rostopic_lib",
         ],
     )

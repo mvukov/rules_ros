@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
     "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
     "cc_ros_msg_library",
@@ -128,7 +129,7 @@ expand_template(
 )
 
 py_library(
-    name = "rosgraph",
+    name = "rosgraph_lib",
     srcs = glob(["tools/rosgraph/src/**/*.py"]) + [_LOGGING_CONFIG_PY],
     imports = ["tools/rosgraph/src"],
     deps = [
@@ -140,6 +141,22 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
+_ROSGRAPH_APP = "rosgraph_app.py"
+
+copy_file(
+    name = "rosgraph_app",
+    src = "tools/rosgraph/scripts/rosgraph",
+    out = _ROSGRAPH_APP,
+)
+
+py_binary(
+    name = "rosgraph",
+    srcs = [_ROSGRAPH_APP],
+    main = _ROSGRAPH_APP,
+    deps = [":rosgraph_lib"],
+    visibility = ["//visibility:public"],
+)
+
 py_library(
     name = "rosmaster_lib",
     srcs = glob(
@@ -148,7 +165,7 @@ py_library(
     ),
     imports = ["tools/rosmaster/src"],
     deps = [
-        ":rosgraph",
+        ":rosgraph_lib",
         requirement("defusedxml"),
     ],
     visibility = ["//visibility:public"],
@@ -301,7 +318,7 @@ py_library(
     imports = ["clients/rospy/src"],
     deps = [
         ":py_roscpp_msgs_srvs",
-        ":rosgraph",
+        ":rosgraph_lib",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
         "@ros_std_msgs//:py_std_msgs",
@@ -314,7 +331,7 @@ py_library(
 )
 
 py_library(
-    name = "rostopic",
+    name = "rostopic_lib",
     srcs = glob(["tools/rostopic/src/**/*.py"]),
     imports = ["tools/rostopic/src"],
     deps = [
@@ -324,14 +341,39 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
+_ROSTOPIC_APP = "rostopic_app.py"
+
+copy_file(
+    name = "rostopic_app",
+    src = "tools/rostopic/scripts/rostopic",
+    out = _ROSTOPIC_APP,
+    visibility = ["//visibility:public"],
+)
+
 py_library(
-    name = "rosparam",
+    name = "rosparam_lib",
     srcs = glob(["tools/rosparam/src/**/*.py"]),
     imports = ["tools/rosparam/src"],
     deps = [
-        ":rosgraph",
+        ":rosgraph_lib",
         requirement("pyyaml"),
     ],
+    visibility = ["//visibility:public"],
+)
+
+_ROSPARAM_APP = "rosparam_app.py"
+
+copy_file(
+    name = "rosparam_app",
+    src = "tools/rosparam/scripts/rosparam",
+    out = _ROSPARAM_APP,
+)
+
+py_binary(
+    name = "rosparam",
+    srcs = [_ROSPARAM_APP],
+    main = _ROSPARAM_APP,
+    deps = [":rosparam_lib"],
     visibility = ["//visibility:public"],
 )
 
