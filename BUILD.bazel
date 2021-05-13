@@ -41,3 +41,8 @@ alias(
     name = "rosbag_play",
     actual = "@ros_comm//:rosbag_play",
 )
+
+alias(
+    name = "rosservice",
+    actual = "//third_party/rosservice:rosservice",
+)
