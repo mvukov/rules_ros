@@ -4,20 +4,23 @@ interaction.
 
 load("//ros:launch.bzl", "ros_launch")
 load(
-    "//ros:action_generation.bzl",
-    "cc_ros_action_library",
-    "ros_action_library",
+    "//ros:message_generation.bzl",
+    "cc_ros_msg_library",
+    "ros_msg_library",
 )
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
-ros_action_library(
+ros_msg_library(
     name = "dishwasher_actions",
     srcs = ["DoDishes.action"],
+    deps = [
+        "@ros_common_msgs//:actionlib_msgs",  # Must be explicitly defined!
+    ],
 )
 
-cc_ros_action_library(
+cc_ros_msg_library(
     name = "cc_dishwasher_actions",
-    action_library = ":dishwasher_actions",
+    deps = [":dishwasher_actions"],
 )
 
 cc_binary(

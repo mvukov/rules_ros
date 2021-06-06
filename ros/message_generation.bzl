@@ -13,23 +13,55 @@ RosMsgInfo = provider("Provides info for message generation.", fields = [
     "deps",
 ])
 
-def _ros_msg_library_impl(ctx):
-    import_path = ctx.files.srcs[0].dirname
-    for src in ctx.files.srcs[1:]:
-        if src.dirname != import_path:
-            fail("All message/service files must be in the same folder!")
+_ACTION_OUTPUT_MAPPING = [
+    "{}Goal.msg",
+    "{}ActionGoal.msg",
+    "{}Action.msg",
+    "{}Result.msg",
+    "{}ActionResult.msg",
+    "{}Feedback.msg",
+    "{}ActionFeedback.msg",
+]
 
+def _ros_msg_library_impl(ctx):
     package_name = ctx.attr.package_name
     if not package_name:
         package_name = ctx.label.name
 
+    output_srcs = []
+    for src in ctx.files.srcs:
+        if src.extension == "action":
+            stem = get_stem(src)
+            action_msgs = [
+                ctx.actions.declare_file(
+                    "{}/{}".format(package_name, t.format(stem)))
+                for t in _ACTION_OUTPUT_MAPPING
+            ]
+
+            genaction_args = ctx.actions.args()
+            genaction_args.add(src)
+            genaction_args.add("-o", action_msgs[0].dirname)
+            ctx.actions.run(
+                inputs = [src],
+                outputs = action_msgs,
+                executable = ctx.executable._genaction,
+                arguments = [genaction_args],
+            )
+            output_srcs.extend(action_msgs)
+
+        else:
+            src_symlink = ctx.actions.declare_file(
+                "{}/{}".format(package_name, src.basename))
+            ctx.actions.symlink(output = src_symlink, target_file = src)
+            output_srcs.append(src_symlink)
+
     return [
-        DefaultInfo(files = depset(ctx.files.srcs)),
+        DefaultInfo(files = depset(output_srcs)),
         RosMsgInfo(
             info = struct(
                 package_name = package_name,
-                import_path = import_path,
-                srcs = ctx.files.srcs,
+                import_path = output_srcs[0].dirname,
+                srcs = output_srcs,
             ),
             deps = depset(
                 direct = [dep[RosMsgInfo].info for dep in ctx.attr.deps],
@@ -41,11 +73,16 @@ def _ros_msg_library_impl(ctx):
 ros_msg_library = rule(
     attrs = {
         "srcs": attr.label_list(
-            allow_files = [".msg", ".srv"],
+            allow_files = [".action", ".msg", ".srv"],
             mandatory = True,
         ),
         "deps": attr.label_list(providers = [RosMsgInfo]),
         "package_name": attr.string(),
+        "_genaction": attr.label(
+            default = Label("@ros_common_msgs//:genaction"),
+            executable = True,
+            cfg = "exec",
+        ),
     },
     implementation = _ros_msg_library_impl,
 )
@@ -130,7 +167,7 @@ cc_ros_msg_compile = rule(
         "_gencpp": attr.label(
             default = Label("@ros_gencpp//:gencpp"),
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
     },
 )
@@ -257,23 +294,23 @@ def _py_ros_msg_compile_impl(ctx):
     deps = _get_deps(ctx.attr.deps)
     return _py_ros_msg_compile_internal(ctx, deps)
 
-_py_generator_deps = {
+_PY_GENERATOR_DEPS = {
     "_genmsg_py": attr.label(
         default = Label("@ros_genpy//:genmsg_py"),
         executable = True,
-        cfg = "host",
+        cfg = "exec",
     ),
     "_gensrv_py": attr.label(
         default = Label("@ros_genpy//:gensrv_py"),
         executable = True,
-        cfg = "host",
+        cfg = "exec",
     ),
 }
 
 py_ros_msg_compile = rule(
     implementation = _py_ros_msg_compile_impl,
     output_to_genfiles = True,
-    attrs = dicts.add(_py_generator_deps, {
+    attrs = dicts.add(_PY_GENERATOR_DEPS, {
         "deps": attr.label_list(
             mandatory = True,
             providers = [RosMsgInfo],
@@ -354,7 +391,7 @@ def _py_ros_msg_collector_impl(ctx):
 
 py_ros_msg_collector = rule(
     implementation = _py_ros_msg_collector_impl,
-    attrs = dicts.add(_py_generator_deps, {
+    attrs = dicts.add(_PY_GENERATOR_DEPS, {
         "deps": attr.label_list(
             mandatory = True,
             aspects = [ros_msg_collector_aspect],
