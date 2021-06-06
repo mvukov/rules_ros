@@ -2,6 +2,7 @@
 """
 
 load("//ros:message_generation.bzl", "RosMsgInfo", "cc_ros_msg_library", "py_ros_msg_library")
+load("//ros:utils.bzl", "get_stem")
 
 RosActionInfo = provider("Provides info for action generation.", fields = [
     "info",
@@ -45,8 +46,6 @@ ros_action_library = rule(
     implementation = _ros_action_library_impl,
 )
 
-EXT_LEN = 7
-
 def _ros_action_msgs_library_impl(ctx):
     action_info = ctx.attr.action_library[RosActionInfo].info
     package_name = action_info.package_name
@@ -54,7 +53,7 @@ def _ros_action_msgs_library_impl(ctx):
     rel_output_dir = "{}/{}".format(ctx.label.name, package_name)
     all_msgs = []
     for src in action_info.srcs:
-        src_stem = src.basename[:-EXT_LEN]
+        src_stem = get_stem(src)
         rel_generated_files = [
             "{}/{}Goal.msg".format(rel_output_dir, src_stem),
             "{}/{}ActionGoal.msg".format(rel_output_dir, src_stem),

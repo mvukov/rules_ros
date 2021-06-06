@@ -3,6 +3,7 @@
 Inspired by code in https://github.com/nicolov/ros-bazel repo.
 """
 
+load("//ros:utils.bzl", "get_stem")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_library")
@@ -72,8 +73,6 @@ def _get_all_srcs(deps):
         srcs += dep.srcs
     return srcs
 
-EXT_LEN = 4
-
 def _cc_ros_msg_compile_impl(ctx):
     deps = _get_deps(ctx.attr.deps)
     include_flags = _get_include_flags(deps)
@@ -84,7 +83,7 @@ def _cc_ros_msg_compile_impl(ctx):
         package_name = dep.package_name
         rel_output_dir = "{}/{}".format(ctx.label.name, package_name)
         for src in dep.srcs:
-            src_stem = src.basename[:-EXT_LEN]
+            src_stem = get_stem(src)
             msg_header = ctx.actions.declare_file(
                 "{}/{}.h".format(rel_output_dir, src_stem),
             )
@@ -167,7 +166,7 @@ def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msg
 
     py_msg_files = []
     for msg in msgs:
-        msg_stem = msg.basename[:-EXT_LEN]
+        msg_stem = get_stem(msg)
         py_file = ctx.actions.declare_file(
             "{}/{}/_{}.py".format(rel_output_dir, extension, msg_stem),
         )
