@@ -1,3 +1,6 @@
+""" Builds ros_comm_msgs.
+"""
+
 load(
     "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",

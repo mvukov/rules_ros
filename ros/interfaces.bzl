@@ -9,10 +9,12 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_library")
 
 RosInterfaceInfo = provider(
-    "Provides info for interface code generation.", fields = [
-    "info",
-    "deps",
-])
+    "Provides info for interface code generation.",
+    fields = [
+        "info",
+        "deps",
+    ],
+)
 
 _ACTION_OUTPUT_MAPPING = [
     "{}Goal.msg",
@@ -32,7 +34,8 @@ def _ros_interface_library_impl(ctx):
             stem = get_stem(src)
             action_msgs = [
                 ctx.actions.declare_file(
-                    "{}/{}".format(ros_package_name, t.format(stem)))
+                    "{}/{}".format(ros_package_name, t.format(stem)),
+                )
                 for t in _ACTION_OUTPUT_MAPPING
             ]
 
@@ -49,7 +52,8 @@ def _ros_interface_library_impl(ctx):
 
         else:
             src_symlink = ctx.actions.declare_file(
-                "{}/{}".format(ros_package_name, src.basename))
+                "{}/{}".format(ros_package_name, src.basename),
+            )
             ctx.actions.symlink(output = src_symlink, target_file = src)
             output_srcs.append(src_symlink)
 

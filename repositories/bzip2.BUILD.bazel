@@ -1,3 +1,6 @@
+""" Builds bzip2.
+"""
+
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "make")
 
 filegroup(

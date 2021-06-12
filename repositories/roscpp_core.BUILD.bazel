@@ -1,3 +1,6 @@
+""" Builds roscpp_core.
+"""
+
 cc_library(
     name = "cpp_common",
     hdrs = glob(["cpp_common/include/ros/*.h"]),

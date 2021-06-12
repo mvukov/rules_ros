@@ -27,7 +27,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 # Defines a library of ROS messages. Can be used for services as well.
 ros_interface_library(
     name = "example_msgs",
-    srcs = glob(["Example.msg"]),
+    srcs = ["Example.msg"],
     deps = ["@ros_std_msgs//:std_msgs"],
 )
 

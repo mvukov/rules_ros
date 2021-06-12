@@ -1,3 +1,6 @@
+""" Builds console_bridge.
+"""
+
 cc_library(
     name = "console_bridge",
     hdrs = glob(["include/console_bridge/*.h"]) + [":console_bridge_export_h"],

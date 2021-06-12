@@ -1,3 +1,6 @@
+""" Builds ros_comm.
+"""
+
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(

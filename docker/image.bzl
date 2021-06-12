@@ -1,3 +1,6 @@
+""" Implements a macro for constructing Docker images.
+"""
+
 load("@io_bazel_rules_docker//lang:image.bzl", "app_layer")
 
 def container_image(name, binary, base, **kwargs):
@@ -7,7 +10,7 @@ def container_image(name, binary, base, **kwargs):
         name: Name of the target.
         binary: The binary to embed in the image.
         base: Base image to use for the image.
-        **kwargs: TBD.
+        **kwargs: See arguments of app_layer.
     """
 
     app_layer(

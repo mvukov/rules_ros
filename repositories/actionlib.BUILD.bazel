@@ -1,3 +1,6 @@
+""" Builds actionlib.
+"""
+
 cc_library(
     name = "actionlib",
     hdrs = glob(["actionlib/include/actionlib/**/*.h"]),
