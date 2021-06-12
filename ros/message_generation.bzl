@@ -24,10 +24,7 @@ _ACTION_OUTPUT_MAPPING = [
 ]
 
 def _ros_msg_library_impl(ctx):
-    package_name = ctx.attr.package_name
-    if not package_name:
-        package_name = ctx.label.name
-
+    package_name = ctx.label.name  # -> ros_package_name
     output_srcs = []
     for src in ctx.files.srcs:
         if src.extension == "action":
@@ -60,7 +57,6 @@ def _ros_msg_library_impl(ctx):
         RosMsgInfo(
             info = struct(
                 package_name = package_name,
-                import_path = output_srcs[0].dirname,
                 srcs = output_srcs,
             ),
             deps = depset(
@@ -77,7 +73,6 @@ ros_msg_library = rule(
             mandatory = True,
         ),
         "deps": attr.label_list(providers = [RosMsgInfo]),
-        "package_name": attr.string(),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
             executable = True,
@@ -86,8 +81,6 @@ ros_msg_library = rule(
     },
     implementation = _ros_msg_library_impl,
 )
-
-ros_srv_library = ros_msg_library
 
 def _get_deps(attr_deps):
     return depset(
@@ -100,7 +93,7 @@ def _get_include_flags(deps):
     for dep in deps:
         include_flags += [
             "-I",
-            "{}:{}".format(dep.package_name, dep.import_path),
+            "{}:{}".format(dep.package_name, dep.srcs[0].dirname),
         ]
     return include_flags
 
@@ -188,8 +181,6 @@ def cc_ros_msg_library(name, deps, visibility = None):
         ],
         visibility = visibility,
     )
-
-cc_ros_srv_library = cc_ros_msg_library
 
 def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msgs):
     if not msgs:
@@ -331,8 +322,6 @@ def py_ros_msg_library(name, deps, visibility = None):
         deps = ["@ros_genpy//:genpy"],
         visibility = visibility,
     )
-
-py_ros_srv_library = py_ros_msg_library
 
 RosMsgCollectorAspectInfo = provider(
     "Collects ros_msg_library targets.",

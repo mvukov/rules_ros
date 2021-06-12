@@ -53,7 +53,7 @@ cc_binary(
     ],
     deps = [
         ":cc_example_msgs",
-        "@ros_comm//:roscpp",
+        "@ros_comm//:roscpp_lib",
     ],
 )
 
@@ -65,7 +65,7 @@ cc_binary(
     ],
     deps = [
         ":cc_example_msgs",
-        "@ros_comm//:roscpp",
+        "@ros_comm//:roscpp_lib",
     ],
 )
 

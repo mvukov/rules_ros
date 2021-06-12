@@ -5,7 +5,6 @@ load(
     "cc_ros_msg_library",
     "py_ros_msg_library",
     "ros_msg_library",
-    "ros_srv_library",
 )
 load(
     "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
@@ -36,28 +35,20 @@ cc_library(
 )
 
 ros_msg_library(
-    name = "roscpp_msgs",
-    srcs = glob(["clients/roscpp/msg/*.msg"]),
-    package_name = "roscpp",
-    visibility = ["//visibility:public"],
-)
-
-ros_srv_library(
-    name = "roscpp_srvs",
-    srcs = glob(["clients/roscpp/srv/*.srv"]),
-    package_name = "roscpp",
+    name = "roscpp",
+    srcs = glob(["clients/roscpp/msg/*.msg", "clients/roscpp/srv/*.srv"]),
     visibility = ["//visibility:public"],
 )
 
 cc_ros_msg_library(
-    name = "cc_roscpp_msgs_srvs",
-    deps = [":roscpp_msgs", ":roscpp_srvs"],
+    name = "cc_roscpp",
+    deps = [":roscpp"],
     visibility = ["//visibility:public"],
 )
 
 py_ros_msg_library(
-    name = "py_roscpp_msgs_srvs",
-    deps = [":roscpp_msgs", ":roscpp_srvs"],
+    name = "py_roscpp",
+    deps = [":roscpp"],
     visibility = ["//visibility:public"],
 )
 
@@ -101,13 +92,13 @@ expand_template(
 )
 
 cc_library(
-    name = "roscpp",
+    name = "roscpp_lib",
     hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
     includes = ["clients/roscpp/include"],
     srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [_CONFIG_H],
     defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
     deps = [
-        ":cc_roscpp_msgs_srvs",
+        ":cc_roscpp",
         ":xmlrpcpp",
         "@boost//:chrono",
         "@boost//:filesystem",
@@ -244,7 +235,7 @@ cc_library(
         "tools/topic_tools/src/parse.cpp",
     ],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
         ":xmlrpcpp",
         "@roscpp_core//:cpp_common",
         "@rosconsole//:rosconsole",
@@ -274,7 +265,7 @@ cc_library(
     ],
     copts = ["-D_FILE_OFFSET_BITS=64"],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
         ":rosbag_storage",
         ":topic_tools",
         "@boost//:date_time",
@@ -326,7 +317,7 @@ py_library(
     srcs = glob(["clients/rospy/src/**/*.py"]),
     imports = ["clients/rospy/src"],
     deps = [
-        ":py_roscpp_msgs_srvs",
+        ":py_roscpp",
         ":rosgraph_lib",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
@@ -390,7 +381,7 @@ cc_binary(
     name = "rosout",
     srcs = ["tools/rosout/rosout.cpp"],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
     ],
     visibility = ["//visibility:public"],
 )
@@ -401,7 +392,7 @@ cc_library(
     includes = ["utilities/message_filters/include"],
     srcs = glob(["utilities/message_filters/src/*.cpp"]),
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
         "@boost//:thread",
         "@rosconsole//:rosconsole",
     ],

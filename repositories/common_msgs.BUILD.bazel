@@ -3,7 +3,6 @@ load(
     "cc_ros_msg_library",
     "py_ros_msg_library",
     "ros_msg_library",
-    "ros_srv_library",
 )
 
 ros_msg_library(
@@ -33,16 +32,8 @@ py_binary(
 
 ros_msg_library(
     name = "diagnostic_msgs",
-    srcs = glob(["diagnostic_msgs/msg/*.msg"]),
+    srcs = glob(["diagnostic_msgs/msg/*.msg", "diagnostic_msgs/srv/*.srv"]),
     deps = ["@ros_std_msgs//:std_msgs"],
-    visibility = ["//visibility:public"],
-)
-
-ros_srv_library(
-    name = "diagnostic_srvs",
-    srcs = glob(["diagnostic_msgs/srv/*.srv"]),
-    deps = [":diagnostic_msgs"],
-    package_name = "diagnostic_msgs",
     visibility = ["//visibility:public"],
 )
 
@@ -55,68 +46,38 @@ ros_msg_library(
 
 ros_msg_library(
     name = "nav_msgs",
-    srcs = glob(["nav_msgs/msg/*.msg"]),
-    deps = [
-        ":geometry_msgs",
-        "@ros_std_msgs//:std_msgs",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-ros_srv_library(
-    name = "nav_srvs",
-    srcs = glob(["nav_msgs/srv/*.srv"]),
-    deps = [
-        ":geometry_msgs",
-        ":nav_msgs",
-        "@ros_std_msgs//:std_msgs",
-    ],
-    package_name = "nav_msgs",
-    visibility = ["//visibility:public"],
-)
-
-ros_msg_library(
-    name = "nav_actions",
-    srcs = glob(["nav_msgs/action/*.action"]),
+    srcs = glob([
+        "nav_msgs/action/*.action",
+        "nav_msgs/msg/*.msg",
+        "nav_msgs/srv/*.srv",
+    ]),
     deps = [
         ":actionlib_msgs",
-        ":nav_msgs",
+        ":geometry_msgs",
+        "@ros_std_msgs//:std_msgs",
     ],
-    package_name = "nav_msgs",
     visibility = ["//visibility:public"],
 )
 
 cc_ros_msg_library(
-    name = "cc_nav_actions",
-    deps = [":nav_actions"],
+    name = "cc_nav_msgs",
+    deps = [":nav_msgs"],
     visibility = ["//visibility:public"],
 )
 
 py_ros_msg_library(
-    name = "py_nav_actions",
-    deps = [":nav_actions"],
+    name = "py_nav_msgs",
+    deps = [":nav_msgs"],
     visibility = ["//visibility:public"],
 )
 
 ros_msg_library(
     name = "sensor_msgs",
-    srcs = glob(["sensor_msgs/msg/*.msg"]),
+    srcs = glob(["sensor_msgs/msg/*.msg", "sensor_msgs/srv/*.srv"]),
     deps = [
         ":geometry_msgs",
         "@ros_std_msgs//:std_msgs",
     ],
-    visibility = ["//visibility:public"],
-)
-
-ros_srv_library(
-    name = "sensor_srvs",
-    srcs = glob(["sensor_msgs/srv/*.srv"]),
-    deps = [
-        ":geometry_msgs",
-        ":sensor_msgs",
-        "@ros_std_msgs//:std_msgs",
-    ],
-    package_name = "sensor_msgs",
     visibility = ["//visibility:public"],
 )
 

@@ -1,11 +1,8 @@
 load(
     "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
     "cc_ros_msg_library",
-    "cc_ros_srv_library",
     "py_ros_msg_library",
-    "py_ros_srv_library",
     "ros_msg_library",
-    "ros_srv_library",
 )
 
 ros_msg_library(
@@ -15,7 +12,7 @@ ros_msg_library(
     visibility = ["//visibility:public"],
 )
 
-ros_srv_library(
+ros_msg_library(
     name = "std_srvs",
     srcs = glob(["std_srvs/srv/*.srv"]),
     visibility = ["//visibility:public"],
@@ -27,7 +24,7 @@ cc_ros_msg_library(
     visibility = ["//visibility:public"],
 )
 
-cc_ros_srv_library(
+cc_ros_msg_library(
     name = "cc_std_srvs",
     deps = [":std_srvs"],
     visibility = ["//visibility:public"],
@@ -39,7 +36,7 @@ py_ros_msg_library(
     visibility = ["//visibility:public"],
 )
 
-py_ros_srv_library(
+py_ros_msg_library(
     name = "py_std_srvs",
     deps = [":std_srvs"],
     visibility = ["//visibility:public"],
