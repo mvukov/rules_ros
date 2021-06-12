@@ -1,7 +1,7 @@
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
-    "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
+    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",

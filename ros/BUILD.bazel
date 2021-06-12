@@ -1,6 +1,5 @@
 exports_files([
-    "action_generation.bzl",
+    "interfaces.bzl",
     "launch.bzl",
     "launch.py.tpl",
-    "message_generation.bzl",
 ])
