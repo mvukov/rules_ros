@@ -8,7 +8,8 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_library")
 
-RosMsgInfo = provider("Provides info for message generation.", fields = [
+RosInterfaceInfo = provider(
+    "Provides info for interface code generation.", fields = [
     "info",
     "deps",
 ])
@@ -23,15 +24,15 @@ _ACTION_OUTPUT_MAPPING = [
     "{}ActionFeedback.msg",
 ]
 
-def _ros_msg_library_impl(ctx):
-    package_name = ctx.label.name  # -> ros_package_name
-    output_srcs = []
+def _ros_interface_library_impl(ctx):
+    ros_package_name = ctx.label.name
+    output_srcs = []  # Messages and services.
     for src in ctx.files.srcs:
         if src.extension == "action":
             stem = get_stem(src)
             action_msgs = [
                 ctx.actions.declare_file(
-                    "{}/{}".format(package_name, t.format(stem)))
+                    "{}/{}".format(ros_package_name, t.format(stem)))
                 for t in _ACTION_OUTPUT_MAPPING
             ]
 
@@ -48,44 +49,44 @@ def _ros_msg_library_impl(ctx):
 
         else:
             src_symlink = ctx.actions.declare_file(
-                "{}/{}".format(package_name, src.basename))
+                "{}/{}".format(ros_package_name, src.basename))
             ctx.actions.symlink(output = src_symlink, target_file = src)
             output_srcs.append(src_symlink)
 
     return [
         DefaultInfo(files = depset(output_srcs)),
-        RosMsgInfo(
+        RosInterfaceInfo(
             info = struct(
-                package_name = package_name,
+                ros_package_name = ros_package_name,
                 srcs = output_srcs,
             ),
             deps = depset(
-                direct = [dep[RosMsgInfo].info for dep in ctx.attr.deps],
-                transitive = [dep[RosMsgInfo].deps for dep in ctx.attr.deps],
+                direct = [dep[RosInterfaceInfo].info for dep in ctx.attr.deps],
+                transitive = [dep[RosInterfaceInfo].deps for dep in ctx.attr.deps],
             ),
         ),
     ]
 
-ros_msg_library = rule(
+ros_interface_library = rule(
     attrs = {
         "srcs": attr.label_list(
             allow_files = [".action", ".msg", ".srv"],
             mandatory = True,
         ),
-        "deps": attr.label_list(providers = [RosMsgInfo]),
+        "deps": attr.label_list(providers = [RosInterfaceInfo]),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
             executable = True,
             cfg = "exec",
         ),
     },
-    implementation = _ros_msg_library_impl,
+    implementation = _ros_interface_library_impl,
 )
 
 def _get_deps(attr_deps):
     return depset(
-        direct = [src[RosMsgInfo].info for src in attr_deps],
-        transitive = [src[RosMsgInfo].deps for src in attr_deps],
+        direct = [src[RosInterfaceInfo].info for src in attr_deps],
+        transitive = [src[RosInterfaceInfo].deps for src in attr_deps],
     ).to_list()
 
 def _get_include_flags(deps):
@@ -93,7 +94,7 @@ def _get_include_flags(deps):
     for dep in deps:
         include_flags += [
             "-I",
-            "{}:{}".format(dep.package_name, dep.srcs[0].dirname),
+            "{}:{}".format(dep.ros_package_name, dep.srcs[0].dirname),
         ]
     return include_flags
 
@@ -103,15 +104,15 @@ def _get_all_srcs(deps):
         srcs += dep.srcs
     return srcs
 
-def _cc_ros_msg_compile_impl(ctx):
+def _cc_ros_interface_compile_impl(ctx):
     deps = _get_deps(ctx.attr.deps)
     include_flags = _get_include_flags(deps)
     all_srcs = _get_all_srcs(deps)
 
     all_headers = []
     for dep in deps:
-        package_name = dep.package_name
-        rel_output_dir = "{}/{}".format(ctx.label.name, package_name)
+        ros_package_name = dep.ros_package_name
+        rel_output_dir = "{}/{}".format(ctx.label.name, ros_package_name)
         for src in dep.srcs:
             src_stem = get_stem(src)
             msg_header = ctx.actions.declare_file(
@@ -133,7 +134,7 @@ def _cc_ros_msg_compile_impl(ctx):
                 "-o",
                 msg_header.dirname,
                 "-p",
-                package_name,
+                ros_package_name,
             ] + include_flags + [
                 src.path,
             ]
@@ -149,13 +150,13 @@ def _cc_ros_msg_compile_impl(ctx):
         DefaultInfo(files = depset(all_headers)),
     ]
 
-cc_ros_msg_compile = rule(
-    implementation = _cc_ros_msg_compile_impl,
+cc_ros_interface_compile = rule(
+    implementation = _cc_ros_interface_compile_impl,
     output_to_genfiles = True,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            providers = [RosMsgInfo],
+            providers = [RosInterfaceInfo],
         ),
         "_gencpp": attr.label(
             default = Label("@ros_gencpp//:gencpp"),
@@ -165,9 +166,9 @@ cc_ros_msg_compile = rule(
     },
 )
 
-def cc_ros_msg_library(name, deps, visibility = None):
+def cc_ros_interface_library(name, deps, visibility = None):
     name_gencpp = "{}_gencpp".format(name)
-    cc_ros_msg_compile(
+    cc_ros_interface_compile(
         name = name_gencpp,
         deps = deps,
     )
@@ -182,7 +183,7 @@ def cc_ros_msg_library(name, deps, visibility = None):
         visibility = visibility,
     )
 
-def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msgs):
+def _py_generate(ctx, include_flags, all_srcs, ros_package_name, rel_output_dir, msgs):
     if not msgs:
         return []
 
@@ -204,7 +205,7 @@ def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msg
         "-o",
         py_msg_files[0].dirname,
         "-p",
-        package_name,
+        ros_package_name,
     ] + include_flags + [
         msg.path
         for msg in msgs
@@ -226,7 +227,7 @@ def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msg
         "-o",
         py_msg_files[0].dirname,
         "-p",
-        package_name,
+        ros_package_name,
     ]
 
     ctx.actions.run(
@@ -238,29 +239,29 @@ def _py_generate(ctx, include_flags, all_srcs, package_name, rel_output_dir, msg
 
     return py_msg_files + [init_py]
 
-def _py_ros_msg_compile_internal(ctx, deps):
+def _py_ros_interface_compile_internal(ctx, deps):
     include_flags = _get_include_flags(deps)
     all_srcs = _get_all_srcs(deps)
 
-    package_names_to_srcs = {}
+    ros_package_names_to_srcs = {}
     for dep in deps:
-        if dep.package_name not in package_names_to_srcs:
-            package_names_to_srcs[dep.package_name] = dep.srcs
+        if dep.ros_package_name not in ros_package_names_to_srcs:
+            ros_package_names_to_srcs[dep.ros_package_name] = dep.srcs
         else:
-            package_names_to_srcs[dep.package_name] = (
-                package_names_to_srcs[dep.package_name] + dep.srcs
+            ros_package_names_to_srcs[dep.ros_package_name] = (
+                ros_package_names_to_srcs[dep.ros_package_name] + dep.srcs
             )
 
     all_py_files = []
-    for package_name, srcs in package_names_to_srcs.items():
-        rel_output_dir = "{}/{}".format(ctx.label.name, package_name)
+    for ros_package_name, srcs in ros_package_names_to_srcs.items():
+        rel_output_dir = "{}/{}".format(ctx.label.name, ros_package_name)
 
         msgs = [src for src in srcs if src.extension == "msg"]
         py_msg_files = _py_generate(
             ctx,
             include_flags,
             all_srcs,
-            package_name,
+            ros_package_name,
             rel_output_dir,
             msgs,
         )
@@ -271,7 +272,7 @@ def _py_ros_msg_compile_internal(ctx, deps):
             ctx,
             include_flags,
             all_srcs,
-            package_name,
+            ros_package_name,
             rel_output_dir,
             srvs,
         )
@@ -281,9 +282,9 @@ def _py_ros_msg_compile_internal(ctx, deps):
         DefaultInfo(files = depset(all_py_files)),
     ]
 
-def _py_ros_msg_compile_impl(ctx):
+def _py_ros_interface_compile_impl(ctx):
     deps = _get_deps(ctx.attr.deps)
-    return _py_ros_msg_compile_internal(ctx, deps)
+    return _py_ros_interface_compile_internal(ctx, deps)
 
 _PY_GENERATOR_DEPS = {
     "_genmsg_py": attr.label(
@@ -298,20 +299,20 @@ _PY_GENERATOR_DEPS = {
     ),
 }
 
-py_ros_msg_compile = rule(
-    implementation = _py_ros_msg_compile_impl,
+py_ros_interface_compile = rule(
+    implementation = _py_ros_interface_compile_impl,
     output_to_genfiles = True,
     attrs = dicts.add(_PY_GENERATOR_DEPS, {
         "deps": attr.label_list(
             mandatory = True,
-            providers = [RosMsgInfo],
+            providers = [RosInterfaceInfo],
         ),
     }),
 )
 
-def py_ros_msg_library(name, deps, visibility = None):
+def py_ros_interface_library(name, deps, visibility = None):
     name_genpy = "{}_genpy".format(name)
-    py_ros_msg_compile(
+    py_ros_interface_compile(
         name = name_genpy,
         deps = deps,
     )
@@ -323,8 +324,8 @@ def py_ros_msg_library(name, deps, visibility = None):
         visibility = visibility,
     )
 
-RosMsgCollectorAspectInfo = provider(
-    "Collects ros_msg_library targets.",
+RosInterfaceCollectorAspectInfo = provider(
+    "Collects ros_interface_library targets.",
     fields = [
         "deps",
     ],
@@ -339,23 +340,23 @@ def _collect_dependencies(rule_attr, attr_name):
     return [
         dep
         for dep in _getattr_as_list(rule_attr, attr_name)
-        if type(dep) == "Target" and RosMsgCollectorAspectInfo in dep
+        if type(dep) == "Target" and RosInterfaceCollectorAspectInfo in dep
     ]
 
 _ROS_MSG_COLLECTOR_ASPECT_ATTRS = ["data", "deps", "hdrs", "srcs"]
 
-def _ros_msg_collector_aspect_impl(target, ctx):
+def _ros_interface_collector_aspect_impl(target, ctx):
     direct_deps = []
-    if ctx.rule.kind == "ros_msg_library":
+    if ctx.rule.kind == "ros_interface_library":
         direct_deps = [target]
 
     transitive_deps = []
     for attr_name in _ROS_MSG_COLLECTOR_ASPECT_ATTRS:
         for dep in _collect_dependencies(ctx.rule.attr, attr_name):
-            transitive_deps.append(dep[RosMsgCollectorAspectInfo].deps)
+            transitive_deps.append(dep[RosInterfaceCollectorAspectInfo].deps)
 
     return [
-        RosMsgCollectorAspectInfo(
+        RosInterfaceCollectorAspectInfo(
             deps = depset(
                 direct = direct_deps,
                 transitive = transitive_deps,
@@ -363,28 +364,28 @@ def _ros_msg_collector_aspect_impl(target, ctx):
         ),
     ]
 
-ros_msg_collector_aspect = aspect(
-    implementation = _ros_msg_collector_aspect_impl,
+ros_interface_collector_aspect = aspect(
+    implementation = _ros_interface_collector_aspect_impl,
     attr_aspects = _ROS_MSG_COLLECTOR_ASPECT_ATTRS,
 )
 
-def _py_ros_msg_collector_impl(ctx):
+def _py_ros_interface_collector_impl(ctx):
     msg_targets = depset(
         transitive = [
-            dep[RosMsgCollectorAspectInfo].deps
+            dep[RosInterfaceCollectorAspectInfo].deps
             for dep in ctx.attr.deps
         ],
     ).to_list()
     deps = _get_deps(msg_targets)
-    return _py_ros_msg_compile_internal(ctx, deps)
+    return _py_ros_interface_compile_internal(ctx, deps)
 
-py_ros_msg_collector = rule(
-    implementation = _py_ros_msg_collector_impl,
+py_ros_interface_collector = rule(
+    implementation = _py_ros_interface_collector_impl,
     attrs = dicts.add(_PY_GENERATOR_DEPS, {
         "deps": attr.label_list(
             mandatory = True,
-            aspects = [ros_msg_collector_aspect],
-            providers = [RosMsgCollectorAspectInfo],
+            aspects = [ros_interface_collector_aspect],
+            providers = [RosInterfaceCollectorAspectInfo],
         ),
     }),
 )

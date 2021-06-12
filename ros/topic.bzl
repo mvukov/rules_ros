@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//ros:message_generation.bzl", "py_ros_msg_collector")
+load("//ros:message_generation.bzl", "py_ros_interface_collector")
 
 def ros_topic(name, deps):
     py_msgs = "{}_py_msgs".format(name)
-    py_ros_msg_collector(
+    py_ros_interface_collector(
         name = py_msgs,
         deps = deps,
     )

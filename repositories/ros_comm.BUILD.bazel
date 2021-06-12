@@ -2,9 +2,9 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
     "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
-    "cc_ros_msg_library",
-    "py_ros_msg_library",
-    "ros_msg_library",
+    "cc_ros_interface_library",
+    "py_ros_interface_library",
+    "ros_interface_library",
 )
 load(
     "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
@@ -34,19 +34,19 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-ros_msg_library(
+ros_interface_library(
     name = "roscpp",
     srcs = glob(["clients/roscpp/msg/*.msg", "clients/roscpp/srv/*.srv"]),
     visibility = ["//visibility:public"],
 )
 
-cc_ros_msg_library(
+cc_ros_interface_library(
     name = "cc_roscpp",
     deps = [":roscpp"],
     visibility = ["//visibility:public"],
 )
 
-py_ros_msg_library(
+py_ros_interface_library(
     name = "py_roscpp",
     deps = [":roscpp"],
     visibility = ["//visibility:public"],
