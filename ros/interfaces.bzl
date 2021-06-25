@@ -1,4 +1,18 @@
-"""Implements functionality for message generation.
+# Copyright 2021 Milan Vukov
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Implements functionality for code generation of ROS interfaces.
 
 Inspired by code in https://github.com/nicolov/ros-bazel repo.
 """
@@ -87,6 +101,119 @@ ros_interface_library = rule(
     implementation = _ros_interface_library_impl,
 )
 
+def _cc_generator_aspect_impl(target, ctx):
+    ros_package_name = target.label.name
+    srcs = target[RosInterfaceInfo].info.srcs
+
+    include_flags = ["-I", "{}:{}".format(ros_package_name, srcs[0].dirname)]
+    for dep in ctx.rule.attr.deps:
+        include_flags += ["-I", "{}:{}".format(
+            dep.label.name,
+            dep[RosInterfaceInfo].info.srcs[0].dirname,
+        )]
+
+    all_srcs = depset(
+        direct = srcs,
+        transitive = [
+            depset(dep[RosInterfaceInfo].info.srcs)
+            for dep in ctx.rule.attr.deps
+        ],
+    )
+
+    all_headers = []
+    for src in srcs:
+        src_stem = get_stem(src)
+        msg_header = ctx.actions.declare_file(
+            "{}/{}.h".format(ros_package_name, src_stem),
+        )
+        msg_headers = [msg_header]
+
+        if src.extension == "srv":
+            msg_headers.append(ctx.actions.declare_file(
+                "{}/{}Request.h".format(ros_package_name, src_stem),
+            ))
+            msg_headers.append(ctx.actions.declare_file(
+                "{}/{}Response.h".format(ros_package_name, src_stem),
+            ))
+
+        all_headers.extend(msg_headers)
+
+        args = [
+            "-o",
+            msg_header.dirname,
+            "-p",
+            ros_package_name,
+        ] + include_flags + [
+            src.path,
+        ]
+
+        ctx.actions.run(
+            inputs = all_srcs,
+            outputs = msg_headers,
+            executable = ctx.executable._gencpp,
+            arguments = args,
+        )
+
+    cc_include_dir = "/".join(srcs[0].dirname.split("/")[:-1])
+    compilation_context = cc_common.create_compilation_context(
+        headers = depset(all_headers),
+        system_includes = depset([cc_include_dir]),
+    )
+    cc_info = cc_common.merge_cc_infos(
+        direct_cc_infos = [CcInfo(compilation_context = compilation_context)] + [
+            dep[CcInfo]
+            for dep in ctx.rule.attr.deps
+        ],
+    )
+    return [cc_info]
+
+cc_generator_aspect = aspect(
+    implementation = _cc_generator_aspect_impl,
+    attr_aspects = ["deps"],
+    attrs = {
+        "_gencpp": attr.label(
+            default = Label("@ros_gencpp//:gencpp"),
+            executable = True,
+            cfg = "exec",
+        ),
+    },
+    provides = [CcInfo],
+)
+
+def _cc_generator_impl(ctx):
+    cc_info = cc_common.merge_cc_infos(
+        direct_cc_infos = [dep[CcInfo] for dep in ctx.attr.deps],
+    )
+    return [cc_info]
+
+cc_generator = rule(
+    implementation = _cc_generator_impl,
+    output_to_genfiles = True,
+    attrs = {
+        "deps": attr.label_list(
+            mandatory = True,
+            aspects = [cc_generator_aspect],
+            providers = [RosInterfaceInfo],
+        ),
+    },
+)
+
+def cc_ros_interface_library(name, deps, visibility = None):
+    name_gencpp = "{}_gencpp".format(name)
+    cc_generator(
+        name = name_gencpp,
+        deps = deps,
+    )
+    cc_library(
+        name = name,
+        deps = [
+            name_gencpp,
+            "@roscpp_core//:roscpp_core",
+            "@ros_std_msgs//:cc_std_msgs_headers",
+        ],
+        visibility = visibility,
+    )
+
 def _get_deps(attr_deps):
     return depset(
         direct = [src[RosInterfaceInfo].info for src in attr_deps],
@@ -107,85 +234,6 @@ def _get_all_srcs(deps):
     for dep in deps:
         srcs += dep.srcs
     return srcs
-
-def _cc_ros_interface_compile_impl(ctx):
-    deps = _get_deps(ctx.attr.deps)
-    include_flags = _get_include_flags(deps)
-    all_srcs = _get_all_srcs(deps)
-
-    all_headers = []
-    for dep in deps:
-        ros_package_name = dep.ros_package_name
-        rel_output_dir = "{}/{}".format(ctx.label.name, ros_package_name)
-        for src in dep.srcs:
-            src_stem = get_stem(src)
-            msg_header = ctx.actions.declare_file(
-                "{}/{}.h".format(rel_output_dir, src_stem),
-            )
-            msg_headers = [msg_header]
-
-            if src.extension == "srv":
-                msg_headers.append(ctx.actions.declare_file(
-                    "{}/{}Request.h".format(rel_output_dir, src_stem),
-                ))
-                msg_headers.append(ctx.actions.declare_file(
-                    "{}/{}Response.h".format(rel_output_dir, src_stem),
-                ))
-
-            all_headers.extend(msg_headers)
-
-            args = [
-                "-o",
-                msg_header.dirname,
-                "-p",
-                ros_package_name,
-            ] + include_flags + [
-                src.path,
-            ]
-
-            ctx.actions.run(
-                inputs = all_srcs,
-                outputs = msg_headers,
-                executable = ctx.executable._gencpp,
-                arguments = args,
-            )
-
-    return [
-        DefaultInfo(files = depset(all_headers)),
-    ]
-
-cc_ros_interface_compile = rule(
-    implementation = _cc_ros_interface_compile_impl,
-    output_to_genfiles = True,
-    attrs = {
-        "deps": attr.label_list(
-            mandatory = True,
-            providers = [RosInterfaceInfo],
-        ),
-        "_gencpp": attr.label(
-            default = Label("@ros_gencpp//:gencpp"),
-            executable = True,
-            cfg = "exec",
-        ),
-    },
-)
-
-def cc_ros_interface_library(name, deps, visibility = None):
-    name_gencpp = "{}_gencpp".format(name)
-    cc_ros_interface_compile(
-        name = name_gencpp,
-        deps = deps,
-    )
-    cc_library(
-        name = name,
-        hdrs = [name_gencpp],
-        includes = [name_gencpp],
-        deps = [
-            "@roscpp_core//:roscpp_core",
-            "@ros_std_msgs//:cc_std_msgs_headers",
-        ],
-        visibility = visibility,
-    )
 
 def _py_generate(ctx, include_flags, all_srcs, ros_package_name, rel_output_dir, msgs):
     if not msgs:
