@@ -80,7 +80,10 @@ def _ros_interface_library_impl(ctx):
             ),
             deps = depset(
                 direct = [dep[RosInterfaceInfo].info for dep in ctx.attr.deps],
-                transitive = [dep[RosInterfaceInfo].deps for dep in ctx.attr.deps],
+                transitive = [
+                    dep[RosInterfaceInfo].deps
+                    for dep in ctx.attr.deps
+                ],
             ),
         ),
     ]
@@ -101,25 +104,34 @@ ros_interface_library = rule(
     implementation = _ros_interface_library_impl,
 )
 
-def _cc_generator_aspect_impl(target, ctx):
+def _get_include_flags(target, ctx):
     ros_package_name = target.label.name
     srcs = target[RosInterfaceInfo].info.srcs
+    deps = target[RosInterfaceInfo].deps
 
     include_flags = ["-I", "{}:{}".format(ros_package_name, srcs[0].dirname)]
-    for dep in ctx.rule.attr.deps:
+    for dep in deps.to_list():
         include_flags += ["-I", "{}:{}".format(
-            dep.label.name,
-            dep[RosInterfaceInfo].info.srcs[0].dirname,
+            dep.ros_package_name,
+            dep.srcs[0].dirname,
         )]
+    return include_flags
 
-    all_srcs = depset(
+def _get_all_srcs(target, ctx):
+    srcs = target[RosInterfaceInfo].info.srcs
+    deps = target[RosInterfaceInfo].deps
+
+    return depset(
         direct = srcs,
-        transitive = [
-            depset(dep[RosInterfaceInfo].info.srcs)
-            for dep in ctx.rule.attr.deps
-        ],
+        transitive = [depset(dep.srcs) for dep in deps.to_list()],
     )
 
+def _cc_ros_generator_aspect_impl(target, ctx):
+    include_flags = _get_include_flags(target, ctx)
+    all_srcs = _get_all_srcs(target, ctx)
+
+    ros_package_name = target.label.name
+    srcs = target[RosInterfaceInfo].info.srcs
     all_headers = []
     for src in srcs:
         src_stem = get_stem(src)
@@ -160,15 +172,17 @@ def _cc_generator_aspect_impl(target, ctx):
         system_includes = depset([cc_include_dir]),
     )
     cc_info = cc_common.merge_cc_infos(
-        direct_cc_infos = [CcInfo(compilation_context = compilation_context)] + [
+        direct_cc_infos = [
+            CcInfo(compilation_context = compilation_context),
+        ] + [
             dep[CcInfo]
             for dep in ctx.rule.attr.deps
         ],
     )
     return [cc_info]
 
-cc_generator_aspect = aspect(
-    implementation = _cc_generator_aspect_impl,
+cc_ros_generator_aspect = aspect(
+    implementation = _cc_ros_generator_aspect_impl,
     attr_aspects = ["deps"],
     attrs = {
         "_gencpp": attr.label(
@@ -180,19 +194,19 @@ cc_generator_aspect = aspect(
     provides = [CcInfo],
 )
 
-def _cc_generator_impl(ctx):
+def _cc_ros_generator_impl(ctx):
     cc_info = cc_common.merge_cc_infos(
         direct_cc_infos = [dep[CcInfo] for dep in ctx.attr.deps],
     )
     return [cc_info]
 
-cc_generator = rule(
-    implementation = _cc_generator_impl,
+cc_ros_generator = rule(
+    implementation = _cc_ros_generator_impl,
     output_to_genfiles = True,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            aspects = [cc_generator_aspect],
+            aspects = [cc_ros_generator_aspect],
             providers = [RosInterfaceInfo],
         ),
     },
@@ -200,7 +214,7 @@ cc_generator = rule(
 
 def cc_ros_interface_library(name, deps, visibility = None):
     name_gencpp = "{}_gencpp".format(name)
-    cc_generator(
+    cc_ros_generator(
         name = name_gencpp,
         deps = deps,
     )
@@ -312,27 +326,11 @@ _PY_ROS_GENERATOR_ATTR_ASPECTS = ["data", "deps"]
 def _py_ros_generator_aspect_impl(target, ctx):
     py_infos = []
     if ctx.rule.kind == "ros_interface_library":
+        include_flags = _get_include_flags(target, ctx)
+        all_srcs = _get_all_srcs(target, ctx)
+
         ros_package_name = target.label.name
         srcs = target[RosInterfaceInfo].info.srcs
-
-        include_flags = [
-            "-I",
-            "{}:{}".format(ros_package_name, srcs[0].dirname),
-        ]
-        for dep in ctx.rule.attr.deps:
-            include_flags += ["-I", "{}:{}".format(
-                dep.label.name,
-                dep[RosInterfaceInfo].info.srcs[0].dirname,
-            )]
-
-        all_srcs = depset(
-            direct = srcs,
-            transitive = [
-                depset(dep[RosInterfaceInfo].info.srcs)
-                for dep in ctx.rule.attr.deps
-            ],
-        )
-
         rel_output_dir = ros_package_name
         all_py_files = []
 

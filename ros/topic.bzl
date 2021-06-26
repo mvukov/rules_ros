@@ -1,7 +1,7 @@
 """ Implements a macro for setting up target-dependent rostopic app.
 """
 
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//ros:interfaces.bzl", "py_ros_interface_collector")
 
 def ros_topic(name, deps):
@@ -11,7 +11,7 @@ def ros_topic(name, deps):
         name: The app (target) name.
         deps: A list of deps for which all ros_interface_library targets are
         collected and on which this target can operate on. This would typically
-        be a list of ROS node targets.
+        be a list of ROS node targets or ROS deployments (ros_launch targets).
     """
     interfaces = "{}_interfaces".format(name)
     py_ros_interface_collector(
