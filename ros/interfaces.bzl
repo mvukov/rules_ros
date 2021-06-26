@@ -18,7 +18,7 @@ Inspired by code in https://github.com/nicolov/ros-bazel repo.
 """
 
 load("//ros:utils.bzl", "get_stem")
-load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_library")
 
@@ -214,28 +214,13 @@ def cc_ros_interface_library(name, deps, visibility = None):
         visibility = visibility,
     )
 
-def _get_deps(attr_deps):
-    return depset(
-        direct = [src[RosInterfaceInfo].info for src in attr_deps],
-        transitive = [src[RosInterfaceInfo].deps for src in attr_deps],
-    ).to_list()
-
-def _get_include_flags(deps):
-    include_flags = []
-    for dep in deps:
-        include_flags += [
-            "-I",
-            "{}:{}".format(dep.ros_package_name, dep.srcs[0].dirname),
-        ]
-    return include_flags
-
-def _get_all_srcs(deps):
-    srcs = []
-    for dep in deps:
-        srcs += dep.srcs
-    return srcs
-
-def _py_generate(ctx, include_flags, all_srcs, ros_package_name, rel_output_dir, msgs):
+def _py_generate(
+        ctx,
+        include_flags,
+        all_srcs,
+        ros_package_name,
+        rel_output_dir,
+        msgs):
     if not msgs:
         return []
 
@@ -291,22 +276,65 @@ def _py_generate(ctx, include_flags, all_srcs, ros_package_name, rel_output_dir,
 
     return py_msg_files + [init_py]
 
-def _py_ros_interface_compile_internal(ctx, deps):
-    include_flags = _get_include_flags(deps)
-    all_srcs = _get_all_srcs(deps)
+PyRosGeneratorAspectInfo = provider(
+    "Accumulates Python ROS interfaces.",
+    fields = [
+        "transitive_sources",
+        "imports",
+    ],
+)
 
-    ros_package_names_to_srcs = {}
-    for dep in deps:
-        if dep.ros_package_name not in ros_package_names_to_srcs:
-            ros_package_names_to_srcs[dep.ros_package_name] = dep.srcs
-        else:
-            ros_package_names_to_srcs[dep.ros_package_name] = (
-                ros_package_names_to_srcs[dep.ros_package_name] + dep.srcs
-            )
+def _get_list_attr(rule_attr, attr_name):
+    if not hasattr(rule_attr, attr_name):
+        return []
+    candidate = getattr(rule_attr, attr_name)
+    if type(candidate) != "list":
+        fail("Expected a list for attribute `{}`!".format(attr_name))
+    return candidate
 
-    all_py_files = []
-    for ros_package_name, srcs in ros_package_names_to_srcs.items():
-        rel_output_dir = "{}/{}".format(ctx.label.name, ros_package_name)
+def _collect_py_ros_generator_deps(rule_attr, attr_name):
+    return [
+        dep
+        for dep in _get_list_attr(rule_attr, attr_name)
+        if type(dep) == "Target" and PyRosGeneratorAspectInfo in dep
+    ]
+
+def _merge_py_ros_generator_aspect_infos(py_infos):
+    return PyRosGeneratorAspectInfo(
+        transitive_sources = depset(
+            transitive = [info.transitive_sources for info in py_infos],
+        ),
+        imports = depset(transitive = [info.imports for info in py_infos]),
+    )
+
+_PY_ROS_GENERATOR_ATTR_ASPECTS = ["data", "deps"]
+
+def _py_ros_generator_aspect_impl(target, ctx):
+    py_infos = []
+    if ctx.rule.kind == "ros_interface_library":
+        ros_package_name = target.label.name
+        srcs = target[RosInterfaceInfo].info.srcs
+
+        include_flags = [
+            "-I",
+            "{}:{}".format(ros_package_name, srcs[0].dirname),
+        ]
+        for dep in ctx.rule.attr.deps:
+            include_flags += ["-I", "{}:{}".format(
+                dep.label.name,
+                dep[RosInterfaceInfo].info.srcs[0].dirname,
+            )]
+
+        all_srcs = depset(
+            direct = srcs,
+            transitive = [
+                depset(dep[RosInterfaceInfo].info.srcs)
+                for dep in ctx.rule.attr.deps
+            ],
+        )
+
+        rel_output_dir = ros_package_name
+        all_py_files = []
 
         msgs = [src for src in srcs if src.extension == "msg"]
         py_msg_files = _py_generate(
@@ -330,114 +358,95 @@ def _py_ros_interface_compile_internal(ctx, deps):
         )
         all_py_files.extend(py_srv_files)
 
-    return [
-        DefaultInfo(files = depset(all_py_files)),
-    ]
+        the_file = all_py_files[0]
+        relative_path_parts = paths.relativize(
+            the_file.dirname,
+            the_file.root.path,
+        ).split("/")
+        if relative_path_parts[0] == "external":
+            py_import_path = paths.join(*relative_path_parts[1:-2])
+        else:
+            py_import_path = paths.join(
+                ctx.workspace_name,
+                *relative_path_parts[0:-2]
+            )
 
-def _py_ros_interface_compile_impl(ctx):
-    deps = _get_deps(ctx.attr.deps)
-    return _py_ros_interface_compile_internal(ctx, deps)
+        py_infos = [PyRosGeneratorAspectInfo(
+            transitive_sources = depset(all_py_files),
+            imports = depset([py_import_path]),
+        )]
 
-_PY_GENERATOR_DEPS = {
-    "_genmsg_py": attr.label(
-        default = Label("@ros_genpy//:genmsg_py"),
-        executable = True,
-        cfg = "exec",
-    ),
-    "_gensrv_py": attr.label(
-        default = Label("@ros_genpy//:gensrv_py"),
-        executable = True,
-        cfg = "exec",
-    ),
-}
+    for attr_name in _PY_ROS_GENERATOR_ATTR_ASPECTS:
+        for dep in _collect_py_ros_generator_deps(ctx.rule.attr, attr_name):
+            py_infos.append(dep[PyRosGeneratorAspectInfo])
 
-py_ros_interface_compile = rule(
-    implementation = _py_ros_interface_compile_impl,
-    output_to_genfiles = True,
-    attrs = dicts.add(_PY_GENERATOR_DEPS, {
-        "deps": attr.label_list(
-            mandatory = True,
-            providers = [RosInterfaceInfo],
+    merged_py_info = _merge_py_ros_generator_aspect_infos(py_infos)
+    return [merged_py_info]
+
+py_ros_generator_aspect = aspect(
+    implementation = _py_ros_generator_aspect_impl,
+    attr_aspects = _PY_ROS_GENERATOR_ATTR_ASPECTS,
+    attrs = {
+        "_genmsg_py": attr.label(
+            default = Label("@ros_genpy//:genmsg_py"),
+            executable = True,
+            cfg = "exec",
         ),
-    }),
+        "_gensrv_py": attr.label(
+            default = Label("@ros_genpy//:gensrv_py"),
+            executable = True,
+            cfg = "exec",
+        ),
+    },
+    provides = [PyRosGeneratorAspectInfo],
 )
 
-def py_ros_interface_library(name, deps, visibility = None):
+def _py_ros_generator_impl(ctx):
+    py_info = _merge_py_ros_generator_aspect_infos([
+        dep[PyRosGeneratorAspectInfo]
+        for dep in ctx.attr.deps
+    ])
+    return [
+        DefaultInfo(runfiles = ctx.runfiles(
+            transitive_files = py_info.transitive_sources,
+        )),
+        PyInfo(
+            transitive_sources = py_info.transitive_sources,
+            imports = py_info.imports,
+        ),
+    ]
+
+py_ros_generator = rule(
+    implementation = _py_ros_generator_impl,
+    output_to_genfiles = True,
+    attrs = {
+        "deps": attr.label_list(
+            mandatory = True,
+            aspects = [py_ros_generator_aspect],
+            providers = [RosInterfaceInfo],
+        ),
+    },
+)
+
+def py_ros_interface_library(name, deps, **kwargs):
     name_genpy = "{}_genpy".format(name)
-    py_ros_interface_compile(
+    py_ros_generator(
         name = name_genpy,
         deps = deps,
     )
     py_library(
         name = name,
-        srcs = [name_genpy],
-        imports = [name_genpy],
-        deps = ["@ros_genpy//:genpy"],
-        visibility = visibility,
+        deps = [name_genpy, "@ros_genpy//:genpy"],
+        **kwargs
     )
 
-RosInterfaceCollectorAspectInfo = provider(
-    "Collects ros_interface_library targets.",
-    fields = [
-        "deps",
-    ],
-)
-
-def _getattr_as_list(rule_attr, attr_name):
-    if not hasattr(rule_attr, attr_name):
-        return []
-    return getattr(rule_attr, attr_name)
-
-def _collect_dependencies(rule_attr, attr_name):
-    return [
-        dep
-        for dep in _getattr_as_list(rule_attr, attr_name)
-        if type(dep) == "Target" and RosInterfaceCollectorAspectInfo in dep
-    ]
-
-_ROS_MSG_COLLECTOR_ASPECT_ATTRS = ["data", "deps", "hdrs", "srcs"]
-
-def _ros_interface_collector_aspect_impl(target, ctx):
-    direct_deps = []
-    if ctx.rule.kind == "ros_interface_library":
-        direct_deps = [target]
-
-    transitive_deps = []
-    for attr_name in _ROS_MSG_COLLECTOR_ASPECT_ATTRS:
-        for dep in _collect_dependencies(ctx.rule.attr, attr_name):
-            transitive_deps.append(dep[RosInterfaceCollectorAspectInfo].deps)
-
-    return [
-        RosInterfaceCollectorAspectInfo(
-            deps = depset(
-                direct = direct_deps,
-                transitive = transitive_deps,
-            ),
-        ),
-    ]
-
-ros_interface_collector_aspect = aspect(
-    implementation = _ros_interface_collector_aspect_impl,
-    attr_aspects = _ROS_MSG_COLLECTOR_ASPECT_ATTRS,
-)
-
-def _py_ros_interface_collector_impl(ctx):
-    msg_targets = depset(
-        transitive = [
-            dep[RosInterfaceCollectorAspectInfo].deps
-            for dep in ctx.attr.deps
-        ],
-    ).to_list()
-    deps = _get_deps(msg_targets)
-    return _py_ros_interface_compile_internal(ctx, deps)
-
 py_ros_interface_collector = rule(
-    implementation = _py_ros_interface_collector_impl,
-    attrs = dicts.add(_PY_GENERATOR_DEPS, {
+    implementation = _py_ros_generator_impl,
+    output_to_genfiles = True,
+    attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            aspects = [ros_interface_collector_aspect],
-            providers = [RosInterfaceCollectorAspectInfo],
+            aspects = [py_ros_generator_aspect],
         ),
-    }),
+    },
 )

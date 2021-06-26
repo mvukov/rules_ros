@@ -81,8 +81,8 @@ py_binary(
 )
 
 # Defines a launch target with talker and listener. Just run as
-# `bazel run //examples/chatter:chatter`. This will build the two nodes, the deployment
-# and start the launcher.
+# `bazel run //examples/chatter:chatter`. This will build the two nodes,
+# the deployment and start the launcher.
 ros_launch(
     name = "chatter",
     launch_files = [":chatter.launch"],

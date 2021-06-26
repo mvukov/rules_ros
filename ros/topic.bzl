@@ -9,28 +9,22 @@ def ros_topic(name, deps):
 
     Args:
         name: The app (target) name.
-        deps: A set of deps for which all ros_interface_library targets are
-        collected and on which this target can operate on.
+        deps: A list of deps for which all ros_interface_library targets are
+        collected and on which this target can operate on. This would typically
+        be a list of ROS node targets.
     """
-
-    py_msgs = "{}_py_msgs".format(name)
+    interfaces = "{}_interfaces".format(name)
     py_ros_interface_collector(
-        name = py_msgs,
+        name = interfaces,
         deps = deps,
-    )
-    py_lib = "{}_lib".format(name)
-    py_library(
-        name = py_lib,
-        srcs = [py_msgs],
-        imports = [py_msgs],
-        deps = ["@ros_genpy//:genpy"],
     )
     py_binary(
         name = name,
         srcs = ["@ros_comm//:rostopic_app.py"],
         main = "@ros_comm//:rostopic_app.py",
         deps = [
-            py_lib,
+            interfaces,
             "@ros_comm//:rostopic_lib",
+            "@ros_genpy//:genpy",
         ],
     )
