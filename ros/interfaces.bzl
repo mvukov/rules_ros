@@ -150,20 +150,16 @@ def _cc_ros_generator_aspect_impl(target, ctx):
 
         all_headers.extend(msg_headers)
 
-        args = [
-            "-o",
-            msg_header.dirname,
-            "-p",
-            ros_package_name,
-        ] + include_flags + [
-            src.path,
-        ]
-
+        args = ctx.actions.args()
+        args.add("-o", msg_header.dirname)
+        args.add("-p", ros_package_name)
+        args.add_all(include_flags)
+        args.add(src)
         ctx.actions.run(
             inputs = all_srcs,
             outputs = msg_headers,
             executable = ctx.executable._gencpp,
-            arguments = args,
+            arguments = [args],
         )
 
     cc_include_dir = "/".join(srcs[0].dirname.split("/")[:-1])
@@ -252,40 +248,31 @@ def _py_generate(
         )
         py_msg_files.append(py_file)
 
-    args = [
-        "-o",
-        py_msg_files[0].dirname,
-        "-p",
-        ros_package_name,
-    ] + include_flags + [
-        msg.path
-        for msg in msgs
-    ]
-
+    args = ctx.actions.args()
+    args.add("-o", py_msg_files[0].dirname)
+    args.add("-p", ros_package_name)
+    args.add_all(include_flags)
+    args.add_all(msgs)
     ctx.actions.run(
         inputs = all_srcs,
         outputs = py_msg_files,
         executable = generator,
-        arguments = args,
+        arguments = [args],
     )
 
     init_py = ctx.actions.declare_file(
         "{}/{}/__init__.py".format(rel_output_dir, extension),
     )
 
-    args = [
-        "--initpy",
-        "-o",
-        py_msg_files[0].dirname,
-        "-p",
-        ros_package_name,
-    ]
-
+    args = ctx.actions.args()
+    args.add("--initpy")
+    args.add("-o", py_msg_files[0].dirname)
+    args.add("-p", ros_package_name)
     ctx.actions.run(
         inputs = py_msg_files,
         outputs = [init_py],
         executable = generator,
-        arguments = args,
+        arguments = [args],
     )
 
     return py_msg_files + [init_py]

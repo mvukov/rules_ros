@@ -2,4 +2,6 @@ exports_files([
     "interfaces.bzl",
     "launch.bzl",
     "launch.py.tpl",
+    "topic.bzl",
+    "utils.bzl",
 ])
