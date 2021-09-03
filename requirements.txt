@@ -1,10 +1,19 @@
+# Here are packages necessary for the core functionality, i.e. running C++-based
+# nodes with ros_launch deployments.
 defusedxml
 empy
-gnupg
 ifaddr
-numpy  # Compiled, only one file in rospy needs it.
-pycryptodomex
 rospkg
 # Versions >=5.4 ignore the global option. Should be investigated further.
 pyyaml==5.3 --global-option="--without-libyaml"
+
+# Here are packages that might have compiled extensions and are not needed by
+# for the core functionality.
+# NOTE: Targets depending Python packages with compiled extensions should not
+# be used with cross-compilation deployments.
+gnupg
+numpy  # Compiled, only one file in rospy needs it.
+pycryptodomex
+
+# Here are packages only needed for development.
 pylint
