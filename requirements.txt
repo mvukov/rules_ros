@@ -1,5 +1,6 @@
 # Here are packages necessary for the core functionality, i.e. running C++-based
-# nodes with ros_launch deployments.
+# nodes with ros_launch deployments. Those deps, and their deps, should not
+# have any deps with compiled extensions.
 defusedxml
 empy
 ifaddr
