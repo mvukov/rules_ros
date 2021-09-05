@@ -1,23 +1,5 @@
-load("@rules_python//python:defs.bzl", "py_binary")
-
-py_binary(
-    name = "rosgraph",
-    srcs = ["rosgraph_app.py"],
-    main = "rosgraph_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosgraph"],
-)
-
-py_binary(
-    name = "rosparam",
-    srcs = ["rosparam_app.py"],
-    main = "rosparam_app.py",
-    visibility = ["//visibility:public"],
-    deps = ["@ros_comm//:rosparam"],
-)
-
 exports_files([
     "expand_teplate.bzl",
-    "rostopic_app.py",
     "launcher.sh.tpl",
+    "packaging.bzl",
 ])

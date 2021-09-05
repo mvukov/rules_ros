@@ -149,9 +149,9 @@ def ros_repositories():
         http_archive,
         name = "ros_comm",
         build_file = "@com_github_mvukov_rules_ros//repositories:ros_comm.BUILD.bazel",
-        sha256 = "a9dc58e6001f839c4c54f0a3d63c1272a7b800ae142baa048201ff59c9d17833",
-        strip_prefix = "ros_comm-38549f0fe9a85a62b8ca5b46f82a9bae40eca2e0",
-        urls = ["https://github.com/mvukov/ros_comm/archive/38549f0fe9a85a62b8ca5b46f82a9bae40eca2e0.tar.gz"],
+        sha256 = "65906eab18bdf5832af7b6de8c21e3d87d3fac9732a1219637f5b6f5c948508d",
+        strip_prefix = "ros_comm-30922861f247937001f82094c0934a6b802b6325",
+        urls = ["https://github.com/mvukov/ros_comm/archive/30922861f247937001f82094c0934a6b802b6325.tar.gz"],
     )
 
     maybe(

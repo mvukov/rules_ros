@@ -1,0 +1,21 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "rosservice_lib",
+    srcs = ["__init__.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:py_roslib_slim",
+        "@ros_comm//:rosgraph_lib",
+        "@ros_comm//:rospy",
+        "@ros_genpy//:genpy",
+    ],
+)
+
+py_binary(
+    name = "rosservice",
+    srcs = ["rosservice_app.py"],
+    main = "rosservice_app.py",
+    visibility = ["//visibility:public"],
+    deps = [":rosservice_lib"],
+)

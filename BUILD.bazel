@@ -24,12 +24,12 @@ alias(
 
 alias(
     name = "rosgraph",
-    actual = "//third_party:rosgraph",
+    actual = "@ros_comm//:rosgraph",
 )
 
 alias(
     name = "rosparam",
-    actual = "//third_party:rosparam",
+    actual = "@ros_comm//:rosparam",
 )
 
 alias(
@@ -40,4 +40,9 @@ alias(
 alias(
     name = "rosbag_play",
     actual = "@ros_comm//:rosbag_play",
+)
+
+alias(
+    name = "rosservice",
+    actual = "//third_party/rosservice:rosservice",
 )

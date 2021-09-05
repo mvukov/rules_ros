@@ -1,10 +1,13 @@
+""" Implements a macro for setting up pylint-based linter targets.
+"""
+
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_test")
 
 def _is_py_source_label(label):
     return label.endswith(".py")
 
-def _add_linter_rules(source_labels, source_filenames, name):
+def _add_linter_rule(source_labels, source_filenames, name):
     pylint_cfg = "//:pylint.rc"
 
     py_test(
@@ -45,7 +48,7 @@ def pylint():
 
         # Run the pylint checker as a unit test.
         if len(source_filenames) > 0:
-            _add_linter_rules(
+            _add_linter_rule(
                 source_labels,
                 source_filenames,
                 rule["name"],

@@ -11,10 +11,10 @@
 load("//docker:image.bzl", "container_image")
 load("//ros:launch.bzl", "ros_launch")
 load(
-    "//ros:message_generation.bzl",
-    "cc_ros_msg_library",
-    "py_ros_msg_library",
-    "ros_msg_library",
+    "//ros:interfaces.bzl",
+    "cc_ros_interface_library",
+    "py_ros_interface_library",
+    "ros_interface_library",
 )
 load("//ros:topic.bzl", "ros_topic")
 load("//third_party:packaging.bzl", "binary_pkg_tar")
@@ -26,21 +26,21 @@ load("@rules_python//python:defs.bzl", "py_binary")
 # handling protobuf messages (e.g. proto_library and cc_proto_library).
 
 # Defines a library of ROS messages. Can be used for services as well.
-ros_msg_library(
+ros_interface_library(
     name = "example_msgs",
-    srcs = glob(["msg/*.msg"]),
+    srcs = ["Example.msg"],
     deps = ["@ros_std_msgs//:std_msgs"],
 )
 
 # Defines a C++ library made of auto-generated code from the given messages.
-cc_ros_msg_library(
+cc_ros_interface_library(
     name = "cc_example_msgs",
     visibility = ["//visibility:public"],
     deps = [":example_msgs"],
 )
 
 # Defines a Python library made of auto-generated code from the given messages.
-py_ros_msg_library(
+py_ros_interface_library(
     name = "py_example_msgs",
     visibility = ["//visibility:public"],
     deps = [":example_msgs"],
@@ -54,7 +54,7 @@ cc_binary(
     ],
     deps = [
         ":cc_example_msgs",
-        "@ros_comm//:roscpp",
+        "@ros_comm//:roscpp_lib",
     ],
 )
 
@@ -66,7 +66,7 @@ cc_binary(
     ],
     deps = [
         ":cc_example_msgs",
-        "@ros_comm//:roscpp",
+        "@ros_comm//:roscpp_lib",
     ],
 )
 
@@ -82,8 +82,8 @@ py_binary(
 )
 
 # Defines a launch target with talker and listener. Just run as
-# `bazel run //examples/chatter:chatter`. This will build the two nodes, the deployment
-# and start the launcher.
+# `bazel run //examples/chatter:chatter`. This will build the two nodes,
+# the deployment and start the launcher.
 ros_launch(
     name = "chatter",
     launch_files = [":chatter.launch"],
