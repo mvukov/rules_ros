@@ -122,6 +122,7 @@ ros_topic(
     deps = [":chatter"],
 )
 
+# Builds an archive out of the deployment and it's dependencies.
 binary_pkg_tar(
     name = "chatter_pkg",
     binary = ":chatter",

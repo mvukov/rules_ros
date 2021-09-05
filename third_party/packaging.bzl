@@ -1,3 +1,27 @@
+# Copyright 2017 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Implements a rule for packaging the given binary.
+
+Most of the functionality has been extracted from rules_docker repo. The code
+has been adapted to package a single binary in more/less the same fashion a
+Docker layer is assembled.
+
+A small contribution is an addition of the launcher script that simplifies
+the execution of the binary -- the script sets up the correct working directory
+before invoking the packaged binary.
+"""
+
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load(
     "@bazel_tools//tools/build_defs/hash:hash.bzl",
@@ -12,7 +36,7 @@ load(
 
 def _binary_name(ctx):
     # For //foo/bar/baz:blah this would translate to
-    # /app/foo/bar/baz/blah
+    # <directory>/foo/bar/baz/blah
     return "/".join([
         ctx.attr.directory,
         ctx.attr.binary.label.package,
@@ -21,14 +45,14 @@ def _binary_name(ctx):
 
 def _runfiles_dir(ctx):
     # For @foo//bar/baz:blah this would translate to
-    # /app/bar/baz/blah.runfiles
+    # <directory>/bar/baz/blah.runfiles
     return _binary_name(ctx) + ".runfiles"
 
 # The directory relative to which all ".short_path" paths are relative.
 
 def _reference_dir(ctx):
     # For @foo//bar/baz:blah this would translate to
-    # /app/bar/baz/blah.runfiles/foo
+    # <directory>/bar/baz/blah.runfiles/foo
     return "/".join([_runfiles_dir(ctx), ctx.workspace_name])
 
 # The special "external" directory which is an alternate way of accessing
@@ -36,7 +60,7 @@ def _reference_dir(ctx):
 
 def _external_dir(ctx):
     # For @foo//bar/baz:blah this would translate to
-    # /app/bar/baz/blah.runfiles/foo/external
+    # <directory>/bar/baz/blah.runfiles/foo/external
     return "/".join([_reference_dir(ctx), "external"])
 
 # The final location that this file needs to exist for the foo_binary target to
@@ -67,7 +91,7 @@ def _final_file_path(ctx, f):
 # The foo_binary independent location in which we store a particular dependency's
 # file such that it can be shared.
 
-def _layer_emptyfile_path(ctx, name):
+def _package_emptyfile_path(ctx, name):
     if not name.startswith("external/"):
         # Names that don't start with external are relative to our own workspace.
         return "/".join([ctx.attr.directory, ctx.workspace_name, name])
@@ -86,7 +110,7 @@ def _layer_emptyfile_path(ctx, name):
 # The foo_binary independent location in which we store a particular dependency's
 # file such that it can be shared.
 
-def layer_file_path(ctx, f):
+def _package_file_path(ctx, f):
     return "/".join([ctx.attr.directory, ctx.workspace_name, f.short_path])
 
 def _default_runfiles(dep):
@@ -119,7 +143,7 @@ def _build_package(
        symlinks: List of symlinks to include in the package
 
     Returns:
-       The package tar and its sha256 digest
+       The package tar and its sha256 digest.
     """
     toolchain_info = ctx.toolchains["@io_bazel_rules_docker//toolchains/docker:toolchain_type"].info
     name = ctx.label.name
@@ -175,7 +199,7 @@ def _zip_package(ctx, package, compression = "", compression_options = None):
        compression_options: str, command-line options for the compression tool
 
     Returns:
-       The zipped package tar and its sha256 digest
+       The zipped package tar and its sha256 digest.
     """
     compression_options = compression_options or []
     if compression == "gzip":
@@ -189,6 +213,9 @@ def _zip_package(ctx, package, compression = "", compression_options = None):
     return zipped_package, _sha256(ctx, zipped_package)
 
 def _binary_pkg_tar_impl(ctx):
+    if not ctx.attr.directory.startswith("/"):
+        fail("The directory must be an absolute path!")
+
     runfiles = _default_runfiles
     emptyfiles = _default_emptyfiles
 
@@ -214,19 +241,19 @@ def _binary_pkg_tar_impl(ctx):
     symlinks = {}
 
     # Create symlinks to the runfiles path.
-    # Include any symlinks from the runfiles of the target for which we are synthesizing the layer.
+    # Include any symlinks from the runfiles of the target for which we are synthesizing the package.
     symlinks.update({
-        (_reference_dir(ctx) + "/" + s.path): layer_file_path(ctx, s.target_file)
+        (_reference_dir(ctx) + "/" + s.path): _package_file_path(ctx, s.target_file)
         for s in _default_symlinks(dep).to_list()
         if hasattr(s, "path")  # "path" and "target_file" are exposed to starlark since bazel 0.21.0.
     })
     symlinks.update({
-        _final_file_path(ctx, f): layer_file_path(ctx, f)
+        _final_file_path(ctx, f): _package_file_path(ctx, f)
         for f in runfiles_list
         if _final_file_path(ctx, f) not in file_map
     })
     symlinks.update({
-        _final_emptyfile_path(ctx, f): _layer_emptyfile_path(ctx, f)
+        _final_emptyfile_path(ctx, f): _package_emptyfile_path(ctx, f)
         for f in emptyfiles_list
         if _final_emptyfile_path(ctx, f) not in empty_files
     })
@@ -236,6 +263,9 @@ def _binary_pkg_tar_impl(ctx):
         _external_dir(ctx): _runfiles_dir(ctx),
     })
 
+    # We can do better than just creating a symlink to the actual binary.
+    # Here we create a launcher that sets correct workdir and then invokes
+    # the actual binary.
     launcher_name = ctx.label.name + "_launcher.sh"
     launcher = ctx.actions.declare_file(launcher_name)
     workdir = "/".join([_runfiles_dir(ctx), ctx.workspace_name])
@@ -244,7 +274,7 @@ def _binary_pkg_tar_impl(ctx):
         output = launcher,
         substitutions = {
             "${workdir}": workdir,
-            "${binary}": _final_file_path(ctx, ctx.executable.binary)
+            "${binary}": _final_file_path(ctx, ctx.executable.binary),
         },
         is_executable = True,
     )
@@ -268,7 +298,8 @@ def _binary_pkg_tar_impl(ctx):
         compression_options = ctx.attr.compression_options,
     )
 
-    return [DefaultInfo(files=depset([package, zipped_package]))]
+    # TODO(mvukov) Create a custom provider and return sha-sums.
+    return [DefaultInfo(files = depset([package, zipped_package]))]
 
 _DEFAULT_MTIME = -1
 

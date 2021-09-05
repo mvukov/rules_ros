@@ -2,4 +2,4 @@
 
 set -eu
 
-cd ${workdir} && ${binary}
+cd ${workdir} && ${binary} "$@"
