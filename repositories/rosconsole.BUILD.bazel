@@ -1,3 +1,6 @@
+""" Builds rosconsole.
+"""
+
 cc_library(
     name = "rosconsole",
     hdrs = glob(["include/**/*.h"]),

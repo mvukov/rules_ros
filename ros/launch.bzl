@@ -4,22 +4,20 @@
 load("//third_party:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-DEFAULT_PYTHON_LOGGING_CONF = "@ros_comm//:tools/rosgraph/conf/python_logging.conf"
-
-def ros_launch(name, nodes, launch_files):
+def ros_launch(name, nodes, launch_files, launch_args = None):
     """Defines a ROS deployment.
 
     Args:
         name: The name of the deployment.
         nodes: The nodes used by the deployment.
         launch_files: The launch files used by the deployment.
+        launch_args: The launch arguments used by the deployment.
     """
     launch_file_paths = ["'$(location {})'".format(x) for x in launch_files]
+    launch_args = launch_args or []
     substitutions = {
-        "{default_python_logging_conf}": "$(location {})".format(
-            DEFAULT_PYTHON_LOGGING_CONF,
-        ),
         "{launch_files}": ", ".join(launch_file_paths),
+        "{launch_args}": ", ".join(launch_args),
     }
 
     launch_script = "{}_launch.py".format(name)
@@ -28,7 +26,7 @@ def ros_launch(name, nodes, launch_files):
         template = "@com_github_mvukov_rules_ros//ros:launch.py.tpl",
         substitutions = substitutions,
         out = launch_script,
-        data = [DEFAULT_PYTHON_LOGGING_CONF] + launch_files,
+        data = launch_files,
     )
 
     py_binary(

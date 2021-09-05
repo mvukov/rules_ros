@@ -7,6 +7,12 @@ load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_depende
 load("@rules_python//python:pip.bzl", "pip_parse")
 
 def ros_deps(python_interpreter, python_requirements_lock):
+    """ Sets up ROS deps.
+
+    Args:
+      python_interpreter: The Python interpreter.
+      python_requirements_lock: The transitively locked set of Python requirements.
+    """
     if not native.existing_rule("rules_ros_pip_deps"):
         pip_parse(
             name = "rules_ros_pip_deps",

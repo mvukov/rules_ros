@@ -1,3 +1,6 @@
+""" Builds gencpp.
+"""
+
 py_library(
     name = "gencpp_lib",
     srcs = glob(["src/**/*.py"]),

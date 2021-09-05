@@ -1,9 +1,17 @@
+""" Builds ros_comm.
+"""
+
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
-    "@com_github_mvukov_rules_ros//ros:message_generation.bzl",
-    "cc_ros_msg_library",
-    "py_ros_msg_library",
-    "ros_msg_library",
-    "ros_srv_library",
+    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "cc_ros_interface_library",
+    "py_ros_interface_library",
+    "ros_interface_library",
+)
+load(
+    "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
+    "expand_template",
 )
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
@@ -29,29 +37,21 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-ros_msg_library(
-    name = "roscpp_msgs",
-    srcs = glob(["clients/roscpp/msg/*.msg"]),
-    package_name = "roscpp",
+ros_interface_library(
+    name = "roscpp",
+    srcs = glob(["clients/roscpp/msg/*.msg", "clients/roscpp/srv/*.srv"]),
     visibility = ["//visibility:public"],
 )
 
-ros_srv_library(
-    name = "roscpp_srvs",
-    srcs = glob(["clients/roscpp/srv/*.srv"]),
-    package_name = "roscpp",
+cc_ros_interface_library(
+    name = "cc_roscpp",
+    deps = [":roscpp"],
     visibility = ["//visibility:public"],
 )
 
-cc_ros_msg_library(
-    name = "cc_roscpp_msgs_srvs",
-    deps = [":roscpp_msgs", ":roscpp_srvs"],
-    visibility = ["//visibility:public"],
-)
-
-py_ros_msg_library(
-    name = "py_roscpp_msgs_srvs",
-    deps = [":roscpp_msgs", ":roscpp_srvs"],
+py_ros_interface_library(
+    name = "py_roscpp",
+    deps = [":roscpp"],
     visibility = ["//visibility:public"],
 )
 
@@ -59,41 +59,49 @@ ROS_VERSION_MAJOR = 1
 ROS_VERSION_MINOR = 15
 ROS_VERSION_PATCH = 9
 
-genrule(
+_ROS_COMMON_H = "ros/common.h"
+
+expand_template(
     name = "ros_common_h",
-    srcs = ["clients/roscpp/include/ros/common.h.in"],
-    outs = ["ros/common.h"],
-    cmd = "\n".join([
-        "cp $< $@",
-        "sed -i 's/@roscpp_VERSION_MAJOR@/{}/g' $@".format(ROS_VERSION_MAJOR),
-        "sed -i 's/@roscpp_VERSION_MINOR@/{}/g' $@".format(ROS_VERSION_MINOR),
-        "sed -i 's/@roscpp_VERSION_PATCH@/{}/g' $@".format(ROS_VERSION_PATCH),
-    ]),
+    out = _ROS_COMMON_H,
+    substitutions = {
+        "@roscpp_VERSION_MAJOR@": str(ROS_VERSION_MAJOR),
+        "@roscpp_VERSION_MINOR@": str(ROS_VERSION_MINOR),
+        "@roscpp_VERSION_PATCH@": str(ROS_VERSION_PATCH),
+    },
+    template = "clients/roscpp/include/ros/common.h.in",
 )
 
-# This is an internal header.
-genrule(
+_CONFIG_H = "config.h"
+_CONFIG_COMMON_SUBSTITUTIONS = {
+    "#cmakedefine HAVE_TRUNC": "#define HAVE_TRUNC",
+    "#cmakedefine HAVE_IFADDRS_H": "#define HAVE_IFADDRS_H",
+}
+
+expand_template(
     name = "config_h",
-    visibility = ["//visibility:private"],
-    outs = [
-        "config.h",
-    ],
-    cmd = """cat > $@ << EOL
-#define HAVE_TRUNC
-#define HAVE_IFADDRS_H
-#define HAVE_EPOLL
-EOL
-""",
+    out = _CONFIG_H,
+    substitutions = select({
+        "@platforms//os:linux": dicts.add(
+            _CONFIG_COMMON_SUBSTITUTIONS,
+            {"#cmakedefine HAVE_EPOLL": "#define HAVE_EPOLL"},
+        ),
+        "@platforms//os:macos": dicts.add(
+            _CONFIG_COMMON_SUBSTITUTIONS,
+            {"#cmakedefine HAVE_EPOLL": "/*#cmakedefine HAVE_EPOLL*/"},
+        ),
+    }, no_match_error = "Only Linux and macOS are supported!"),
+    template = "clients/roscpp/src/libros/config.h.in",
 )
 
 cc_library(
-    name = "roscpp",
-    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [":ros_common_h"],
+    name = "roscpp_lib",
+    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
     includes = ["clients/roscpp/include"],
-    srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [":config_h"],
+    srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [_CONFIG_H],
     defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
     deps = [
-        ":cc_roscpp_msgs_srvs",
+        ":cc_roscpp",
         ":xmlrpcpp",
         "@boost//:chrono",
         "@boost//:filesystem",
@@ -110,20 +118,45 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-exports_files([
-    "tools/rosgraph/conf/python_logging.conf",
-])
+_DEFAULT_PYTHON_LOGGING_CONFIG = "tools/rosgraph/conf/python_logging.conf"
+_LOGGING_CONFIG_PY = "tools/rosgraph/src/rosgraph/ros_logging_config.py"
+
+expand_template(
+    name = "ros_logging_config",
+    out = _LOGGING_CONFIG_PY,
+    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
+    substitutions = {
+        "{default_python_logging_conf}": "$(location {})".format(_DEFAULT_PYTHON_LOGGING_CONFIG),
+    },
+    template = "@com_github_mvukov_rules_ros//repositories:ros_logging_config.py.tpl",
+)
 
 py_library(
-    name = "rosgraph",
-    srcs = glob(["tools/rosgraph/src/**/*.py"]),
+    name = "rosgraph_lib",
+    srcs = glob(["tools/rosgraph/src/**/*.py"]) + [_LOGGING_CONFIG_PY],
     imports = ["tools/rosgraph/src"],
     deps = [
         requirement("ifaddr"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
-    data = ["tools/rosgraph/conf/python_logging.conf"],
+    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
+    visibility = ["//visibility:public"],
+)
+
+_ROSGRAPH_APP_PY = "rosgraph_app.py"
+
+copy_file(
+    name = "rosgraph_app",
+    src = "tools/rosgraph/scripts/rosgraph",
+    out = _ROSGRAPH_APP_PY,
+)
+
+py_binary(
+    name = "rosgraph",
+    srcs = [_ROSGRAPH_APP_PY],
+    main = _ROSGRAPH_APP_PY,
+    deps = [":rosgraph_lib"],
     visibility = ["//visibility:public"],
 )
 
@@ -135,7 +168,7 @@ py_library(
     ),
     imports = ["tools/rosmaster/src"],
     deps = [
-        ":rosgraph",
+        ":rosgraph_lib",
         requirement("defusedxml"),
     ],
     visibility = ["//visibility:public"],
@@ -205,7 +238,7 @@ cc_library(
         "tools/topic_tools/src/parse.cpp",
     ],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
         ":xmlrpcpp",
         "@roscpp_core//:cpp_common",
         "@rosconsole//:rosconsole",
@@ -235,7 +268,7 @@ cc_library(
     ],
     copts = ["-D_FILE_OFFSET_BITS=64"],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
         ":rosbag_storage",
         ":topic_tools",
         "@boost//:date_time",
@@ -287,8 +320,8 @@ py_library(
     srcs = glob(["clients/rospy/src/**/*.py"]),
     imports = ["clients/rospy/src"],
     deps = [
-        ":py_roscpp_msgs_srvs",
-        ":rosgraph",
+        ":py_roscpp",
+        ":rosgraph_lib",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
         "@ros_std_msgs//:py_std_msgs",
@@ -301,7 +334,7 @@ py_library(
 )
 
 py_library(
-    name = "rostopic",
+    name = "rostopic_lib",
     srcs = glob(["tools/rostopic/src/**/*.py"]),
     imports = ["tools/rostopic/src"],
     deps = [
@@ -311,14 +344,39 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
+_ROSTOPIC_APP_PY = "rostopic_app.py"
+
+copy_file(
+    name = "rostopic_app",
+    src = "tools/rostopic/scripts/rostopic",
+    out = _ROSTOPIC_APP_PY,
+    visibility = ["//visibility:public"],
+)
+
 py_library(
-    name = "rosparam",
+    name = "rosparam_lib",
     srcs = glob(["tools/rosparam/src/**/*.py"]),
     imports = ["tools/rosparam/src"],
     deps = [
-        ":rosgraph",
+        ":rosgraph_lib",
         requirement("pyyaml"),
     ],
+    visibility = ["//visibility:public"],
+)
+
+_ROSPARAM_APP_PY = "rosparam_app.py"
+
+copy_file(
+    name = "rosparam_app",
+    src = "tools/rosparam/scripts/rosparam",
+    out = _ROSPARAM_APP_PY,
+)
+
+py_binary(
+    name = "rosparam",
+    srcs = [_ROSPARAM_APP_PY],
+    main = _ROSPARAM_APP_PY,
+    deps = [":rosparam_lib"],
     visibility = ["//visibility:public"],
 )
 
@@ -326,7 +384,28 @@ cc_binary(
     name = "rosout",
     srcs = ["tools/rosout/rosout.cpp"],
     deps = [
-        ":roscpp",
+        ":roscpp_lib",
     ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "message_filters",
+    hdrs = glob(["utilities/message_filters/include/**/*.h"]),
+    includes = ["utilities/message_filters/include"],
+    srcs = glob(["utilities/message_filters/src/*.cpp"]),
+    deps = [
+        ":roscpp_lib",
+        "@boost//:thread",
+        "@rosconsole//:rosconsole",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "py_message_filters",
+    srcs = glob(["utilities/message_filters/src/message_filters/*.py"]),
+    imports = ["utilities/message_filters/src/"],
+    deps = [":rospy"],
     visibility = ["//visibility:public"],
 )

@@ -245,7 +245,7 @@ class LoaderContext(object):
 
         resolve_dict = self.resolve_dict if self.include_resolve_dict is None else self.include_resolve_dict
 
-        if not 'arg' in resolve_dict:
+        if 'arg' not in resolve_dict:
             resolve_dict['arg'] = {}
         arg_dict = resolve_dict['arg']
 
@@ -271,7 +271,7 @@ class LoaderContext(object):
             pass
 
         # add arg documentation string dict if it doesn't exist yet and if it can be used
-        if not 'arg_doc' in resolve_dict:
+        if 'arg_doc' not in resolve_dict:
             resolve_dict['arg_doc'] = {}
         arg_doc_dict = resolve_dict['arg_doc']
 
