@@ -1,5 +1,4 @@
 # Copyright 2017 Google Inc. All rights reserved.
-# Copyright 2021 Milan Vukov. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +16,10 @@
 Most of the functionality has been extracted from rules_docker repo. The code
 has been adapted to package a single binary in more/less the same fashion a
 Docker layer is assembled.
+
+A small contribution is an addition of the launcher script that simplifies
+the execution of the binary -- the script sets up the correct working directory
+before invoking the packaged binary.
 """
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
