@@ -1,0 +1,82 @@
+""" Builds geometry2.
+"""
+
+load(
+    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "cc_ros_interface_library",
+    "ros_interface_library",
+)
+
+ros_interface_library(
+    name = "tf2_msgs",
+    srcs = glob([
+        "tf2_msgs/action/*.action",
+        "tf2_msgs/msg/*.msg",
+        "tf2_msgs/srv/*.srv",
+    ]),
+    deps = [
+        "@ros_common_msgs//:actionlib_msgs",
+        "@ros_common_msgs//:geometry_msgs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_interface_library(
+    name = "cc_tf2_msgs",
+    deps = [":tf2_msgs"],
+)
+
+cc_library(
+    name = "tf2",
+    srcs = glob(["tf2/src/*.cpp"]),
+    hdrs = glob(["tf2/include/**/*.h"]),
+    includes = ["tf2/include"],
+    deps = [
+        ":cc_tf2_msgs",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge//:console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@roscpp_core//:rostime",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "tf2_ros",
+    srcs = [
+        "tf2_ros/src/buffer.cpp",
+        "tf2_ros/src/transform_listener.cpp",
+        "tf2_ros/src/buffer_client.cpp",
+        "tf2_ros/src/buffer_server.cpp",
+        "tf2_ros/src/transform_broadcaster.cpp",
+        "tf2_ros/src/static_transform_broadcaster.cpp",
+    ],
+    hdrs = glob(["tf2_ros/include/tf2_ros/*.h"]),
+    includes = ["tf2_ros/include"],
+    deps = [
+        "@ros_actionlib//:actionlib",
+        "@ros_common_msgs//:cc_actionlib_msgs",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_comm//:message_filters",
+        "@ros_comm//:roscpp_lib",
+        ":cc_tf2_msgs",
+        ":tf2",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "tf2_ros_buffer_server",
+    srcs = ["tf2_ros/src/buffer_server_main.cpp"],
+    deps = [":tf2_ros"],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "tf2_ros_static_transform_publisher",
+    srcs = ["tf2_ros/src/static_transform_broadcaster_program.cpp"],
+    deps = [":tf2_ros"],
+    visibility = ["//visibility:public"],
+)

@@ -180,3 +180,12 @@ def ros_repositories():
         strip_prefix = "actionlib-1.13.2",
         urls = ["https://github.com/ros/actionlib/archive/1.13.2.tar.gz"],
     )
+
+    maybe(
+        http_archive,
+        name = "ros_geometry2",
+        build_file = "@com_github_mvukov_rules_ros//repositories:geometry2.BUILD.bazel",
+        sha256 = "0b5d461c71d6dc1dbdb99a2ba39e1515194cd451c2e53d53caadb3ecea13367a",
+        strip_prefix = "geometry2-0.7.5",
+        urls = ["https://github.com/ros/geometry2/archive/0.7.5.tar.gz"],
+    )

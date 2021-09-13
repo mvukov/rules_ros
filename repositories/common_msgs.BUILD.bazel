@@ -47,6 +47,12 @@ ros_interface_library(
     visibility = ["//visibility:public"],
 )
 
+cc_ros_interface_library(
+    name = "cc_geometry_msgs",
+    deps = [":geometry_msgs"],
+    visibility = ["//visibility:public"],
+)
+
 ros_interface_library(
     name = "nav_msgs",
     srcs = glob([
