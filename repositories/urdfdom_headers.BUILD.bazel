@@ -1,0 +1,21 @@
+""" Builds urdfdom_headers.
+"""
+
+cc_library(
+    name = "urdfdom_headers",
+    hdrs = glob([
+        "urdf_exception/**/*.h",
+        "urdf_model/**/*.h",
+        "urdf_model_state/**/*.h",
+        "urdf_sensor/**/*.h",
+        "urdf_world/**/*.h",
+    ]),
+    includes = [
+        "urdf_exception/include",
+        "urdf_model/include",
+        "urdf_model_state/include",
+        "urdf_sensor/include",
+        "urdf_world/include",
+    ],
+    visibility = ["//visibility:public"],
+)

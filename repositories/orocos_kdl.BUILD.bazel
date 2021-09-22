@@ -1,0 +1,36 @@
+""" Builds orocos_kdl.
+"""
+
+load(
+    "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
+    "expand_template",
+)
+
+cc_library(
+    name = "orocos_kdl",
+    hdrs = glob([
+        "orocos_kdl/src/**/*.h",
+        "orocos_kdl/src/**/*.hpp",
+        "orocos_kdl/src/**/*.inl",
+    ]) + [":config_h"],
+    includes = ["orocos_kdl/src"],
+    srcs = glob(["orocos_kdl/src/**/*.cpp", "orocos_kdl/src/**/*.cxx"]),
+    deps = [
+        "@boost//:smart_ptr",
+        "@eigen",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+expand_template(
+    name = "config_h",
+    out = "config.h",
+    substitutions = {
+        "@KDL_VERSION_MAJOR@": "1",
+        "@KDL_VERSION_MINOR@": "5",
+        "@KDL_VERSION_PATCH@": "1",
+        "#cmakedefine HAVE_STL_CONTAINER_INCOMPLETE_TYPES": "#define HAVE_STL_CONTAINER_INCOMPLETE_TYPES",
+        "#cmakedefine KDL_USE_NEW_TREE_INTERFACE": "#define KDL_USE_NEW_TREE_INTERFACE",
+    },
+    template = "orocos_kdl/src/config.h.in",
+)

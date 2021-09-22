@@ -181,6 +181,17 @@ def ros_repositories():
         urls = ["https://github.com/ros/actionlib/archive/1.13.2.tar.gz"],
     )
 
+    ############################################################################
+
+    maybe(
+        http_archive,
+        name = "eigen",
+        build_file = "@com_github_mvukov_rules_ros//repositories:eigen.BUILD.bazel",
+        sha256 = "7985975b787340124786f092b3a07d594b2e9cd53bbfe5f3d9b1daee7d55f56f",
+        strip_prefix = "eigen-3.3.9",
+        urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz"],
+    )
+
     maybe(
         http_archive,
         name = "ros_geometry2",
@@ -188,4 +199,42 @@ def ros_repositories():
         sha256 = "0b5d461c71d6dc1dbdb99a2ba39e1515194cd451c2e53d53caadb3ecea13367a",
         strip_prefix = "geometry2-0.7.5",
         urls = ["https://github.com/ros/geometry2/archive/0.7.5.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "orocos_kdl",
+        build_file = "@com_github_mvukov_rules_ros//repositories:orocos_kdl.BUILD.bazel",
+        sha256 = "5acb90acd82b10971717aca6c17874390762ecdaa3a8e4db04984ea1d4a2af9b",
+        strip_prefix = "orocos_kinematics_dynamics-1.5.1",
+        urls = ["https://github.com/orocos/orocos_kinematics_dynamics/archive/refs/tags/v1.5.1.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "urdfdom_headers",
+        build_file = "@com_github_mvukov_rules_ros//repositories:urdfdom_headers.BUILD.bazel",
+        sha256 = "76a68657c38e54bb45bddc4bd7d823a3b04edcd08064a56d8e7d46b9912035ac",
+        strip_prefix = "urdfdom_headers-1.0.5",
+        urls = ["https://github.com/ros/urdfdom_headers/archive/refs/tags/1.0.5.tar.gz"],
+    )
+
+    maybe(
+        http_archive,
+        name = "tinyxml",
+        build_file = "@com_github_mvukov_rules_ros//repositories:tinyxml.BUILD.bazel",
+        sha256 = "15bdfdcec58a7da30adc87ac2b078e4417dbe5392f3afb719f9ba6d062645593",
+        urls = [
+            "https://sourceforge.net/projects/tinyxml/files/tinyxml/2.6.2/tinyxml_2_6_2.tar.gz",
+            "http://archive.ubuntu.com/ubuntu/pool/universe/t/tinyxml/tinyxml_2.6.2.orig.tar.gz",
+        ],
+    )
+
+    maybe(
+        http_archive,
+        name = "urdfdom",
+        build_file = "@com_github_mvukov_rules_ros//repositories:urdfdom.BUILD.bazel",
+        sha256 = "8f3d56b0cbc4b84436d8baf4c8346cd2ee7ffb257bba5ddd9892c41bf516edc4",
+        strip_prefix = "urdfdom-1.0.4",
+        urls = ["https://github.com/ros/urdfdom/archive/refs/tags/1.0.4.tar.gz"],
     )

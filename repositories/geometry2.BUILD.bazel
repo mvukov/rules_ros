@@ -55,14 +55,15 @@ cc_library(
     ],
     hdrs = glob(["tf2_ros/include/tf2_ros/*.h"]),
     includes = ["tf2_ros/include"],
+    copts = ["-w"],
     deps = [
+        ":cc_tf2_msgs",
+        ":tf2",
         "@ros_actionlib//:actionlib",
         "@ros_common_msgs//:cc_actionlib_msgs",
         "@ros_common_msgs//:cc_geometry_msgs",
         "@ros_comm//:message_filters",
         "@ros_comm//:roscpp_lib",
-        ":cc_tf2_msgs",
-        ":tf2",
     ],
     visibility = ["//visibility:public"],
 )
