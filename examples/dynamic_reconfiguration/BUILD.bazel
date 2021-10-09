@@ -1,0 +1,49 @@
+"""Implements an example to demonstrate simple client-server interaction
+   for dynamic reconfiguration.
+"""
+
+load("//ros:dynamic_reconfigure.bzl",
+    "ros_dynamic_reconfigure_library",
+    "cc_ros_dynamic_reconfigure_library",
+)
+load("//ros:launch.bzl", "ros_launch")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+ros_dynamic_reconfigure_library(
+    name = "tutorial_cfg",
+    src = "Tutorial.cfg",
+)
+
+cc_ros_dynamic_reconfigure_library(
+    name = "cc_tutorial_cfg",
+    dep = ":tutorial_cfg",
+)
+
+cc_binary(
+    name = "server",
+    srcs = ["server.cc"],
+    deps = [
+        ":cc_tutorial_cfg",
+        "@ros_comm//:roscpp_lib",
+        "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
+    ],
+)
+
+cc_binary(
+    name = "client",
+    srcs = ["client.cc"],
+    deps = [
+        ":cc_tutorial_cfg",
+        "@ros_comm//:roscpp_lib",
+        "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
+    ],
+)
+
+ros_launch(
+    name = "dynamic_reconfiguration",
+    launch_files = [":dynamic_reconfiguration.launch"],
+    nodes = [
+        ":client",
+        ":server",
+    ],
+)

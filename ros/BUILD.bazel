@@ -1,7 +1,16 @@
 exports_files([
+    "dynamic_reconfigure.bzl",
     "interfaces.bzl",
     "launch.bzl",
     "launch.py.tpl",
     "topic.bzl",
     "utils.bzl",
 ])
+
+py_binary(
+    name = "parameter_generator_app",
+    srcs = ["parameter_generator_app.py"],
+    main = "parameter_generator_app.py",
+    deps = ["@com_github_mvukov_rules_ros//:dynamic_reconfigure"],
+    visibility = ["//visibility:public"],
+)

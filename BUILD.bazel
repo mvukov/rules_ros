@@ -17,6 +17,13 @@ py_library(
     ],
 )
 
+py_library(
+    name = "dynamic_reconfigure",
+    srcs = ["//third_party/dynamic_reconfigure:parameter_generator.py"],
+    imports = ["third_party"],
+    visibility = ["//visibility:public"],
+)
+
 alias(
     name = "roscore",
     actual = "//third_party/legacy_roslaunch:roscore",

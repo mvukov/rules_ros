@@ -181,6 +181,15 @@ def ros_repositories():
         urls = ["https://github.com/ros/actionlib/archive/1.13.2.tar.gz"],
     )
 
+    maybe(
+        http_archive,
+        name = "ros_dynamic_reconfigure",
+        build_file = "@com_github_mvukov_rules_ros//repositories:dynamic_reconfigure.BUILD.bazel",
+        sha256 = "7cdb46269ae222a0ed5632d7c9b9d6f1e351c35dc9cc14b48930ad89273a5da5",
+        strip_prefix = "dynamic_reconfigure-1.7.1",
+        urls = ["https://github.com/ros/dynamic_reconfigure/archive/refs/tags/1.7.1.tar.gz"],
+    )
+
     ############################################################################
 
     maybe(

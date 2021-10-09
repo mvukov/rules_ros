@@ -1,0 +1,44 @@
+""" Builds dynamic_reconfigure.
+"""
+
+load(
+    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "cc_ros_interface_library",
+    "ros_interface_library",
+)
+
+ros_interface_library(
+    name = "dynamic_reconfigure",
+    srcs = glob(["msg/*.msg", "srv/*.srv"]),
+    deps = ["@ros_std_msgs//:std_msgs",],
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_interface_library(
+    name = "cc_dynamic_reconfigure",
+    deps = [":dynamic_reconfigure"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "dynamic_reconfigure_lib",
+    hdrs = glob(["include/dynamic_reconfigure/*.h"]),
+    includes = ["include"],
+    srcs = glob(["src/*.cpp"]),
+    deps = [
+        ":cc_dynamic_reconfigure",
+        "@boost//:chrono",
+        "@boost//:thread",
+        "@ros_comm//:roscpp_lib",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "cc_templates",
+    srcs = [
+        "templates/ConfigType.h.template",
+        "templates/GroupClass.h.template",
+    ],
+    visibility = ["//visibility:public"],
+)
