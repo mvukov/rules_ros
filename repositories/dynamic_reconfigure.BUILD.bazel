@@ -10,7 +10,7 @@ load(
 ros_interface_library(
     name = "dynamic_reconfigure",
     srcs = glob(["msg/*.msg", "srv/*.srv"]),
-    deps = ["@ros_std_msgs//:std_msgs",],
+    deps = ["@ros_std_msgs//:std_msgs"],
     visibility = ["//visibility:public"],
 )
 

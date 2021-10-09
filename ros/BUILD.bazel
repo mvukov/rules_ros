@@ -1,3 +1,5 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
 exports_files([
     "dynamic_reconfigure.bzl",
     "interfaces.bzl",
@@ -11,6 +13,6 @@ py_binary(
     name = "parameter_generator_app",
     srcs = ["parameter_generator_app.py"],
     main = "parameter_generator_app.py",
-    deps = ["@com_github_mvukov_rules_ros//:dynamic_reconfigure"],
     visibility = ["//visibility:public"],
+    deps = ["@com_github_mvukov_rules_ros//:dynamic_reconfigure"],
 )

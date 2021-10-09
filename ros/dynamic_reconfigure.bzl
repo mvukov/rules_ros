@@ -59,7 +59,8 @@ def _cc_ros_dynamic_reconfigure_generator_impl(ctx):
 
     stem = get_stem(cfg_file)
     output = ctx.actions.declare_file(
-        "{}/{}Config.h".format(ros_package_name, stem))
+        "{}/{}Config.h".format(ros_package_name, stem),
+    )
 
     args = ctx.actions.args()
     args.add("--input", cfg_file)
@@ -96,15 +97,15 @@ cc_ros_dynamic_reconfigure_generator = rule(
         ),
         "_templates": attr.label(
             default = Label("@ros_dynamic_reconfigure//:cc_templates"),
-        )
+        ),
     },
 )
 
-def cc_ros_dynamic_reconfigure_library(name, dep, visibility=None):
+def cc_ros_dynamic_reconfigure_library(name, dep, visibility = None):
     generator_name = name + "_generator"
     cc_ros_dynamic_reconfigure_generator(
         name = generator_name,
-        dep = dep
+        dep = dep,
     )
     cc_library(
         name = name,
@@ -115,5 +116,5 @@ def cc_ros_dynamic_reconfigure_library(name, dep, visibility=None):
             "@boost//:thread",
             "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
         ],
-        visibility = visibility
+        visibility = visibility,
     )
