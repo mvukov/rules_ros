@@ -42,8 +42,7 @@
 # Need to check types of min max and default
 # Need to put sane error on exceptions
 
-from __future__ import print_function
-
+import argparse
 import inspect
 import os
 import re
@@ -67,13 +66,17 @@ def check_description(description):
     quotes = ['"', "'"]
     for quote in quotes:
         if description.find(quote) != -1:
-            raise Exception(r"""quotes not allowed in description string `%s`""" % description)
+            raise Exception(
+                r"""quotes not allowed in description string `%s`""" %
+                description)
 
 
 def check_name(name):
     pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
     if not re.match(pattern, name):
-        raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions" % name)
+        raise Exception(
+            "The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"
+            % name)
 
 
 class ParameterGenerator(object):
@@ -112,7 +115,8 @@ class ParameterGenerator(object):
             self.state = state
 
             self.srcline = inspect.currentframe().f_back.f_lineno
-            self.srcfile = inspect.getsourcefile(inspect.currentframe().f_back.f_code)
+            self.srcfile = inspect.getsourcefile(
+                inspect.currentframe().f_back.f_code)
 
             self.instances[self.id] = self
 
@@ -126,27 +130,50 @@ class ParameterGenerator(object):
             self.groups.append(group)
             return group
 
-        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
+        def add(self,
+                name,
+                paramtype,
+                level,
+                description,
+                default=None,
+                min=None,
+                max=None,
+                edit_method=""):
             newparam = {
-                'name': name,
-                'type': paramtype,
-                'default': default,
-                'level': level,
-                'description': description,
-                'min': min,
-                'max': max,
-                'srcline': inspect.currentframe().f_back.f_lineno,
-                'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
-                'edit_method': edit_method,
+                'name':
+                    name,
+                'type':
+                    paramtype,
+                'default':
+                    default,
+                'level':
+                    level,
+                'description':
+                    description,
+                'min':
+                    min,
+                'max':
+                    max,
+                'srcline':
+                    inspect.currentframe().f_back.f_lineno,
+                'srcfile':
+                    inspect.getsourcefile(inspect.currentframe().f_back.f_code),
+                'edit_method':
+                    edit_method,
             }
-            if (paramtype == str_t or paramtype == bool_t) and (max is not None or min is not None):
+            if (paramtype == str_t or paramtype
+                    == bool_t) and (max is not None or min is not None):
                 raise Exception(
-                    "Max or min specified for %s, which is of '%s' type" % (name, paramtype))
+                    "Max or min specified for %s, which is of '%s' type" %
+                    (name, paramtype))
             check_name(name)
             self.gen.fill_type(newparam)
-            self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
-            self.gen.check_type_fill_default(newparam, 'max', self.gen.maxval[paramtype])
-            self.gen.check_type_fill_default(newparam, 'min', self.gen.minval[paramtype])
+            self.gen.check_type_fill_default(newparam, 'default',
+                                             self.gen.defval[paramtype])
+            self.gen.check_type_fill_default(newparam, 'max',
+                                             self.gen.maxval[paramtype])
+            self.gen.check_type_fill_default(newparam, 'min',
+                                             self.gen.minval[paramtype])
 
             self.parameters.append(newparam)
 
@@ -203,7 +230,8 @@ class ParameterGenerator(object):
                 'type': self.type,
                 'state': self.state,
                 'cstate': state,
-                'id': self.id, 'parent': self.parent,
+                'id': self.id,
+                'parent': self.parent,
                 'parameters': self.parameters,
                 'groups': [group.to_dict() for group in self.groups],
                 'srcline': self.srcline,
@@ -225,12 +253,23 @@ class ParameterGenerator(object):
         value = param[field]
         pytype = self.pytype(drtype)
         if pytype != type(value) and (pytype != float or type(value) != int):
-            raise TypeError("'%s' has type %s, but %s is %s" % (name, drtype, field, repr(value)))
+            raise TypeError("'%s' has type %s, but %s is %s" %
+                            (name, drtype, field, repr(value)))
         param[field] = pytype(value)
 
     def fill_type(self, param):
-        param['ctype'] = {'str': 'std::string', 'int': 'int', 'double': 'double', 'bool': 'bool'}[param['type']]
-        param['cconsttype'] = {'str': 'const char * const', 'int': 'const int', 'double': 'const double', 'bool': 'const bool'}[param['type']]
+        param['ctype'] = {
+            'str': 'std::string',
+            'int': 'int',
+            'double': 'double',
+            'bool': 'bool'
+        }[param['type']]
+        param['cconsttype'] = {
+            'str': 'const char * const',
+            'int': 'const int',
+            'double': 'const double',
+            'bool': 'const bool'
+        }[param['type']]
 
     def check_type_fill_default(self, param, field, default):
         value = param[field]
@@ -247,7 +286,8 @@ class ParameterGenerator(object):
         id = 1
         self.constants = []
         if len(sys.argv) < 5:
-            raise SystemExit(textwrap.dedent("""\
+            raise SystemExit(
+                textwrap.dedent("""\
             ahhhh! Unexpected command line syntax!
 
             Are you trying to call a dynamic_reconfigure configuration generation script
@@ -260,19 +300,32 @@ class ParameterGenerator(object):
 
             Have a nice day
             """))
-        self.dynconfpath = sys.argv[1]  # FIXME this is awful
-        self.binary_dir = sys.argv[2]
-        self.cpp_gen_dir = sys.argv[3]
-        self.py_gen_dir = sys.argv[4]
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--dynconfpath", type=str, required=True)
+        parser.add_argument("--binary_dir", type=str)
+        parser.add_argument("--cpp_gen_dir", type=str)
+        parser.add_argument("--py_gen_dir", type=str)
+        args = parser.parse_args()
+
+        self.dynconfpath = args.dynconfpath
+        self.binary_dir = args.binary_dir
+        self.cpp_gen_dir = args.cpp_gen_dir
+        self.py_gen_dir = args.py_gen_dir
 
     def const(self, name, type, value, descr):
         newconst = {
-            'name': name,
-            'type': type,
-            'value': value,
-            'srcline': inspect.currentframe().f_back.f_lineno,
-            'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
-            'description': descr
+            'name':
+                name,
+            'type':
+                type,
+            'value':
+                value,
+            'srcline':
+                inspect.currentframe().f_back.f_lineno,
+            'srcfile':
+                inspect.getsourcefile(inspect.currentframe().f_back.f_code),
+            'description':
+                descr
         }
         check_description(descr)
         self.fill_type(newconst)
@@ -287,8 +340,17 @@ class ParameterGenerator(object):
         return repr({'enum': constants, 'enum_description': description})
 
     # Wrap add and add_group for the default group
-    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
-        self.group.add(name, paramtype, level, description, default, min, max, edit_method)
+    def add(self,
+            name,
+            paramtype,
+            level,
+            description,
+            default=None,
+            min=None,
+            max=None,
+            edit_method=""):
+        self.group.add(name, paramtype, level, description, default, min, max,
+                       edit_method)
 
     def add_group(self, name, type="", state=True):
         return self.group.add_group(name, type=type, state=state)
@@ -297,7 +359,9 @@ class ParameterGenerator(object):
         if os.path.isdir(path):
             pass
         elif os.path.isfile(path):
-            raise OSError("Error creating directory %s, a file with the same name exists" % path)
+            raise OSError(
+                "Error creating directory %s, a file with the same name exists"
+                % path)
         else:
             try:
                 os.makedirs(path)
@@ -311,7 +375,8 @@ class ParameterGenerator(object):
         e.g. given Tutorials.cfg, name must be Tutorials
         """
         try:
-            if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
+            if sys.modules[
+                    '__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
                 # Done this way because importing this module from gendeps
                 # causes imports of dynamic_reconfigure.msg to fail from at
                 # least some .cfg files. (Not sure why)
@@ -325,8 +390,10 @@ class ParameterGenerator(object):
             self.msgname = name + "Config"
             # print('**************************************************************')
             # print('**************************************************************')
-            print(Template("Generating reconfiguration files for $name in $pkgname").
-                  substitute(name=self.name, pkgname=self.pkgname))
+            print(
+                Template(
+                    "Generating reconfiguration files for $name in $pkgname").
+                substitute(name=self.name, pkgname=self.pkgname))
             # print('**************************************************************')
             # print('**************************************************************')
             self.generatecpp()
@@ -342,35 +409,49 @@ class ParameterGenerator(object):
             exit(1)
 
     def generatewikidoc(self):
+        if not self.binary_dir:
+            return
         self.mkdirabs(os.path.join(self.binary_dir, "docs"))
-        with open(os.path.join(self.binary_dir, "docs", self.msgname + ".wikidoc"), 'w') as f:
+        with open(
+                os.path.join(self.binary_dir, "docs",
+                             self.msgname + ".wikidoc"), 'w') as f:
             print(textwrap.dedent("""\
                 # Autogenerated param section. Do not hand edit.
                 param {
                 group.0 {
                 name=Dynamically Reconfigurable Parameters
                 desc=See the [[dynamic_reconfigure]] package for details on dynamically reconfigurable parameters."""
-            ), file=f)
+                                 ),
+                  file=f)
             i = -1
             for param in self.group.get_parameters():
                 i = i + 1
                 range = ""
                 try:
                     enum = eval(param['edit_method'])['enum']
-                    range = ", ".join(Template("$name ($value): $description").substitute(const) for const in enum)
+                    range = ", ".join(
+                        Template("$name ($value): $description").substitute(
+                            const) for const in enum)
                     range = "Possible values are: " + range
                 except Exception:
                     if param['type'] == int_t or param['type'] == double_t:
-                        range = Template("Range: $min to $max").substitute(param)
-                print(Template(textwrap.dedent("""\
+                        range = Template("Range: $min to $max").substitute(
+                            param)
+                print(Template(
+                    textwrap.dedent("""\
                     $i.name= ~$name
                     $i.default= $default
                     $i.type= $type
-                    $i.desc=$description $range"""
-                )).substitute(param, range=range, i=i), file=f)
-            print("}\n}\n# End of autogenerated section. You may edit below.", file=f)
+                    $i.desc=$description $range""")).substitute(param,
+                                                                range=range,
+                                                                i=i),
+                      file=f)
+            print("}\n}\n# End of autogenerated section. You may edit below.",
+                  file=f)
 
     def generatedoc(self):
+        if not self.binary_dir:
+            return
         self.mkdirabs("docs")
         dir_path = os.path.join(self.binary_dir, "docs")
         self.mkdirabs(dir_path)
@@ -378,23 +459,37 @@ class ParameterGenerator(object):
             # print("/**", file=f)
             print("\\subsubsection parameters ROS parameters", file=f)
             print("", file=f)
-            print("Reads and maintains the following parameters on the ROS server", file=f)
+            print(
+                "Reads and maintains the following parameters on the ROS server",
+                file=f)
             print("", file=f)
             for param in self.group.get_parameters():
-                print(Template("- \\b \"~$name\" : \\b [$type] $description min: $min, default: $default, max: $max").substitute(param), file=f)
+                print(Template(
+                    "- \\b \"~$name\" : \\b [$type] $description min: $min, default: $default, max: $max"
+                ).substitute(param),
+                      file=f)
             print("", file=f)
             # print("*/", file=f)
 
     def generateusage(self):
+        if not self.binary_dir:
+            return
         self.mkdirabs("docs")
-        with open(os.path.join(self.binary_dir, "docs", self.msgname + "-usage.dox"), 'w') as f:
+        with open(
+                os.path.join(self.binary_dir, "docs",
+                             self.msgname + "-usage.dox"), 'w') as f:
             # print("/**", file=f)
             print("\\subsubsection usage Usage", file=f)
             print('\\verbatim', file=f)
-            print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
-                pkgname=self.pkgname, nodename=self.nodename), file=f)
+            print(Template(
+                '<node name="$nodename" pkg="$pkgname" type="$nodename">').
+                  substitute(pkgname=self.pkgname, nodename=self.nodename),
+                  file=f)
             for param in self.group.get_parameters():
-                print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
+                print(Template(
+                    '  <param name="$name" type="$type" value="$default" />').
+                      substitute(param),
+                      file=f)
             print('</node>', file=f)
             print('\\endverbatim', file=f)
             print("", file=f)
@@ -409,25 +504,18 @@ class ParameterGenerator(object):
         if type == 'bool':
             return {True: 1, False: 0}[val]
         raise TypeError(type)
-#        if type == 'string':
-#            return '"' + val + '"'
-#        if 'uint' in type:
-#            return str(val) + 'ULL'
-#        if 'int' in type:
-#            return str(val) + 'LL'
-#        if 'time' in type:
-#            return 'ros::Time('+str(val)+')'
-#        if 'duration' in type:
-#            return 'ros::Duration('+str(val)+')'
-#        if  'float' in types:
-#            return str(val)
 
     def appendline(self, list, text, param, value=None):
         if value is None:
             val = ""
         else:
             val = self.crepr(param, param[value])
-        list.append(Template('${doline} $srcline "$srcfile"\n      ' + text).safe_substitute(param, v=val, doline=LINEDEBUG, configname=self.name))
+        list.append(
+            Template('${doline} $srcline "$srcfile"\n      ' +
+                     text).safe_substitute(param,
+                                           v=val,
+                                           doline=LINEDEBUG,
+                                           configname=self.name))
 
     def appendgroup(self, list, group):
         subgroups = []
@@ -436,25 +524,42 @@ class ParameterGenerator(object):
         setters = []
         params = []
         for p in group.parameters:
-            setters.append(Template("        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p))
+            setters.append(
+                Template(
+                    "        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}"
+                ).substitute(p))
             params.append(Template("${ctype} ${name};").substitute(p))
 
         subgroups = "\n".join(subgroups)
         setters = "\n".join(setters)
         params = "\n".join(params)
-        grouptemplate = open(os.path.join(self.dynconfpath, "templates", "GroupClass.h.template")).read()
-        list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups=subgroups, setters=setters, params=params, configname=self.name))
+        grouptemplate = open(
+            os.path.join(self.dynconfpath, "templates",
+                         "GroupClass.h.template")).read()
+        list.append(
+            Template(grouptemplate).safe_substitute(group.to_dict(),
+                                                    subgroups=subgroups,
+                                                    setters=setters,
+                                                    params=params,
+                                                    configname=self.name))
 
     def generatecpp(self):
+        if not self.cpp_gen_dir:
+            return
+
         # Read the configuration manipulator template and insert line numbers and file name into template.
-        templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.h.template")
+        templatefile = os.path.join(self.dynconfpath, "templates",
+                                    "ConfigType.h.template")
         templatelines = []
-        templatefilesafe = templatefile.replace('\\', '\\\\')  # line directive does backslash expansion.
+        templatefilesafe = templatefile.replace(
+            '\\', '\\\\')  # line directive does backslash expansion.
         curline = 1
         with open(templatefile) as f:
             for line in f:
                 curline = curline + 1
-                templatelines.append(Template(line).safe_substitute(linenum=curline, filename=templatefilesafe))
+                templatelines.append(
+                    Template(line).safe_substitute(linenum=curline,
+                                                   filename=templatefilesafe))
 
         template = ''.join(templatelines)
 
@@ -465,37 +570,60 @@ class ParameterGenerator(object):
         members = []
         constants = []
         for const in self.constants:
-            self.appendline(constants, "${cconsttype} ${configname}_${name} = $v;", const, "value")
+            self.appendline(constants,
+                            "${cconsttype} ${configname}_${name} = $v;", const,
+                            "value")
 
         def write_params(group):
             if group.id == 0:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${lower});").safe_substitute(group.to_dict(), configname=self.name))
+                paramdescr.append(
+                    Template(
+                        "${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${lower});"
+                    ).safe_substitute(group.to_dict(), configname=self.name))
             else:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname=self.name))
+                paramdescr.append(
+                    Template(
+                        "${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});"
+                    ).safe_substitute(group.to_dict(), configname=self.name))
             for param in group.parameters:
                 self.appendline(members, "${ctype} ${name};", param)
-                self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
-                self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
-                self.appendline(paramdescr, "__default__.${name} = $v;", param, "default")
+                self.appendline(paramdescr, "__min__.${name} = $v;", param,
+                                "min")
+                self.appendline(paramdescr, "__max__.${name} = $v;", param,
+                                "max")
+                self.appendline(paramdescr, "__default__.${name} = $v;", param,
+                                "default")
                 self.appendline(
                     paramdescr,
                     group.to_dict()['name'] +
                     ".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));",
+                    param)
                 self.appendline(
                     paramdescr,
                     "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));",
+                    param)
 
             for g in group.groups:
                 write_params(g)
 
-            self.appendline(paramdescr, "${name}.convertParams();", group.to_dict())
+            self.appendline(paramdescr, "${name}.convertParams();",
+                            group.to_dict())
             if group.id == 0:
-                self.appendline(paramdescr, "__group_descriptions__.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config>(${name})));", group.to_dict())
+                self.appendline(
+                    paramdescr,
+                    "__group_descriptions__.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config>(${name})));",
+                    group.to_dict())
             else:
-                self.appendline(paramdescr, "${parentname}.groups.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}>(${name})));", group.to_dict())
-                self.appendline(paramdescr, "__group_descriptions__.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}>(${name})));", group.to_dict())
+                self.appendline(
+                    paramdescr,
+                    "${parentname}.groups.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}>(${name})));",
+                    group.to_dict())
+                self.appendline(
+                    paramdescr,
+                    "__group_descriptions__.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}>(${name})));",
+                    group.to_dict())
 
         write_params(self.group)
         self.appendgroup(groups, self.group)
@@ -504,12 +632,20 @@ class ParameterGenerator(object):
         members = '\n'.join(members)
         constants = '\n'.join(constants)
         groups = '\n'.join(groups)
-        with open(os.path.join(self.cpp_gen_dir, self.name + "Config.h"), 'w') as f:
-            f.write(Template(template).substitute(
-                uname=self.name.upper(),
-                configname=self.name, pkgname=self.pkgname, paramdescr=paramdescr,
-                members=members, groups=groups, doline=LINEDEBUG, constants=constants))
-        print("Wrote header file in " + os.path.join(self.cpp_gen_dir, self.name + "Config.h"))
+        with open(os.path.join(self.cpp_gen_dir, self.name + "Config.h"),
+                  'w') as f:
+            f.write(
+                Template(template).substitute(uname=self.name.upper(),
+                                              configname=self.name,
+                                              pkgname=self.pkgname,
+                                              paramdescr=paramdescr,
+                                              members=members,
+                                              groups=groups,
+                                              doline=LINEDEBUG,
+                                              constants=constants))
+        print("Wrote header file in " +
+              os.path.join(self.cpp_gen_dir, self.name + "Config.h"))
+
 
 # def deleteoneobsolete(self, file):
 #          try:
@@ -574,28 +710,38 @@ class ParameterGenerator(object):
         return orig_dict
 
     def replace_infinity(self, config_dict):
-        config_dict = self._rreplace_str_with_val_in_dict(config_dict, '-std::numeric_limits<double>::infinity()', -float("inf"))
-        config_dict = self._rreplace_str_with_val_in_dict(config_dict, 'std::numeric_limits<double>::infinity()', float("inf"))
+        config_dict = self._rreplace_str_with_val_in_dict(
+            config_dict, '-std::numeric_limits<double>::infinity()',
+            -float("inf"))
+        config_dict = self._rreplace_str_with_val_in_dict(
+            config_dict, 'std::numeric_limits<double>::infinity()',
+            float("inf"))
 
         return config_dict
 
     def generatepy(self):
+        if not self.py_gen_dir:
+            return
+
         # Read the configuration manipulator template and insert line numbers and file name into template.
-        templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.py.template")
+        templatefile = os.path.join(self.dynconfpath, "templates",
+                                    "ConfigType.py.template")
         with open(templatefile) as f:
             template = f.read()
 
         # Write the configuration manipulator.
         self.mkdirabs(os.path.join(self.py_gen_dir, "cfg"))
-        with open(os.path.join(self.py_gen_dir, "cfg", self.name + "Config.py"), 'w') as f:
+        with open(os.path.join(self.py_gen_dir, "cfg", self.name + "Config.py"),
+                  'w') as f:
             pycfgdata = self.replace_infinity(self.group.to_dict())
-            f.write(Template(template).substitute(
-                name=self.name,
-                pkgname=self.pkgname, pycfgdata=pycfgdata))
+            f.write(
+                Template(template).substitute(name=self.name,
+                                              pkgname=self.pkgname,
+                                              pycfgdata=pycfgdata))
             for const in self.constants:
-                f.write(Template("${configname}_${name} = $v\n").substitute(
-                    const, v=repr(const['value']),
-                    configname=self.name))
+                f.write(
+                    Template("${configname}_${name} = $v\n").substitute(
+                        const, v=repr(const['value']), configname=self.name))
 
         with open(os.path.join(self.py_gen_dir, "cfg", "__init__.py"), 'a'):
             pass
