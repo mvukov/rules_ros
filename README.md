@@ -22,7 +22,11 @@ And no, you don't have to install any ROS packages via `apt`.
 
 ## What works?
 
-So far a subset of ros-base packages can be built.
+So far a subset of ros-base packages can be built, including support for
+- messages,
+- services,
+- actions, and
+- dynamic reconfiguration.
 
 Here is an example.
 
