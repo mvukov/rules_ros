@@ -1,7 +1,13 @@
 """ Builds urdfdom.
 """
 
-cc_library(
+load(
+    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "cc_ros_binary",
+    "cc_ros_library",
+)
+
+cc_ros_library(
     name = "urdf_parser",
     hdrs = glob(["urdf_parser/include/urdf_parser/*.h"]),
     includes = ["urdf_parser/include"],
@@ -22,13 +28,13 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "check_urdf",
     srcs = ["urdf_parser/src/check_urdf.cpp"],
     deps = [":urdf_parser"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "urdf_to_graphviz",
     srcs = ["urdf_parser/src/urdf_to_graphiz.cpp"],
     deps = [":urdf_parser"],

@@ -2,13 +2,13 @@
 interaction.
 """
 
+load("//ros:cc_defs.bzl", "cc_ros_binary")
 load("//ros:launch.bzl", "ros_launch")
 load(
     "//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "ros_interface_library",
 )
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 ros_interface_library(
     name = "dishwasher_actions",
@@ -23,7 +23,7 @@ cc_ros_interface_library(
     deps = [":dishwasher_actions"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "server",
     srcs = ["server.cc"],
     deps = [
@@ -32,7 +32,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "client",
     srcs = ["client.cc"],
     deps = [

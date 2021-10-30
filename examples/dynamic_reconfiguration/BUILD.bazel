@@ -2,13 +2,13 @@
    for dynamic reconfiguration.
 """
 
+load("//ros:cc_defs.bzl", "cc_ros_binary")
 load(
     "//ros:dynamic_reconfigure.bzl",
     "cc_ros_dynamic_reconfigure_library",
     "ros_dynamic_reconfigure_library",
 )
 load("//ros:launch.bzl", "ros_launch")
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 ros_dynamic_reconfigure_library(
     name = "tutorial_cfg",
@@ -20,7 +20,7 @@ cc_ros_dynamic_reconfigure_library(
     dep = ":tutorial_cfg",
 )
 
-cc_binary(
+cc_ros_binary(
     name = "server",
     srcs = ["server.cc"],
     deps = [
@@ -30,7 +30,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "client",
     srcs = ["client.cc"],
     deps = [

@@ -9,6 +9,7 @@
 """
 
 load("//docker:image.bzl", "container_image")
+load("//ros:cc_defs.bzl", "cc_ros_binary")
 load("//ros:launch.bzl", "ros_launch")
 load(
     "//ros:interfaces.bzl",
@@ -19,7 +20,6 @@ load(
 load("//ros:topic.bzl", "ros_topic")
 load("//third_party:packaging.bzl", "binary_pkg_tar")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
@@ -47,7 +47,7 @@ py_ros_interface_library(
 )
 
 # Defines a talker ROS node.
-cc_binary(
+cc_ros_binary(
     name = "talker",
     srcs = [
         "talker.cc",
@@ -59,7 +59,7 @@ cc_binary(
 )
 
 # Defines a C++ listener ROS node.
-cc_binary(
+cc_ros_binary(
     name = "listener",
     srcs = [
         "listener.cc",

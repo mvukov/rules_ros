@@ -4,6 +4,11 @@
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load(
+    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "cc_ros_binary",
+    "cc_ros_library",
+)
+load(
     "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
@@ -23,7 +28,7 @@ cc_library(
     visibility = ["//visibility:private"],
 )
 
-cc_library(
+cc_ros_library(
     name = "xmlrpcpp",
     hdrs = glob(["utilities/xmlrpcpp/include/xmlrpcpp/*.h"]),
     includes = ["utilities/xmlrpcpp/include"],
@@ -94,7 +99,7 @@ expand_template(
     template = "clients/roscpp/src/libros/config.h.in",
 )
 
-cc_library(
+cc_ros_library(
     name = "roscpp_lib",
     hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
     includes = ["clients/roscpp/include"],
@@ -115,6 +120,7 @@ cc_library(
         "@ros_comm_msgs//:cc_rosgraph_msgs",
         "@ros_std_msgs//:cc_std_msgs",
     ],
+    ros_package_name = "roscpp",
     visibility = ["//visibility:public"],
 )
 
@@ -182,7 +188,7 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "roslz4",
     hdrs = glob(["utilities/roslz4/include/roslz4/*.h"]),
     includes = ["utilities/roslz4/include"],
@@ -198,7 +204,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "rosbag_storage",
     hdrs = glob(["tools/rosbag_storage/include/rosbag/*.h"]),
     includes = ["tools/rosbag_storage/include"],
@@ -229,7 +235,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "topic_tools",
     hdrs = glob(["tools/topic_tools/include/topic_tools/*.h"]),
     includes = ["tools/topic_tools/include"],
@@ -257,7 +263,7 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "rosbag",
     hdrs = glob(["tools/rosbag/include/rosbag/*.h"]),
     includes = ["tools/rosbag/include"],
@@ -280,7 +286,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "rosbag_record",
     srcs = ["tools/rosbag/src/record.cpp"],
     deps = [
@@ -290,7 +296,7 @@ cc_binary(
     visibility = ["//visibility:public"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "rosbag_play",
     srcs = ["tools/rosbag/src/play.cpp"],
     deps = [
@@ -380,7 +386,7 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
-cc_binary(
+cc_ros_binary(
     name = "rosout",
     srcs = ["tools/rosout/rosout.cpp"],
     deps = [
@@ -389,7 +395,7 @@ cc_binary(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "message_filters",
     hdrs = glob(["utilities/message_filters/include/**/*.h"]),
     includes = ["utilities/message_filters/include"],

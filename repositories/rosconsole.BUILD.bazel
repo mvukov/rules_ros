@@ -1,7 +1,9 @@
 """ Builds rosconsole.
 """
 
-cc_library(
+load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+
+cc_ros_library(
     name = "rosconsole",
     hdrs = glob(["include/**/*.h"]),
     includes = ["include"],

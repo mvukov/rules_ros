@@ -1,6 +1,7 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 exports_files([
+    "cc_defs.bzl",
     "dynamic_reconfigure.bzl",
     "interfaces.bzl",
     "launch.bzl",

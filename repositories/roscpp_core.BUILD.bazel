@@ -1,12 +1,18 @@
 """ Builds roscpp_core.
 """
 
-cc_library(
+load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+
+cc_ros_library(
     name = "cpp_common",
     hdrs = glob(["cpp_common/include/ros/*.h"]),
     includes = ["cpp_common/include"],
     srcs = glob(["cpp_common/src/*.cpp"]),
-    local_defines = ["HAVE_EXECINFO_H", "HAVE_CXXABI_H", "HAVE_GLIBC_BACKTRACE"],
+    local_defines = [
+        "HAVE_EXECINFO_H",
+        "HAVE_CXXABI_H",
+        "HAVE_GLIBC_BACKTRACE",
+    ],
     deps = [
         "@boost//:system",
         "@boost//:thread",
@@ -15,7 +21,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "rostime",
     hdrs = glob(["rostime/include/ros/**/*.h"]),
     includes = ["rostime/include"],
@@ -37,7 +43,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+cc_ros_library(
     name = "roscpp_serialization",
     hdrs = glob(["roscpp_serialization/include/ros/*.h"]),
     includes = ["roscpp_serialization/include"],
