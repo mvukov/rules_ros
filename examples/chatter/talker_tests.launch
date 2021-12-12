@@ -1,0 +1,14 @@
+<launch>
+  <node name="talker" type="examples/chatter/talker" />
+
+  <test name="publishtest"
+        test-name="publishtest"
+        type="third_party/legacy_rostest/publishtest">
+    <rosparam>
+      topics:
+        - name: chatter
+          timeout: 0.1
+          negative: False
+    </rosparam>
+  </test>
+</launch>

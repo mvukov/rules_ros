@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="simple_tests" type="test/rostest/simple_tests" />
+</launch>
