@@ -45,7 +45,6 @@ import unittest
 import warnings
 import xmlrpc.client as xmlrpcclient
 
-import coverage
 import rosgraph
 import rospy
 import rosunit
@@ -128,9 +127,6 @@ def rosrun(package, test_name, test, sysargs=None):
         if arg.startswith(XML_OUTPUT_FLAG):
             result_file = arg[len(XML_OUTPUT_FLAG):]
     text_mode = '--text' in sysargs
-    # coverage_mode = '--cov' in sysargs
-    # if coverage_mode:
-    #     _start_coverage([package])
 
     suite = None
     if isinstance(test, str):
@@ -144,8 +140,6 @@ def rosrun(package, test_name, test, sysargs=None):
     else:
         result = rosunit.create_xml_runner(package, test_name,
                                            result_file).run(suite)
-    # if coverage_mode:
-    #     _stop_coverage([package])
     rosunit.print_unittest_summary(result)
 
     # shutdown any node resources in case test forgets to
