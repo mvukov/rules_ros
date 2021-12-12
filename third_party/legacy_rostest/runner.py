@@ -143,16 +143,6 @@ def rostestRunner(test, results_base_dir=None):
             test_file = os.path.join(rospkg.get_test_results_dir(),
                                      "{}.xml".format(test_name))
 
-            # # - we pass in the output test_file name so we can scrape it
-            # env = None
-            # if results_base_dir:
-            #     env = {ROS_TEST_RESULTS_DIR: results_base_dir}
-            # print("TEST_NAME {}".format(test_name))
-            # test_file = xmlResultsFile(test_name, False, env=env)
-            # if os.path.exists(test_file):
-            #     printlog("removing previous test results file [%s]", test_file)
-            #     os.remove(test_file)
-
             # TODO: have to redeclare this due to a bug -- this file
             # needs to be renamed as it aliases the module where the
             # constant is elsewhere defined. The fix is to rename
