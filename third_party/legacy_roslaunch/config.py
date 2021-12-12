@@ -332,7 +332,7 @@ class ROSLaunchConfig(object):
                 print("Added machine [%s]" % name)
             return True
 
-    def add_test(self, test, _verbose=True):
+    def add_test(self, test, verbose=True):
         """
         Add test declaration. Used by rostest
         @param test: test node instance to add to launch

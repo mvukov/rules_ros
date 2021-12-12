@@ -1,4 +1,3 @@
-import os
 import sys
 
 from third_party.legacy_roslaunch import main as roslaunch_main

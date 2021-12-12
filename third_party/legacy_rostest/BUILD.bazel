@@ -1,0 +1,27 @@
+load("//build_tools:pylint.bzl", "pylint")
+
+py_library(
+    name = "legacy_rostest",
+    srcs = [
+        "__init__.py",
+        "rostest_main.py",
+        "rostest_parent.py",
+        "rostestutil.py",
+        "runner.py",
+    ],
+    deps = [
+        "@com_github_mvukov_rules_ros//third_party/legacy_roslaunch",
+        "@ros_comm//:rospy",
+        "@ros_ros//:rosunit",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "publishtest",
+    srcs = ["publishtest.py"],
+    deps = [":legacy_rostest"],
+    visibility = ["//visibility:public"],
+)
+
+pylint()

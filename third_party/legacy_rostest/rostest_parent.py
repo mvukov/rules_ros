@@ -32,25 +32,23 @@
 #
 # Revision $Id$
 
-import logging
-import sys
+# pylint: disable=raise-missing-from,consider-using-f-string,invalid-name
+# pylint: disable=line-too-long
 
 import rosgraph
-import roslaunch.config
-from roslaunch.core import printlog_bold, RLException
-import roslaunch.launch
-import roslaunch.pmon
-import roslaunch.server
-import roslaunch.xmlloader 
-
-import roslaunch.parent
-
 from rosmaster.master import Master
-from rospy import logwarn
+from third_party.legacy_roslaunch import core
+from third_party.legacy_roslaunch import parent
 
-class ROSTestLaunchParent(roslaunch.parent.ROSLaunchParent):
 
-    def __init__(self, config, roslaunch_files, port=0, reuse_master=False, clear=False):
+class ROSTestLaunchParent(parent.ROSLaunchParent):
+
+    def __init__(self,
+                 config,
+                 roslaunch_files,
+                 port=0,
+                 reuse_master=False,
+                 clear=False):
         if config is None:
             raise Exception("config not initialized")
         # we generate a run_id for each test
@@ -61,8 +59,8 @@ class ROSTestLaunchParent(roslaunch.parent.ROSLaunchParent):
             except Exception as e:
                 # The user asked us to connect to an existing ROS master, and
                 # we can't. Throw an exception and die
-                raise Exception("Could not connect to existing ROS master. "
-                                + "Original exception was: %s" % str(e))
+                raise Exception("Could not connect to existing ROS master. " +
+                                "Original exception was: %s" % str(e))
             except:
                 # oh boy; we got something that wasn't an exception.
                 # Throw an exception and die
@@ -81,13 +79,16 @@ class ROSTestLaunchParent(roslaunch.parent.ROSLaunchParent):
                 for param in params:
                     param_server.deleteParam(param)
         else:
-            run_id = roslaunch.core.generate_run_id()
-        super(ROSTestLaunchParent, self).__init__(run_id, roslaunch_files, is_core=False, is_rostest=True)
+            run_id = core.generate_run_id()
+        super(ROSTestLaunchParent, self).__init__(run_id,
+                                                  roslaunch_files,
+                                                  is_core=False,
+                                                  is_rostest=True)
         self.config = config
         self.port = port
         self.reuse_master = reuse_master
         self.master = None
-        
+
     def _load_config(self):
         # disable super, just in case, though this shouldn't get called
         pass
@@ -125,10 +126,10 @@ class ROSTestLaunchParent(roslaunch.parent.ROSLaunchParent):
 
     def run_test(self, test):
         """
-        run the test, blocks until completion 
+        run the test, blocks until completion
         """
         if self.runner is not None:
-            # run the test, blocks until completion            
+            # run the test, blocks until completion
             return self.runner.run_test(test)
         else:
             raise Exception("no runner")

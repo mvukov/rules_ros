@@ -10,3 +10,10 @@ py_library(
     imports = ["tools/rosclean/src"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "rosunit",
+    srcs = glob(["tools/rosunit/src/rosunit/*.py"]),
+    imports = ["tools/rosunit/src"],
+    visibility = ["//visibility:public"],
+)

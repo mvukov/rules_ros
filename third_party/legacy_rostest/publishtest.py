@@ -32,7 +32,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
-
 """
 Integration test node that subscribes to any topic and verifies
 there is at least one message publishing of the topic.
@@ -53,18 +52,23 @@ below parameters must be set:
 Author: Kentaro Wada <www.kentaro.wada@gmail.com>
 """
 
+# pylint: disable=bad-super-call,consider-using-f-string
+# pylint: disable=line-too-long
+
 import sys
 import time
 import unittest
 
 import rospy
 
+import third_party.legacy_rostest as rostest
 
 PKG = 'rostest'
 NAME = 'publishtest'
 
 
 class PublishChecker(object):
+
     def __init__(self, topic_name, timeout, negative):
         self.topic_name = topic_name
         self.negative = negative
@@ -84,6 +88,7 @@ class PublishChecker(object):
 
 
 class PublishTest(unittest.TestCase):
+
     def __init__(self, *args):
         super(self.__class__, self).__init__(*args)
         rospy.init_node(NAME)
@@ -92,7 +97,8 @@ class PublishTest(unittest.TestCase):
         params = rospy.get_param('~topics', [])
         for param in params:
             if 'name' not in param:
-                self.fail("'name' field in rosparam is required but not specified.")
+                self.fail(
+                    "'name' field in rosparam is required but not specified.")
             topic = {'timeout': 10, 'negative': False}
             topic.update(param)
             self.topics.append(topic)
@@ -107,7 +113,9 @@ class PublishTest(unittest.TestCase):
         while not rospy.is_shutdown() and \
                 use_sim_time and (rospy.Time.now() == rospy.Time(0)):
             rospy.logwarn_throttle(
-                1, '/use_sim_time is specified and rostime is 0, /clock is published?')
+                1,
+                '/use_sim_time is specified and rostime is 0, /clock is published?'
+            )
             if time.time() - t_start > 10:
                 self.fail('Timed out (10s) of /clock publication.')
             # must use time.sleep because /clock isn't yet published, so rospy.sleep hangs.
@@ -118,11 +126,9 @@ class PublishTest(unittest.TestCase):
             topic_name = topic['name']
             timeout = topic['timeout']
             negative = topic['negative']
-            print('Waiting [%s] for [%d] seconds with negative [%s]'
-                  % (topic_name, timeout, negative))
-            checkers.append(
-                PublishChecker(topic_name, timeout, negative))
-        deadline = max(checker.deadline for checker in checkers)
+            print('Waiting [%s] for [%d] seconds with negative [%s]' %
+                  (topic_name, timeout, negative))
+            checkers.append(PublishChecker(topic_name, timeout, negative))
         # assert
         finished_topics = []
         while not rospy.is_shutdown():
@@ -138,10 +144,10 @@ class PublishTest(unittest.TestCase):
                 if checker.negative:
                     assert ret, 'Topic [%s] is published' % (checker.topic_name)
                 else:
-                    assert ret, 'Topic [%s] is not published' % (checker.topic_name)
+                    assert ret, 'Topic [%s] is not published' % (
+                        checker.topic_name)
             rospy.sleep(0.01)
 
 
 if __name__ == '__main__':
-    import rostest
     rostest.run(PKG, NAME, PublishTest, sys.argv)

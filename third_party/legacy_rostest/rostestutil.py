@@ -31,51 +31,51 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
-from __future__ import print_function
-
 """
 rostest helper routines.
 """
 
+# pylint: disable=invalid-name,global-statement
+# pylint: disable=line-too-long
+
 # IMPORTANT: no routine here can in anyway cause rospy to be loaded (that includes roslaunch)
 
-import os
 import sys
 import logging
 
+import rosunit
+
+
 def printlog(msg, *args):
     if args:
-        msg = msg%args
+        msg = msg % args
     logging.getLogger('rostest').info(msg)
     print("[ROSTEST]" + msg)
+
+
 def printlogerr(msg, *args):
     if args:
-        msg = msg%args
+        msg = msg % args
     logging.getLogger('rostest').error(msg)
     print("[ROSTEST]" + msg, file=sys.stderr)
 
-_errors = None
-def getErrors():
-    return _errors
 
 # Most of this code has been moved down into rosunit
 
-import rosunit
-
 rostest_name_from_path = rosunit.rostest_name_from_path
+
 
 def printRostestSummary(result, rostest_results):
     """
     Print summary of rostest results to stdout.
     """
-    # TODO: probably can removed this
-    global _errors
-    _errors = result.errors
-    return rosunit.print_runner_summary(result, rostest_results, runner_name='ROSTEST')
+    return rosunit.print_runner_summary(result,
+                                        rostest_results,
+                                        runner_name='ROSTEST')
+
 
 printSummary = rosunit.print_unittest_summary
 createXMLRunner = rosunit.create_xml_runner
-xmlResultsFile = rosunit.xml_results_file    
+xmlResultsFile = rosunit.xml_results_file
 test_failure_junit_xml = rosunit.junitxml.test_failure_junit_xml
 test_success_junit_xml = rosunit.junitxml.test_success_junit_xml

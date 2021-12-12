@@ -6,6 +6,8 @@ exports_files([
     "interfaces.bzl",
     "launch.bzl",
     "launch.py.tpl",
+    "test.bzl",
+    "test.py.tpl",
     "topic.bzl",
     "utils.bzl",
 ])
@@ -14,6 +16,6 @@ py_binary(
     name = "parameter_generator_app",
     srcs = ["parameter_generator_app.py"],
     main = "parameter_generator_app.py",
-    visibility = ["//visibility:public"],
     deps = ["@com_github_mvukov_rules_ros//:dynamic_reconfigure"],
+    visibility = ["//visibility:public"],
 )
