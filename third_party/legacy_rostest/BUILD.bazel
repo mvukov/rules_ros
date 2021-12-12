@@ -43,7 +43,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":legacy_rostest",
-        "@com_github_mvukov_rules_ros//third_party/rosservice",
     ],
 )
 
