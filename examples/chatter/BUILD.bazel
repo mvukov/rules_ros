@@ -61,11 +61,11 @@ cc_ros_binary(
 
 ros_test(
     name = "talker_tests",
+    launch_file = "talker_tests.launch",
     nodes = [
         ":talker",
         "//third_party/legacy_rostest:publishtest",
     ],
-    launch_file = "talker_tests.launch",
 )
 
 # Defines a C++ listener ROS node.

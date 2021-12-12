@@ -1,6 +1,7 @@
 """ Defines tests.
 """
 
+load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//ros:test.bzl", "ros_test")
 
 cc_test(
@@ -12,6 +13,6 @@ cc_test(
 
 ros_test(
     name = "simple_tests_ros",
-    nodes = [":simple_tests"],
     launch_file = "simple_tests.launch",
+    nodes = [":simple_tests"],
 )
