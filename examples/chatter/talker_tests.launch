@@ -1,12 +1,23 @@
 <launch>
   <node name="talker" type="examples/chatter/talker" />
 
+  <test name="advertisetest"
+      test-name="advertisetest"
+      type="third_party/legacy_rostest/advertisetest">
+    <rosparam>
+      topics:
+        - name: /chatter
+          timeout: 0.1
+          type: example_msgs/Example
+    </rosparam>
+  </test>
+
   <test name="publishtest"
         test-name="publishtest"
         type="third_party/legacy_rostest/publishtest">
     <rosparam>
       topics:
-        - name: chatter
+        - name: /chatter
           timeout: 0.1
           negative: False
     </rosparam>

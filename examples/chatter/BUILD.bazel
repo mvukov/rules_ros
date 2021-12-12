@@ -65,6 +65,7 @@ ros_test(
     launch_file = "talker_tests.launch",
     nodes = [
         ":talker",
+        "//third_party/legacy_rostest:advertisetest",
         "//third_party/legacy_rostest:publishtest",
     ],
 )
