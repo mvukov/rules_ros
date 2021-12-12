@@ -19,6 +19,35 @@ py_library(
 )
 
 py_binary(
+    name = "advertisetest",
+    srcs = ["advertisetest.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":legacy_rostest",
+        "@com_github_mvukov_rules_ros//third_party/rosservice",
+    ],
+)
+
+py_binary(
+    name = "hztest",
+    srcs = ["hztest.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":legacy_rostest",
+    ],
+)
+
+py_binary(
+    name = "paramtest",
+    srcs = ["paramtest.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":legacy_rostest",
+        "@com_github_mvukov_rules_ros//third_party/rosservice",
+    ],
+)
+
+py_binary(
     name = "publishtest",
     srcs = ["publishtest.py"],
     visibility = ["//visibility:public"],

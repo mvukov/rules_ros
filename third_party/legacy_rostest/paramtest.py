@@ -40,7 +40,8 @@
 #  * ~/test_duration: time (in secs) to run test
 #
 
-from __future__ import print_function
+# pylint: disable=bad-super-call,consider-using-f-string,deprecated-method
+# pylint: disable=line-too-long
 
 import sys
 import threading
@@ -48,12 +49,14 @@ import time
 import unittest
 
 import rospy
-import rostest
+
+import third_party.legacy_rostest as rostest
 
 CLASSNAME = 'paramtest'
 
 
 class ParamTest(unittest.TestCase):
+
     def __init__(self, *args):
         super(ParamTest, self).__init__(*args)
         rospy.init_node(CLASSNAME)
@@ -72,19 +75,31 @@ class ParamTest(unittest.TestCase):
         try:
             # Getting the attributes of the test.
             testattr_paramname_target = rospy.get_param("~param_name_target")
-            paramvalue_expected = rospy.get_param("~param_value_expected", None)  # This is the expected param value.
+            paramvalue_expected = rospy.get_param(
+                "~param_value_expected",
+                None)  # This is the expected param value.
             # length of test
             testattr_duration = float(rospy.get_param("~test_duration", 5))
             # time to wait before
             wait_time = rospy.get_param("~wait_time", 20)
         except KeyError as e:
-            self.fail("ParamTest not initialized properly. Parameter [%s] not set. Caller ID: [%s] Resolved name: [%s]"%(str(e), rospy.get_caller_id(), rospy.resolve_name(e.args[0])))
-        print("Parameter: %s Test Duration: %s" % (testattr_paramname_target, testattr_duration))
-        self._test_param(testattr_paramname_target, testattr_duration, wait_time, paramvalue_expected)
+            self.fail(
+                "ParamTest not initialized properly. Parameter [%s] not set. Caller ID: [%s] Resolved name: [%s]"
+                %
+                (str(e), rospy.get_caller_id(), rospy.resolve_name(e.args[0])))
+        print("Parameter: %s Test Duration: %s" %
+              (testattr_paramname_target, testattr_duration))
+        self._test_param(testattr_paramname_target, testattr_duration,
+                         wait_time, paramvalue_expected)
 
-    def _test_param(self, testattr_paramname_target, testattr_duration, wait_time, paramvalue_expected=None):
+    def _test_param(self,
+                    testattr_paramname_target,
+                    testattr_duration,
+                    wait_time,
+                    paramvalue_expected=None):
         self.assert_(testattr_duration > 0.0, "bad parameter (test_duration)")
-        self.assert_(len(testattr_paramname_target), "bad parameter (testattr_paramname_target)")
+        self.assert_(len(testattr_paramname_target),
+                     "bad parameter (testattr_paramname_target)")
 
         print("Waiting for parameters")
 
@@ -94,13 +109,17 @@ class ParamTest(unittest.TestCase):
             try:
                 param_obtained = rospy.get_param(testattr_paramname_target)
             except KeyError as e:
-                print('Designated parameter [%s] is not registered yet, will wait. Caller ID: [%s] Resolved name: [%s]'%(testattr_paramname_target, rospy.get_caller_id(), rospy.resolve_name(e.args[0])))
+                print(
+                    'Designated parameter [%s] is not registered yet, will wait. Caller ID: [%s] Resolved name: [%s]'
+                    % (testattr_paramname_target, rospy.get_caller_id(),
+                       rospy.resolve_name(e.args[0])))
             time.sleep(0.1)
 
         if paramvalue_expected:
             self.assertEqual(paramvalue_expected, param_obtained)
         else:
             self.assertIsNotNone(param_obtained)
+
 
 if __name__ == '__main__':
     try:

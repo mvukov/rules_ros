@@ -32,7 +32,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
-
 """
 Integration test node that checks if the specified topics are advertised.
 below parameters must be set:
@@ -65,6 +64,9 @@ below parameters must be set:
 Author: Yuki Furuta <me@furushchev.ru>
 """
 
+# pylint: disable=bad-super-call,consider-using-f-string
+# pylint: disable=line-too-long
+
 import sys
 import time
 import unittest
@@ -72,12 +74,14 @@ import unittest
 import rospy
 import rosservice
 
+import third_party.legacy_rostest as rostest
 
 PKG = 'rostest'
 NAME = 'advertisetest'
 
 
 class AdvertiseTest(unittest.TestCase):
+
     def __init__(self, *args):
         super(self.__class__, self).__init__(*args)
         rospy.init_node(NAME)
@@ -86,16 +90,26 @@ class AdvertiseTest(unittest.TestCase):
         params = rospy.get_param('~topics', [])
         for param in params:
             if 'name' not in param:
-                self.fail("'name' field in rosparam is required but not specified.")
-            topic = {'timeout': 10, 'type': None, 'negative': False,}
+                self.fail(
+                    "'name' field in rosparam is required but not specified.")
+            topic = {
+                'timeout': 10,
+                'type': None,
+                'negative': False,
+            }
             topic.update(param)
             self.topics[topic['name']] = topic
         self.services = {}
         params = rospy.get_param('~services', [])
         for param in params:
             if 'name' not in param:
-                self.fail("'name' field in rosparam is required but not specified.")
-            service = {'timeout': 10, 'type': None, 'negative': False,}
+                self.fail(
+                    "'name' field in rosparam is required but not specified.")
+            service = {
+                'timeout': 10,
+                'type': None,
+                'negative': False,
+            }
             service.update(param)
             self.services[service['name']] = service
         # check if there is at least one topic or one service
@@ -109,8 +123,10 @@ class AdvertiseTest(unittest.TestCase):
         while not rospy.is_shutdown() and \
                 use_sim_time and (rospy.Time.now() == rospy.Time(0)):
             rospy.logwarn_throttle(
-                1, '/use_sim_time is specified and rostime is 0, /clock is published?')
-            if time.time() - t_start > 10:
+                1,
+                '/use_sim_time is specified and rostime is 0, /clock is published?'
+            )
+            if time.time() - self.t_start > 10:
                 self.fail('Timed out (10s) of /clock publication.')
             # must use time.sleep because /clock isn't yet published, so rospy.sleep hangs.
             time.sleep(0.1)
@@ -121,7 +137,6 @@ class AdvertiseTest(unittest.TestCase):
             t_start = self.t_start
             t_name_set = set(self.topics.keys())
             t_timeout_max = max(t['timeout'] for t in self.topics.values())
-            finished_topics = []
             while not rospy.is_shutdown():
                 t_now = time.time()
                 t_elapsed = t_now - t_start
@@ -153,7 +168,6 @@ class AdvertiseTest(unittest.TestCase):
             t_start = self.t_start
             s_name_set = set(self.services.keys())
             t_timeout_max = max(t['timeout'] for t in self.services.values())
-            finished_topics = []
             while not rospy.is_shutdown():
                 t_now = time.time()
                 t_elapsed = t_now - t_start
@@ -183,5 +197,4 @@ class AdvertiseTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import rostest
     rostest.run(PKG, NAME, AdvertiseTest, sys.argv)
