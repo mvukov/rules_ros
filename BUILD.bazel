@@ -1,6 +1,10 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
-exports_files(["pylint.rc"])
+exports_files([
+    "pylint.rc",
+    "requirements.txt",
+    "requirements_lock.txt",
+])
 
 py_library(
     name = "py_roslib_slim",
