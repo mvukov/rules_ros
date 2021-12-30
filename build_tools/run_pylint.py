@@ -3,6 +3,10 @@ import os
 import re
 import sys
 
+# Prevent pylint using its persistent data.
+# Must be set before pylint is imported!
+os.environ['PYLINTHOME'] = os.environ['TEST_UNDECLARED_OUTPUTS_DIR']
+
 import pylint.lint
 import pylint.reporters.text
 
@@ -57,9 +61,6 @@ def main():
         return 0
     pool = multiprocessing.Pool(NUM_CPU_CORES_FOR_PYLINT)
     file_linter = FileLinter(python_path=sys.path)
-    # Prevent pylint using its persistent data by creating a new home dir
-    # for every test (this is equivalent to setting PYLINTHOME env variable).
-    os.mkdir(os.path.join(os.getcwd(), '.pylint.d'))
 
     linting_output = pool.map(file_linter, files_to_lint)
 
