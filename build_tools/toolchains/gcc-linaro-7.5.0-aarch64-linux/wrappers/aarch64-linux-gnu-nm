@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -eu
-
-exec external/gcc-linaro-7.5.0-aarch64-linux/bin/aarch64-linux-gnu-nm "$@"
