@@ -33,6 +33,7 @@ cc_ros_library(
     hdrs = glob(["utilities/xmlrpcpp/include/xmlrpcpp/*.h"]),
     includes = ["utilities/xmlrpcpp/include"],
     srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
+    linkopts = ["-lm"],
     deps = [
         ":libb64",
         "@boost//:thread",
@@ -105,6 +106,7 @@ cc_ros_library(
     includes = ["clients/roscpp/include"],
     srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [_CONFIG_H],
     defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
+    linkopts = ["-lm"],
     deps = [
         ":cc_roscpp",
         ":xmlrpcpp",

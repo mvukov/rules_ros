@@ -16,6 +16,7 @@ At least on Ubuntu 20.04, you'll need to also do the following:
 ```sh
 sudo ln -s /usr/bin/python3 /usr/bin/python
 ```
+
 Bazel-generated driver scripts for Python binaries still use `/usr/bin/python`.
 
 And no, you don't have to install any ROS packages via `apt`.
@@ -69,6 +70,7 @@ Not too shabby.
 
 Next, let's start a deployment with the talker and the listener nodes. You can
 stop the nodes you started with the above commands. Now execute
+
 ```sh
 bazel run //examples/chatter:chatter
 ```
@@ -79,6 +81,7 @@ using Bazel ensures all necessary dependencies are (re-)built.
 
 How about executing the chatter deployment within a Docker container?
 Just run
+
 ```sh
 bazel run //examples/chatter:chatter_image
 ```
@@ -94,40 +97,43 @@ defining and usage of ROS actions (and actionlib).
 ## Packaging
 
 By running
+
 ```sh
 bazel build //examples/chatter:chatter_pkg
-
 ```
+
 one can create the chatter deployment and package it in an archive. This is
 interesting for deployment on devices different than the build machine.
 
 ## Cross-compilation
 
-> This is pretty-much in proof-of-concept state.
-
 You can cross-compile the chatter deployment for e.g. [NVIDIA's Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano-developer-kit) with
-```sh
-bazel build //examples/chatter:chatter --config=jetson
 
+```sh
+bazel build //examples/chatter:chatter --config=jetson-opt
 ```
+
 You don't have to install a cross-compiler, Bazel will download one for you.
 Neat, right? On it's own, this is not yet super interesting as one has to
 deploy the cross-compiled binaries to a target device. The binaries can be
 packaged with
-```sh
-bazel build //examples/chatter:chatter_pkg --config=jetson
 
+```sh
+bazel build //examples/chatter:chatter_pkg --config=jetson-opt
 ```
 
 All you need to deploy to the target device is in `bazel-bin/examples/chatter/chatter_pkg.tar.gz`.
 
 After you transfer the archive to the target, you can do the following at the
 target:
+
 ```bash
 sudo mkdir -p /app  # This is a (configurable) root folder for the deployment.
 sudo tar -xvzf chatter_pkg.tar.gz -C /
 ```
+
 and then you can start the deployment with
+
 ```bash
 /app/examples/chatter/chatter
 ```

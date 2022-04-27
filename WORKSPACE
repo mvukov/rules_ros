@@ -58,12 +58,28 @@ container_pull(
     repository = "mvukov/ros-deploy-base",
 )
 
-load(
-    "//build_tools/toolchains:toolchains.bzl",
-    "register_all_toolchains",
-    "toolchain_repositories",
+http_archive(
+    name = "bazel_gcc_toolchain",
+    sha256 = "4587cac066f970877fda621a8b1480e333bd05cf5165cae5389acaa4327f6471",
+    strip_prefix = "gcc-toolchain-76f3cb579505c93363efec5c69bd00f1ae4285d0",
+    urls = ["https://github.com/aspect-build/gcc-toolchain/archive/76f3cb579505c93363efec5c69bd00f1ae4285d0.zip"],
 )
 
-toolchain_repositories()
+load("@bazel_gcc_toolchain//toolchain:repositories.bzl", gcc_toolchain_repositories = "gcc_toolchain_dependencies")
 
-register_all_toolchains()
+gcc_toolchain_repositories()
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
+
+aspect_bazel_lib_dependencies()
+
+load("@bazel_gcc_toolchain//toolchain:defs.bzl", "gcc_register_toolchain")
+
+# This is GCC 7.3, used to ensure compatibility with Ubuntu 18.04 / Jetpack 4.6 for Jetson Nano.
+gcc_register_toolchain(
+    name = "gcc_toolchain_aarch64",
+    url = "https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--bleeding-edge-2018.02-1.tar.bz2",
+    sha256 = "a857e31461e133265e6dc0618b5e1c5f8d19002e5f8f49b50144a8c7fa787533",
+    strip_prefix = "aarch64--glibc--bleeding-edge-2018.02-1",
+    target_arch = "aarch64",
+)
