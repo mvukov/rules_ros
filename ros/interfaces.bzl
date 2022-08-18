@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements functionality for code generation of ROS interfaces.
+""" Implements functionality for code generation of ROS interfaces.
 
 Inspired by code in https://github.com/nicolov/ros-bazel repo.
 """
@@ -208,7 +208,14 @@ cc_ros_generator = rule(
     },
 )
 
-def cc_ros_interface_library(name, deps, visibility = None):
+def cc_ros_interface_library(name, deps, **kwargs):
+    """ Defines a C++ ROS interface library.
+
+    Args:
+        name: The target name.
+        deps: A list of deps (list of ros_interface_library targets).
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
+    """
     name_gencpp = "{}_gencpp".format(name)
     cc_ros_generator(
         name = name_gencpp,
@@ -221,7 +228,7 @@ def cc_ros_interface_library(name, deps, visibility = None):
             "@roscpp_core//:roscpp_core",
             "@ros_std_msgs//:cc_std_msgs_headers",
         ],
-        visibility = visibility,
+        **kwargs
     )
 
 def _py_generate(
@@ -414,6 +421,13 @@ py_ros_generator = rule(
 )
 
 def py_ros_interface_library(name, deps, **kwargs):
+    """ Defines a Python ROS interface library.
+
+    Args:
+        name: The target name:
+        deps: A list of deps (list of ros_interface_library targets).
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
+    """
     name_genpy = "{}_genpy".format(name)
     py_ros_generator(
         name = name_genpy,

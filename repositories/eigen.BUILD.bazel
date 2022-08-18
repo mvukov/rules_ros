@@ -1,7 +1,7 @@
-# https://raw.githubusercontent.com/tensorflow/tensorflow/master/third_party/eigen.BUILD
-# Description:
-#   Eigen is a C++ template library for linear algebra: vectors,
-#   matrices, and related algorithms.
+""" Builds eigen.
+
+Taken from https://raw.githubusercontent.com/tensorflow/tensorflow/master/third_party/eigen.BUILD
+"""
 
 licenses([
     # Note: Eigen is an MPL2 library that includes GPL v3 and LGPL v2.1+ code.

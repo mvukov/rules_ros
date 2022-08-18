@@ -78,8 +78,8 @@ load("@bazel_gcc_toolchain//toolchain:defs.bzl", "gcc_register_toolchain")
 # This is GCC 7.3, used to ensure compatibility with Ubuntu 18.04 / Jetpack 4.6 for Jetson Nano.
 gcc_register_toolchain(
     name = "gcc_toolchain_aarch64",
-    url = "https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--bleeding-edge-2018.02-1.tar.bz2",
     sha256 = "a857e31461e133265e6dc0618b5e1c5f8d19002e5f8f49b50144a8c7fa787533",
     strip_prefix = "aarch64--glibc--bleeding-edge-2018.02-1",
     target_arch = "aarch64",
+    url = "https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--bleeding-edge-2018.02-1.tar.bz2",
 )

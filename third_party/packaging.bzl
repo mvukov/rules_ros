@@ -134,7 +134,6 @@ def _build_package(
 
     Args:
        ctx: The context
-       name: The name of the package
        package: The output location for this package.
        file_map: Map of files to include in package (source to dest inside package)
        empty_files: List of empty files in the package

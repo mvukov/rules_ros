@@ -1,18 +1,18 @@
-"""Implements functionality for defining ROS tests.
+""" Implements functionality for defining ROS tests.
 """
 
 load("//third_party:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_test")
 
-def ros_test(name, nodes, launch_file, launch_args = None, size = None):
-    """Defines a ROS test.
+def ros_test(name, nodes, launch_file, launch_args = None, **kwargs):
+    """ Defines a ROS test.
 
     Args:
         name: The name of the test.
         nodes: The nodes used by the test.
         launch_file: The launch file used by the test.
         launch_args: The launch arguments used by the test.
-        size: The size of the test.
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-tests
     """
     launch_file_path = "'$(location {})'".format(launch_file)
     launch_args = launch_args or []
@@ -32,10 +32,9 @@ def ros_test(name, nodes, launch_file, launch_args = None, size = None):
 
     py_test(
         name = name,
-        size = size or "medium",
         srcs = [launch_script],
         data = nodes + [launch_file],
         main = launch_script,
-        visibility = ["//visibility:public"],
         deps = ["@com_github_mvukov_rules_ros//third_party/legacy_rostest"],
+        **kwargs
     )

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements code generation functionality for dynamic reconfiguration.
+""" Implements code generation functionality for dynamic reconfiguration.
 """
 
 load("//ros:utils.bzl", "get_stem")
@@ -101,7 +101,14 @@ cc_ros_dynamic_reconfigure_generator = rule(
     },
 )
 
-def cc_ros_dynamic_reconfigure_library(name, dep, visibility = None):
+def cc_ros_dynamic_reconfigure_library(name, dep, **kwargs):
+    """ Defines a C++ dynamic reconfiguration interface library.
+
+    Args:
+        name: The target name.
+        dep: The configuration interface file (.cfg).
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
+    """
     generator_name = name + "_generator"
     cc_ros_dynamic_reconfigure_generator(
         name = generator_name,
@@ -116,5 +123,5 @@ def cc_ros_dynamic_reconfigure_library(name, dep, visibility = None):
             "@boost//:thread",
             "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
         ],
-        visibility = visibility,
+        **kwargs
     )
