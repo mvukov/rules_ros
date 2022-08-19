@@ -11,14 +11,6 @@ Besides Bazel, you will need a C++ compiler and a Python 3.8 interpreter. If you
 want to run ROS deployments in Docker containers, [install Docker](https://docs.docker.com/engine/install/ubuntu/)
 as well.
 
-At least on Ubuntu 20.04, you'll need to also do the following:
-
-```sh
-sudo ln -s /usr/bin/python3 /usr/bin/python
-```
-
-Bazel-generated driver scripts for Python binaries still use `/usr/bin/python`.
-
 And no, you don't have to install any ROS packages via `apt`.
 
 ## What works?
