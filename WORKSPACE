@@ -59,6 +59,26 @@ container_pull(
 )
 
 http_archive(
+    name = "io_bazel_stardoc",
+    sha256 = "aa814dae0ac400bbab2e8881f9915c6f47c49664bf087c409a15f90438d2c23e",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/stardoc/releases/download/0.5.1/stardoc-0.5.1.tar.gz",
+        "https://github.com/bazelbuild/stardoc/releases/download/0.5.1/stardoc-0.5.1.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "e00a57d37a8d8b629951e43d1af9b079429b6ea9710752f08910f13afdb825f0",
+    strip_prefix = "bazel-lib-1.10.1",
+    url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.10.1.tar.gz",
+)
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
+
+aspect_bazel_lib_dependencies()
+
+http_archive(
     name = "bazel_gcc_toolchain",
     sha256 = "4587cac066f970877fda621a8b1480e333bd05cf5165cae5389acaa4327f6471",
     strip_prefix = "gcc-toolchain-76f3cb579505c93363efec5c69bd00f1ae4285d0",
@@ -68,10 +88,6 @@ http_archive(
 load("@bazel_gcc_toolchain//toolchain:repositories.bzl", gcc_toolchain_repositories = "gcc_toolchain_dependencies")
 
 gcc_toolchain_repositories()
-
-load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
-
-aspect_bazel_lib_dependencies()
 
 load("@bazel_gcc_toolchain//toolchain:defs.bzl", "gcc_register_toolchain")
 

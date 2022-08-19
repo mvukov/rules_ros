@@ -1,5 +1,5 @@
 exports_files([
-    "expand_teplate.bzl",
+    "expand_template.bzl",
     "launcher.sh.tpl",
     "packaging.bzl",
 ])

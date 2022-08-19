@@ -12,7 +12,7 @@ def ros_launch(name, nodes, launch_files, launch_args = None, **kwargs):
         nodes: The nodes used by the deployment.
         launch_files: The launch files used by the deployment.
         launch_args: The launch arguments used by the deployment.
-        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
     launch_file_paths = ["'$(location {})'".format(x) for x in launch_files]
     launch_args = launch_args or []
