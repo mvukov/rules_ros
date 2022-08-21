@@ -13,9 +13,9 @@
 # limitations under the License.
 
 """ Implements functionality for code generation of ROS interfaces.
-
-Inspired by code in https://github.com/nicolov/ros-bazel repo.
 """
+
+# Inspired by code in https://github.com/nicolov/ros-bazel repo.
 
 load("//ros:utils.bzl", "get_stem")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -93,8 +93,12 @@ ros_interface_library = rule(
         "srcs": attr.label_list(
             allow_files = [".action", ".msg", ".srv"],
             mandatory = True,
+            doc = " A list of interface files: actions, messages and services. "
         ),
-        "deps": attr.label_list(providers = [RosInterfaceInfo]),
+        "deps": attr.label_list(
+            providers = [RosInterfaceInfo],
+            doc = " A list of other `ros_interface_library` targets. "
+        ),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
             executable = True,
@@ -102,6 +106,12 @@ ros_interface_library = rule(
         ),
     },
     implementation = _ros_interface_library_impl,
+    doc = """ Defines a rule for grouping ROS interfaces: actions, messages and services.
+
+The target name defines the corresponding ROS package name.
+For C++ generated code the target name defines the C++ namespace.
+For Python generated code the target name defines the Python package name.
+"""
 )
 
 def _get_include_flags(target, ctx):
@@ -212,8 +222,8 @@ def cc_ros_interface_library(name, deps, **kwargs):
     """ Defines a C++ ROS interface library.
 
     Args:
-        name: The target name.
-        deps: A list of deps (list of ros_interface_library targets).
+        name: A unique target name.
+        deps: A list of deps (list of `ros_interface_library` targets).
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
     """
     name_gencpp = "{}_gencpp".format(name)
@@ -424,8 +434,8 @@ def py_ros_interface_library(name, deps, **kwargs):
     """ Defines a Python ROS interface library.
 
     Args:
-        name: The target name:
-        deps: A list of deps (list of ros_interface_library targets).
+        name: A unique target name.
+        deps: A list of deps (list of `ros_interface_library` targets).
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
     """
     name_genpy = "{}_genpy".format(name)

@@ -1,4 +1,4 @@
-""" Implements functionality for defining ROS tests.
+""" Implements functionality for defining ROS tests using rostest.
 """
 
 load("//third_party:expand_template.bzl", "expand_template")
@@ -8,10 +8,10 @@ def ros_test(name, nodes, launch_file, launch_args = None, **kwargs):
     """ Defines a ROS test.
 
     Args:
-        name: The name of the test.
-        nodes: The nodes used by the test.
-        launch_file: The launch file used by the test.
-        launch_args: The launch arguments used by the test.
+        name: A unique target name.
+        nodes: A list of ROS nodes used by the test.
+        launch_file: A rostest-compatible launch file.
+        launch_args: A list of rostest arguments used by the test.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-tests
     """
     launch_file_path = "'$(location {})'".format(launch_file)

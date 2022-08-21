@@ -11,7 +11,7 @@ def ros_topic(name, deps, **kwargs):
         name: The app (target) name.
         deps: A list of deps for which all ros_interface_library targets are
             collected and on which this target can operate on. This would typically
-            be a list of ROS node targets or ROS deployments (ros_launch targets).
+            be a list of ROS node targets or ROS deployments (`ros_launch` targets).
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
     interfaces = "{}_interfaces".format(name)

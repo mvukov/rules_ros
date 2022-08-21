@@ -1,6 +1,6 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
- Implements functionality for launching ROS master and ROS nodes.
+ Implements functionality for launching ROS deployments using roslaunch.
 
 
 <a id="ros_launch"></a>
@@ -18,10 +18,10 @@ ros_launch(<a href="#ros_launch-name">name</a>, <a href="#ros_launch-nodes">node
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="ros_launch-name"></a>name |  The name of the deployment.   |  none |
-| <a id="ros_launch-nodes"></a>nodes |  The nodes used by the deployment.   |  none |
-| <a id="ros_launch-launch_files"></a>launch_files |  The launch files used by the deployment.   |  none |
-| <a id="ros_launch-launch_args"></a>launch_args |  The launch arguments used by the deployment.   |  <code>None</code> |
+| <a id="ros_launch-name"></a>name |  A unique target name.   |  none |
+| <a id="ros_launch-nodes"></a>nodes |  A list of ROS nodes for the deployment.   |  none |
+| <a id="ros_launch-launch_files"></a>launch_files |  A list of roslaunch-compatible launch files.   |  none |
+| <a id="ros_launch-launch_args"></a>launch_args |  A list of roslaunch arguments used by the deployment.   |  <code>None</code> |
 | <a id="ros_launch-kwargs"></a>kwargs |  https://bazel.build/reference/be/common-definitions#common-attributes-binaries   |  none |
 
 

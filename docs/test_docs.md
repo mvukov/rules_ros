@@ -1,6 +1,6 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
- Implements functionality for defining ROS tests.
+ Implements functionality for defining ROS tests using rostest.
 
 
 <a id="ros_test"></a>
@@ -18,10 +18,10 @@ ros_test(<a href="#ros_test-name">name</a>, <a href="#ros_test-nodes">nodes</a>,
 
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
-| <a id="ros_test-name"></a>name |  The name of the test.   |  none |
-| <a id="ros_test-nodes"></a>nodes |  The nodes used by the test.   |  none |
-| <a id="ros_test-launch_file"></a>launch_file |  The launch file used by the test.   |  none |
-| <a id="ros_test-launch_args"></a>launch_args |  The launch arguments used by the test.   |  <code>None</code> |
+| <a id="ros_test-name"></a>name |  A unique target name.   |  none |
+| <a id="ros_test-nodes"></a>nodes |  A list of ROS nodes used by the test.   |  none |
+| <a id="ros_test-launch_file"></a>launch_file |  A rostest-compatible launch file.   |  none |
+| <a id="ros_test-launch_args"></a>launch_args |  A list of rostest arguments used by the test.   |  <code>None</code> |
 | <a id="ros_test-kwargs"></a>kwargs |  https://bazel.build/reference/be/common-definitions#common-attributes-tests   |  none |
 
 

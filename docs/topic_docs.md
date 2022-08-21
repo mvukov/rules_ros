@@ -19,7 +19,7 @@ ros_topic(<a href="#ros_topic-name">name</a>, <a href="#ros_topic-deps">deps</a>
 | Name  | Description | Default Value |
 | :------------- | :------------- | :------------- |
 | <a id="ros_topic-name"></a>name |  The app (target) name.   |  none |
-| <a id="ros_topic-deps"></a>deps |  A list of deps for which all ros_interface_library targets are collected and on which this target can operate on. This would typically be a list of ROS node targets or ROS deployments (ros_launch targets).   |  none |
+| <a id="ros_topic-deps"></a>deps |  A list of deps for which all ros_interface_library targets are collected and on which this target can operate on. This would typically be a list of ROS node targets or ROS deployments (<code>ros_launch</code> targets).   |  none |
 | <a id="ros_topic-kwargs"></a>kwargs |  https://bazel.build/reference/be/common-definitions#common-attributes-binaries   |  none |
 
 

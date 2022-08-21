@@ -141,6 +141,14 @@ sudo python3.8 -m pip install pip-tools
 Then you can run the script `./generate_python_requirements.sh` to update
 Python deps.
 
+## Documentation
+
+* [ros/cc_defs.bzl](docs/cc_defs_docs.bzl)
+* [ros/interfaces.bzl](docs/interfaces_docs.bzl)
+* [ros/launch.bzl](docs/launch_docs.bzl)
+* [ros/test.bzl](docs/test_docs.bzl)
+* [ros/topic.bzl](docs/topic_docs.bzl)
+
 ## Background and design decisions
 
 Within this project I want to learn and practice Bazel as well as to learn more

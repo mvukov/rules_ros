@@ -1,4 +1,4 @@
-""" Implements functionality for launching ROS master and ROS nodes.
+""" Implements functionality for launching ROS deployments using roslaunch.
 """
 
 load("//third_party:expand_template.bzl", "expand_template")
@@ -8,10 +8,10 @@ def ros_launch(name, nodes, launch_files, launch_args = None, **kwargs):
     """ Defines a ROS deployment.
 
     Args:
-        name: The name of the deployment.
-        nodes: The nodes used by the deployment.
-        launch_files: The launch files used by the deployment.
-        launch_args: The launch arguments used by the deployment.
+        name: A unique target name.
+        nodes: A list of ROS nodes for the deployment.
+        launch_files: A list of roslaunch-compatible launch files.
+        launch_args: A list of roslaunch arguments used by the deployment.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
     launch_file_paths = ["'$(location {})'".format(x) for x in launch_files]
