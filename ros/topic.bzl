@@ -8,8 +8,8 @@ def ros_topic(name, deps, **kwargs):
     """ Defines rostopic app for a set of deps.
 
     Args:
-        name: The app (target) name.
-        deps: A list of deps for which all ros_interface_library targets are
+        name: A unique target name.
+        deps: A list of deps for which all `ros_interface_library` targets are
             collected and on which this target can operate on. This would typically
             be a list of ROS node targets or ROS deployments (`ros_launch` targets).
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
