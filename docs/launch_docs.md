@@ -8,7 +8,7 @@
 ## ros_launch
 
 <pre>
-ros_launch(<a href="#ros_launch-name">name</a>, <a href="#ros_launch-nodes">nodes</a>, <a href="#ros_launch-launch_files">launch_files</a>, <a href="#ros_launch-launch_args">launch_args</a>, <a href="#ros_launch-kwargs">kwargs</a>)
+ros_launch(<a href="#ros_launch-name">name</a>, <a href="#ros_launch-nodes">nodes</a>, <a href="#ros_launch-launch_files">launch_files</a>, <a href="#ros_launch-kwargs">kwargs</a>)
 </pre>
 
  Defines a ROS deployment.
@@ -21,7 +21,6 @@ ros_launch(<a href="#ros_launch-name">name</a>, <a href="#ros_launch-nodes">node
 | <a id="ros_launch-name"></a>name |  A unique target name.   |  none |
 | <a id="ros_launch-nodes"></a>nodes |  A list of ROS nodes for the deployment.   |  none |
 | <a id="ros_launch-launch_files"></a>launch_files |  A list of roslaunch-compatible launch files.   |  none |
-| <a id="ros_launch-launch_args"></a>launch_args |  A list of roslaunch arguments used by the deployment.   |  <code>None</code> |
 | <a id="ros_launch-kwargs"></a>kwargs |  https://bazel.build/reference/be/common-definitions#common-attributes-binaries   |  none |
 
 
