@@ -130,17 +130,6 @@ and then you can start the deployment with
 /app/examples/chatter/chatter
 ```
 
-## Additional
-
-Optionally you can install `pip-tools` for resolving/updating Python deps:
-
-```sh
-sudo python3.8 -m pip install pip-tools
-```
-
-Then you can run the script `./generate_python_requirements.sh` to update
-Python deps.
-
 ## Documentation
 
 * [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
@@ -153,6 +142,17 @@ Python deps.
 * [ros_launch](docs/launch_docs.md#ros_launch)
 * [ros_test](docs/test_docs.md#ros_test)
 * [ros_topic](docs/topic_docs.md#ros_topic)
+
+## Additional
+
+Optionally you can install `pip-tools` for resolving/updating Python deps:
+
+```sh
+sudo python3.8 -m pip install pip-tools
+```
+
+Then you can run the script `./generate_python_requirements.sh` to update
+Python deps.
 
 ## Background and design decisions
 
