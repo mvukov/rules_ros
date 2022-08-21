@@ -4,21 +4,18 @@
 load("//third_party:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-def ros_launch(name, nodes, launch_files, launch_args = None, **kwargs):
+def ros_launch(name, nodes, launch_files, **kwargs):
     """ Defines a ROS deployment.
 
     Args:
         name: A unique target name.
         nodes: A list of ROS nodes for the deployment.
         launch_files: A list of roslaunch-compatible launch files.
-        launch_args: A list of roslaunch arguments used by the deployment.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
     launch_file_paths = ["'$(location {})'".format(x) for x in launch_files]
-    launch_args = launch_args or []
     substitutions = {
         "{launch_files}": ", ".join(launch_file_paths),
-        "{launch_args}": ", ".join(launch_args),
     }
 
     launch_script = "{}_launch.py".format(name)

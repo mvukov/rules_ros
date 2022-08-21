@@ -8,8 +8,7 @@ os.environ['ROS_LOG_DIR'] = test_outputs_dir
 os.environ['ROS_TEST_RESULTS_DIR'] = test_outputs_dir
 
 LAUNCH_FILE = {launch_file}
-LAUNCH_ARGS = [{launch_args}]
 
-sys.argv = sys.argv[:1] + [LAUNCH_FILE] + LAUNCH_ARGS + sys.argv[1:]
+sys.argv = sys.argv[:1] + [LAUNCH_FILE] + sys.argv[1:]
 
 rostest_main.rostestmain()

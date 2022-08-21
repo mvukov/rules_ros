@@ -4,21 +4,18 @@
 load("//third_party:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_test")
 
-def ros_test(name, nodes, launch_file, launch_args = None, **kwargs):
+def ros_test(name, nodes, launch_file, **kwargs):
     """ Defines a ROS test.
 
     Args:
         name: A unique target name.
         nodes: A list of ROS nodes used by the test.
         launch_file: A rostest-compatible launch file.
-        launch_args: A list of rostest arguments used by the test.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-tests
     """
     launch_file_path = "'$(location {})'".format(launch_file)
-    launch_args = launch_args or []
     substitutions = {
         "{launch_file}": launch_file_path,
-        "{launch_args}": ", ".join(launch_args),
     }
 
     launch_script = "{}_launch.py".format(name)
