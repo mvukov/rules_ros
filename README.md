@@ -145,6 +145,8 @@ Python deps.
 
 * [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
 * [ros_cc_library](docs/cc_defs_docs.md#ros_cc_library)
+* [ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs#ros_dynamic_reconfigure_library)
+* [cc_ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs#cc_ros_dynamic_reconfigure_library)
 * [ros_interface_library](docs/interfaces_docs.md#ros_interface_library)
 * [cc_ros_interface_library](docs/interfaces_docs.md#cc_ros_interface_library)
 * [py_ros_interface_library](docs/interfaces_docs.md#py_ros_interface_library)

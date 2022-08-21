@@ -30,6 +30,16 @@ bzl_library(
     visibility = ["//docs:__pkg__"],
 )
 
+bzl_library(
+    name = "dynamic_reconfigure",
+    srcs = [
+        "dynamic_reconfigure.bzl",
+        "utils.bzl",
+        "@rules_cc//cc:srcs",
+    ],
+    visibility = ["//docs:__pkg__"],
+)
+
 filegroup(
     name = "python_defs",
     srcs = [

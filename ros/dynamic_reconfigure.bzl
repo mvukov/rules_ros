@@ -42,9 +42,11 @@ ros_dynamic_reconfigure_library = rule(
         "src": attr.label(
             allow_files = [".cfg"],
             mandatory = True,
+            doc = "A configuration file (.cfg)."
         ),
     },
     implementation = _ros_dynamic_reconfigure_library_impl,
+    doc = " Defines a rule for storing a dynamic_reconfigure configuration. "
 )
 
 def _get_parent_dir(path):
@@ -102,11 +104,11 @@ cc_ros_dynamic_reconfigure_generator = rule(
 )
 
 def cc_ros_dynamic_reconfigure_library(name, dep, **kwargs):
-    """ Defines a C++ dynamic reconfiguration interface library.
+    """ Defines a C++ dynamic reconfiguration library.
 
     Args:
-        name: The target name.
-        dep: The configuration interface file (.cfg).
+        name: A unique target name.
+        dep: A configuration file -- a `ros_dynamic_reconfigure_library` target.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
     """
     generator_name = name + "_generator"

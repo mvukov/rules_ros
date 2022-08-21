@@ -6,6 +6,15 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
+    name = "dynamic_reconfigure_docs",
+    bzl_library_target = "//ros:dynamic_reconfigure",
+    symbol_names = [
+        "cc_ros_dynamic_reconfigure_library",
+        "ros_dynamic_reconfigure_library",
+    ],
+)
+
+stardoc_with_diff_test(
     name = "interfaces_docs",
     bzl_library_target = "//ros:interfaces",
     symbol_names = [
