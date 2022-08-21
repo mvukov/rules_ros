@@ -143,11 +143,11 @@ Python deps.
 
 ## Documentation
 
-* [ros/cc_defs.bzl](docs/cc_defs_docs.bzl)
-* [ros/interfaces.bzl](docs/interfaces_docs.bzl)
-* [ros/launch.bzl](docs/launch_docs.bzl)
-* [ros/test.bzl](docs/test_docs.bzl)
-* [ros/topic.bzl](docs/topic_docs.bzl)
+* [ros/cc_defs.bzl](docs/cc_defs_docs.md)
+* [ros/interfaces.bzl](docs/interfaces_docs.md)
+* [ros/launch.bzl](docs/launch_docs.md)
+* [ros/test.bzl](docs/test_docs.md)
+* [ros/topic.bzl](docs/topic_docs.md)
 
 ## Background and design decisions
 
