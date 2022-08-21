@@ -93,11 +93,11 @@ ros_interface_library = rule(
         "srcs": attr.label_list(
             allow_files = [".action", ".msg", ".srv"],
             mandatory = True,
-            doc = " A list of interface files: actions, messages and services. "
+            doc = " A list of interface files: actions, messages and services. ",
         ),
         "deps": attr.label_list(
             providers = [RosInterfaceInfo],
-            doc = " A list of other `ros_interface_library` targets. "
+            doc = " A list of other `ros_interface_library` targets. ",
         ),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
@@ -111,7 +111,7 @@ ros_interface_library = rule(
 The target name defines the corresponding ROS package name.
 For C++ generated code the target name defines the C++ namespace.
 For Python generated code the target name defines the Python package name.
-"""
+""",
 )
 
 def _get_include_flags(target, ctx):

@@ -59,10 +59,10 @@ bzl_library(
         ":python_defs",
         "@rules_cc//cc:srcs",
     ],
+    visibility = ["//docs:__pkg__"],
     deps = [
         "@bazel_skylib//lib:paths",
     ],
-    visibility = ["//docs:__pkg__"],
 )
 
 bzl_library(
@@ -91,8 +91,8 @@ bzl_library(
         "topic.bzl",
         ":python_defs",
     ],
+    visibility = ["//docs:__pkg__"],
     deps = [
         ":interfaces",
     ],
-    visibility = ["//docs:__pkg__"],
 )

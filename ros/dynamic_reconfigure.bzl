@@ -42,11 +42,11 @@ ros_dynamic_reconfigure_library = rule(
         "src": attr.label(
             allow_files = [".cfg"],
             mandatory = True,
-            doc = "A configuration file (.cfg)."
+            doc = "A configuration file (.cfg).",
         ),
     },
     implementation = _ros_dynamic_reconfigure_library_impl,
-    doc = " Defines a rule for storing a dynamic_reconfigure configuration. "
+    doc = " Defines a rule for storing a dynamic_reconfigure configuration. ",
 )
 
 def _get_parent_dir(path):
