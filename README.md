@@ -178,7 +178,8 @@ that those changes can be eventually merged into the main `ros_comm` repo and
 that is why those changes are at the moment in a fork.
 
 On the Python side, situation was more difficult. I had to refactor `roslaunch`
-code to filter out non-wanted deps. Next, `roslib` has complex dependencies
+code to filter out unwanted deps (mainly the ones that require compiled Python
+extensions in roslaunch). Next, `roslib` has complex dependencies
 and I kept only strictly necessary parts. Changes to `rosservice` are minimal.
 (Heavily) modified Python ROS packages are stored in `//third_party` and you can
 inspect `git` history to get more info about the changes I made.
