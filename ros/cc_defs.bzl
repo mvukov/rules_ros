@@ -14,7 +14,7 @@ def cc_ros_library(name, ros_package_name = None, **kwargs):
     Args:
         name: A unique target name.
         ros_package_name: If given, defines a ROS package name for the target.
-            Otherwise, name is used as the package name.
+            Otherwise, the `name` is used as the package name.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
     """
     ros_package_name = ros_package_name or name
@@ -34,7 +34,7 @@ def cc_ros_binary(name, ros_package_name = None, **kwargs):
     Args:
         name: A unique target name.
         ros_package_name: If given, defines a ROS package name for the target.
-            Otherwise, name is used as the package name.
+            Otherwise, the `name` is used as the package name.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
     ros_package_name = ros_package_name or name
