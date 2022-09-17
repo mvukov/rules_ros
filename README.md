@@ -132,16 +132,22 @@ and then you can start the deployment with
 
 ## Documentation
 
-* [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
-* [ros_cc_library](docs/cc_defs_docs.md#ros_cc_library)
-* [ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#ros_dynamic_reconfigure_library)
-* [cc_ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#cc_ros_dynamic_reconfigure_library)
-* [ros_interface_library](docs/interfaces_docs.md#ros_interface_library)
-* [cc_ros_interface_library](docs/interfaces_docs.md#cc_ros_interface_library)
-* [py_ros_interface_library](docs/interfaces_docs.md#py_ros_interface_library)
-* [ros_launch](docs/launch_docs.md#ros_launch)
-* [ros_test](docs/test_docs.md#ros_test)
-* [ros_topic](docs/topic_docs.md#ros_topic)
+* C++
+  * [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
+  * [ros_cc_library](docs/cc_defs_docs.md#ros_cc_library)
+* Interfaces (handling messages, services and actions)
+  * [ros_interface_library](docs/interfaces_docs.md#ros_interface_library)
+  * [cc_ros_interface_library](docs/interfaces_docs.md#cc_ros_interface_library)
+  * [py_ros_interface_library](docs/interfaces_docs.md#py_ros_interface_library)
+* Dynamic reconfiguration
+  * [ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#ros_dynamic_reconfigure_library)
+  * [cc_ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#cc_ros_dynamic_reconfigure_library)
+* Deployment
+  * [ros_launch](docs/launch_docs.md#ros_launch)
+* Testing
+  * [ros_test](docs/test_docs.md#ros_test)
+* Utilities
+  * [ros_topic](docs/topic_docs.md#ros_topic)
 
 ## Additional
 
