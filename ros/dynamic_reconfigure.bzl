@@ -15,8 +15,8 @@
 """ Implements code generation functionality for dynamic reconfiguration.
 """
 
-load("//ros:utils.bzl", "get_stem")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//ros:utils.bzl", "get_stem")
 
 RosDynamicReconfigureInfo = provider(
     "Provides code generation info for dynamic reconfigure.",

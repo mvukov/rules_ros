@@ -1,18 +1,19 @@
 """ Builds console_bridge.
 """
 
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "console_bridge",
+    srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/console_bridge/*.h"]) + [":console_bridge_export_h"],
     includes = ["include"],
-    srcs = glob(["src/*.cpp"]),
     linkopts = ["-fvisibility=hidden"],
     visibility = ["//visibility:public"],
 )
 
 genrule(
     name = "console_bridge_export_h",
-    visibility = ["//visibility:private"],
     outs = [
         "console_bridge_export.h",
     ],
@@ -60,4 +61,5 @@ genrule(
 #endif /* CONSOLE_BRIDGE_DLLAPI_H */
 EOL
 """,
+    visibility = ["//visibility:private"],
 )

@@ -18,51 +18,58 @@ load(
     "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
     "expand_template",
 )
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "libb64",
+    srcs = glob(["utilities/xmlrpcpp/libb64/src/*.c"]),
     hdrs = glob(["utilities/xmlrpcpp/libb64/include/b64/*.h"]),
     includes = ["utilities/xmlrpcpp/libb64/include"],
-    srcs = glob(["utilities/xmlrpcpp/libb64/src/*.c"]),
     visibility = ["//visibility:private"],
 )
 
 cc_ros_library(
     name = "xmlrpcpp",
+    srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
     hdrs = glob(["utilities/xmlrpcpp/include/xmlrpcpp/*.h"]),
     includes = ["utilities/xmlrpcpp/include"],
-    srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
     linkopts = ["-lm"],
+    visibility = ["//visibility:public"],
     deps = [
         ":libb64",
         "@boost//:thread",
         "@roscpp_core//:cpp_common",
         "@roscpp_core//:rostime",
     ],
-    visibility = ["//visibility:public"],
 )
 
 ros_interface_library(
     name = "roscpp",
-    srcs = glob(["clients/roscpp/msg/*.msg", "clients/roscpp/srv/*.srv"]),
+    srcs = glob([
+        "clients/roscpp/msg/*.msg",
+        "clients/roscpp/srv/*.srv",
+    ]),
     visibility = ["//visibility:public"],
 )
 
 cc_ros_interface_library(
     name = "cc_roscpp",
-    deps = [":roscpp"],
     visibility = ["//visibility:public"],
+    deps = [":roscpp"],
 )
 
 py_ros_interface_library(
     name = "py_roscpp",
-    deps = [":roscpp"],
     visibility = ["//visibility:public"],
+    deps = [":roscpp"],
 )
 
 ROS_VERSION_MAJOR = 1
+
 ROS_VERSION_MINOR = 15
+
 ROS_VERSION_PATCH = 9
 
 _ROS_COMMON_H = "ros/common.h"
@@ -79,6 +86,7 @@ expand_template(
 )
 
 _CONFIG_H = "config.h"
+
 _CONFIG_COMMON_SUBSTITUTIONS = {
     "#cmakedefine HAVE_TRUNC": "#define HAVE_TRUNC",
     "#cmakedefine HAVE_IFADDRS_H": "#define HAVE_IFADDRS_H",
@@ -87,26 +95,31 @@ _CONFIG_COMMON_SUBSTITUTIONS = {
 expand_template(
     name = "config_h",
     out = _CONFIG_H,
-    substitutions = select({
-        "@platforms//os:linux": dicts.add(
-            _CONFIG_COMMON_SUBSTITUTIONS,
-            {"#cmakedefine HAVE_EPOLL": "#define HAVE_EPOLL"},
-        ),
-        "@platforms//os:macos": dicts.add(
-            _CONFIG_COMMON_SUBSTITUTIONS,
-            {"#cmakedefine HAVE_EPOLL": "/*#cmakedefine HAVE_EPOLL*/"},
-        ),
-    }, no_match_error = "Only Linux and macOS are supported!"),
+    substitutions = select(
+        {
+            "@platforms//os:linux": dicts.add(
+                _CONFIG_COMMON_SUBSTITUTIONS,
+                {"#cmakedefine HAVE_EPOLL": "#define HAVE_EPOLL"},
+            ),
+            "@platforms//os:macos": dicts.add(
+                _CONFIG_COMMON_SUBSTITUTIONS,
+                {"#cmakedefine HAVE_EPOLL": "/*#cmakedefine HAVE_EPOLL*/"},
+            ),
+        },
+        no_match_error = "Only Linux and macOS are supported!",
+    ),
     template = "clients/roscpp/src/libros/config.h.in",
 )
 
 cc_ros_library(
     name = "roscpp_lib",
-    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
-    includes = ["clients/roscpp/include"],
     srcs = glob(["clients/roscpp/src/libros/**/*.cpp"]) + [_CONFIG_H],
+    hdrs = glob(["clients/roscpp/include/**/*.h"]) + [_ROS_COMMON_H],
     defines = ["BOOST_ALLOW_DEPRECATED_HEADERS"],
+    includes = ["clients/roscpp/include"],
     linkopts = ["-lm"],
+    ros_package_name = "roscpp",
+    visibility = ["//visibility:public"],
     deps = [
         ":cc_roscpp",
         ":xmlrpcpp",
@@ -115,18 +128,17 @@ cc_ros_library(
         "@boost//:scope_exit",
         "@boost//:signals2",
         "@boost//:system",
-        "@rosconsole//:rosconsole",
+        "@ros_comm_msgs//:cc_rosgraph_msgs",
+        "@ros_std_msgs//:cc_std_msgs",
+        "@rosconsole",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-        "@ros_comm_msgs//:cc_rosgraph_msgs",
-        "@ros_std_msgs//:cc_std_msgs",
     ],
-    ros_package_name = "roscpp",
-    visibility = ["//visibility:public"],
 )
 
 _DEFAULT_PYTHON_LOGGING_CONFIG = "tools/rosgraph/conf/python_logging.conf"
+
 _LOGGING_CONFIG_PY = "tools/rosgraph/src/rosgraph/ros_logging_config.py"
 
 expand_template(
@@ -142,14 +154,14 @@ expand_template(
 py_library(
     name = "rosgraph_lib",
     srcs = glob(["tools/rosgraph/src/**/*.py"]) + [_LOGGING_CONFIG_PY],
+    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
     imports = ["tools/rosgraph/src"],
+    visibility = ["//visibility:public"],
     deps = [
         requirement("ifaddr"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
-    data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
-    visibility = ["//visibility:public"],
 )
 
 _ROSGRAPH_APP_PY = "rosgraph_app.py"
@@ -164,8 +176,8 @@ py_binary(
     name = "rosgraph",
     srcs = [_ROSGRAPH_APP_PY],
     main = _ROSGRAPH_APP_PY,
-    deps = [":rosgraph_lib"],
     visibility = ["//visibility:public"],
+    deps = [":rosgraph_lib"],
 )
 
 py_library(
@@ -175,109 +187,110 @@ py_library(
         exclude = ["tools/rosmaster/src/rosmaster/main.py"],
     ),
     imports = ["tools/rosmaster/src"],
+    visibility = ["//visibility:public"],
     deps = [
         ":rosgraph_lib",
         requirement("defusedxml"),
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_binary(
     name = "rosmaster",
     srcs = ["tools/rosmaster/src/rosmaster/main.py"],
     main = "tools/rosmaster/src/rosmaster/main.py",
-    deps = [":rosmaster_lib"],
     visibility = ["//visibility:public"],
+    deps = [":rosmaster_lib"],
 )
 
 cc_ros_library(
     name = "roslz4",
-    hdrs = glob(["utilities/roslz4/include/roslz4/*.h"]),
-    includes = ["utilities/roslz4/include"],
     srcs = [
         "utilities/roslz4/src/lz4s.c",
         "utilities/roslz4/src/xxhash.c",
         "utilities/roslz4/src/xxhash.h",
     ],
+    hdrs = glob(["utilities/roslz4/include/roslz4/*.h"]),
+    includes = ["utilities/roslz4/include"],
+    visibility = ["//visibility:public"],
     deps = [
-        "@lz4//:lz4",
+        "@lz4",
         "@roscpp_core//:cpp_common",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_library(
     name = "rosbag_storage",
-    hdrs = glob(["tools/rosbag_storage/include/rosbag/*.h"]),
-    includes = ["tools/rosbag_storage/include"],
     srcs = [
         "tools/rosbag_storage/src/bag.cpp",
         "tools/rosbag_storage/src/bag_player.cpp",
         "tools/rosbag_storage/src/buffer.cpp",
         "tools/rosbag_storage/src/bz2_stream.cpp",
-        "tools/rosbag_storage/src/lz4_stream.cpp",
         "tools/rosbag_storage/src/chunked_file.cpp",
+        "tools/rosbag_storage/src/lz4_stream.cpp",
         "tools/rosbag_storage/src/message_instance.cpp",
+        "tools/rosbag_storage/src/no_encryptor.cpp",
         "tools/rosbag_storage/src/query.cpp",
         "tools/rosbag_storage/src/stream.cpp",
-        "tools/rosbag_storage/src/view.cpp",
         "tools/rosbag_storage/src/uncompressed_stream.cpp",
-        "tools/rosbag_storage/src/no_encryptor.cpp",
+        "tools/rosbag_storage/src/view.cpp",
     ],
+    hdrs = glob(["tools/rosbag_storage/include/rosbag/*.h"]),
+    includes = ["tools/rosbag_storage/include"],
+    visibility = ["//visibility:public"],
     deps = [
         ":roslz4",
         "@boost//:filesystem",
         "@boost//:format",
-        "@bzip2//:bzip2",
-        "@console_bridge//:console_bridge",
+        "@bzip2",
+        "@console_bridge",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_library(
     name = "topic_tools",
+    srcs = [
+        "tools/topic_tools/src/parse.cpp",
+        "tools/topic_tools/src/shape_shifter.cpp",
+    ],
     hdrs = glob(["tools/topic_tools/include/topic_tools/*.h"]),
     includes = ["tools/topic_tools/include"],
-    srcs = [
-        "tools/topic_tools/src/shape_shifter.cpp",
-        "tools/topic_tools/src/parse.cpp",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         ":roscpp_lib",
         ":xmlrpcpp",
+        "@ros_std_msgs//:cc_std_msgs",
+        "@rosconsole",
         "@roscpp_core//:cpp_common",
-        "@rosconsole//:rosconsole",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-        "@ros_std_msgs//:cc_std_msgs",
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "py_topic_tools",
     srcs = glob(["tools/topic_tools/python/**/*.py"]),
-    deps = [":rospy"],
     visibility = ["//visibility:public"],
+    deps = [":rospy"],
 )
 
 cc_ros_library(
     name = "rosbag",
-    hdrs = glob(["tools/rosbag/include/rosbag/*.h"]),
-    includes = ["tools/rosbag/include"],
     srcs = [
         "tools/rosbag/src/player.cpp",
         "tools/rosbag/src/recorder.cpp",
         "tools/rosbag/src/time_translator.cpp",
     ],
+    hdrs = glob(["tools/rosbag/include/rosbag/*.h"]),
     copts = ["-D_FILE_OFFSET_BITS=64"],
+    includes = ["tools/rosbag/include"],
+    visibility = ["//visibility:public"],
     deps = [
-        ":roscpp_lib",
         ":rosbag_storage",
+        ":roscpp_lib",
         ":topic_tools",
         "@boost//:date_time",
         "@boost//:filesystem",
@@ -285,33 +298,33 @@ cc_ros_library(
         "@boost//:thread",
         "@ros_comm_msgs//:cc_std_srvs",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_binary(
     name = "rosbag_record",
     srcs = ["tools/rosbag/src/record.cpp"],
+    visibility = ["//visibility:public"],
     deps = [
         ":rosbag",
         "@boost//:program_options",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_binary(
     name = "rosbag_play",
     srcs = ["tools/rosbag/src/play.cpp"],
+    visibility = ["//visibility:public"],
     deps = [
         ":rosbag",
         "@boost//:program_options",
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "py_rosbag",
     srcs = ["tools/rosbag/src/rosbag/bag.py"],
     imports = ["tools/rosbag/src"],
+    visibility = ["//visibility:public"],
     deps = [
         ":py_topic_tools",
         ":rospy",
@@ -320,36 +333,35 @@ py_library(
         requirement("pycryptodomex"),
         requirement("rospkg"),
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "rospy",
     srcs = glob(["clients/rospy/src/**/*.py"]),
     imports = ["clients/rospy/src"],
+    visibility = ["//visibility:public"],
     deps = [
         ":py_roscpp",
         ":rosgraph_lib",
+        "@com_github_mvukov_rules_ros//:py_roslib_slim",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
         "@ros_std_msgs//:py_std_msgs",
-        "@com_github_mvukov_rules_ros//:py_roslib_slim",
         requirement("numpy"),
         requirement("pyyaml"),
         requirement("rospkg"),
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "rostopic_lib",
     srcs = glob(["tools/rostopic/src/**/*.py"]),
     imports = ["tools/rostopic/src"],
+    visibility = ["//visibility:public"],
     deps = [
         ":py_rosbag",
         ":rospy",
     ],
-    visibility = ["//visibility:public"],
 )
 
 _ROSTOPIC_APP_PY = "rostopic_app.py"
@@ -365,11 +377,11 @@ py_library(
     name = "rosparam_lib",
     srcs = glob(["tools/rosparam/src/**/*.py"]),
     imports = ["tools/rosparam/src"],
+    visibility = ["//visibility:public"],
     deps = [
         ":rosgraph_lib",
         requirement("pyyaml"),
     ],
-    visibility = ["//visibility:public"],
 )
 
 _ROSPARAM_APP_PY = "rosparam_app.py"
@@ -384,36 +396,36 @@ py_binary(
     name = "rosparam",
     srcs = [_ROSPARAM_APP_PY],
     main = _ROSPARAM_APP_PY,
-    deps = [":rosparam_lib"],
     visibility = ["//visibility:public"],
+    deps = [":rosparam_lib"],
 )
 
 cc_ros_binary(
     name = "rosout",
     srcs = ["tools/rosout/rosout.cpp"],
+    visibility = ["//visibility:public"],
     deps = [
         ":roscpp_lib",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_library(
     name = "message_filters",
+    srcs = glob(["utilities/message_filters/src/*.cpp"]),
     hdrs = glob(["utilities/message_filters/include/**/*.h"]),
     includes = ["utilities/message_filters/include"],
-    srcs = glob(["utilities/message_filters/src/*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
         ":roscpp_lib",
         "@boost//:thread",
-        "@rosconsole//:rosconsole",
+        "@rosconsole",
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "py_message_filters",
     srcs = glob(["utilities/message_filters/src/message_filters/*.py"]),
     imports = ["utilities/message_filters/src/"],
-    deps = [":rospy"],
     visibility = ["//visibility:public"],
+    deps = [":rospy"],
 )

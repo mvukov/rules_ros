@@ -17,10 +17,10 @@
 
 # Inspired by code in https://github.com/nicolov/ros-bazel repo.
 
-load("//ros:utils.bzl", "get_stem")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_library")
+load("//ros:utils.bzl", "get_stem")
 
 RosInterfaceInfo = provider(
     "Provides info for interface code generation.",

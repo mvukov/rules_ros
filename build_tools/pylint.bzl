@@ -1,8 +1,8 @@
 """ Implements a macro for setting up pylint-based linter targets.
 """
 
-load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 def _is_py_source_label(label):
     return label.endswith(".py")

@@ -1,31 +1,32 @@
 """ Builds genpy.
 """
 
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 py_library(
     name = "genpy",
     srcs = glob(["src/**/*.py"]),
     imports = ["src"],
+    visibility = ["//visibility:public"],
     deps = [
         "@ros_genmsg//:genmsg",
         requirement("pyyaml"),
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_binary(
     name = "genmsg_py",
     srcs = ["scripts/genmsg_py.py"],
     main = "scripts/genmsg_py.py",
-    deps = [":genpy"],
     visibility = ["//visibility:public"],
+    deps = [":genpy"],
 )
 
 py_binary(
     name = "gensrv_py",
     srcs = ["scripts/gensrv_py.py"],
     main = "scripts/gensrv_py.py",
-    deps = [":genpy"],
     visibility = ["//visibility:public"],
+    deps = [":genpy"],
 )

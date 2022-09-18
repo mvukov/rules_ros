@@ -5,21 +5,25 @@ load(
     "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
     "expand_template",
 )
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "orocos_kdl",
+    srcs = glob([
+        "orocos_kdl/src/**/*.cpp",
+        "orocos_kdl/src/**/*.cxx",
+    ]),
     hdrs = glob([
         "orocos_kdl/src/**/*.h",
         "orocos_kdl/src/**/*.hpp",
         "orocos_kdl/src/**/*.inl",
     ]) + [":config_h"],
     includes = ["orocos_kdl/src"],
-    srcs = glob(["orocos_kdl/src/**/*.cpp", "orocos_kdl/src/**/*.cxx"]),
+    visibility = ["//visibility:public"],
     deps = [
         "@boost//:smart_ptr",
         "@eigen",
     ],
-    visibility = ["//visibility:public"],
 )
 
 expand_template(

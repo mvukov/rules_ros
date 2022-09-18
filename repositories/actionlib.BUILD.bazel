@@ -2,12 +2,14 @@
 """
 
 load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+load("@rules_python//python:defs.bzl", "py_library")
 
 cc_ros_library(
     name = "actionlib",
+    srcs = glob(["actionlib/src/*.cpp"]),
     hdrs = glob(["actionlib/include/actionlib/**/*.h"]),
     includes = ["actionlib/include"],
-    srcs = glob(["actionlib/src/*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
         "@boost//:interprocess",
         "@boost//:thread",
@@ -15,17 +17,16 @@ cc_ros_library(
         "@ros_common_msgs//:cc_actionlib_msgs",
         "@ros_std_msgs//:cc_std_msgs",
     ],
-    visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "py_actionlib",
     srcs = glob(["actionlib/src/actionlib/*.py"]),
     imports = ["actionlib/src"],
+    visibility = ["//visibility:public"],
     deps = [
         "@ros_comm//:rospy",
         "@ros_common_msgs//:py_actionlib_msgs",
         "@ros_std_msgs//:py_std_msgs",
     ],
-    visibility = ["//visibility:public"],
 )

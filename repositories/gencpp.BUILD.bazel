@@ -1,18 +1,20 @@
 """ Builds gencpp.
 """
 
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
 py_library(
     name = "gencpp_lib",
     srcs = glob(["src/**/*.py"]),
     imports = ["src"],
-    deps = ["@ros_genmsg//:genmsg"],
     visibility = ["//visibility:public"],
+    deps = ["@ros_genmsg//:genmsg"],
 )
 
 py_binary(
     name = "gencpp",
     srcs = ["scripts/gen_cpp.py"],
     main = "scripts/gen_cpp.py",
-    deps = [":gencpp_lib"],
     visibility = ["//visibility:public"],
+    deps = [":gencpp_lib"],
 )

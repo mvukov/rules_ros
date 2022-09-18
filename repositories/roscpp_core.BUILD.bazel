@@ -2,64 +2,72 @@
 """
 
 load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_ros_library(
     name = "cpp_common",
+    srcs = glob(["cpp_common/src/*.cpp"]),
     hdrs = glob(["cpp_common/include/ros/*.h"]),
     includes = ["cpp_common/include"],
-    srcs = glob(["cpp_common/src/*.cpp"]),
     local_defines = [
         "HAVE_EXECINFO_H",
         "HAVE_CXXABI_H",
         "HAVE_GLIBC_BACKTRACE",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "@boost//:system",
         "@boost//:thread",
-        "@console_bridge//:console_bridge",
+        "@console_bridge",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_library(
     name = "rostime",
+    srcs = glob(["rostime/src/*.cpp"]),
     hdrs = glob(["rostime/include/ros/**/*.h"]),
     includes = ["rostime/include"],
-    srcs = glob(["rostime/src/*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
+        ":cpp_common",
         "@boost//:date_time",
         "@boost//:system",
         "@boost//:thread",
-        ":cpp_common",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "roscpp_traits",
     hdrs = glob(["roscpp_traits/include/ros/*.h"]),
     includes = ["roscpp_traits/include"],
-    deps = [":cpp_common", ":rostime"],
     visibility = ["//visibility:public"],
+    deps = [
+        ":cpp_common",
+        ":rostime",
+    ],
 )
 
 cc_ros_library(
     name = "roscpp_serialization",
-    hdrs = glob(["roscpp_serialization/include/ros/*.h"]),
-    includes = ["roscpp_serialization/include"],
     srcs = glob(["roscpp_serialization/src/*.cpp"]),
+    hdrs = glob(["roscpp_serialization/include/ros/*.h"]),
     defines = ["BOOST_BIND_GLOBAL_PLACEHOLDERS"],
-    deps = [":cpp_common", ":rostime", ":roscpp_traits"],
+    includes = ["roscpp_serialization/include"],
     visibility = ["//visibility:public"],
+    deps = [
+        ":cpp_common",
+        ":roscpp_traits",
+        ":rostime",
+    ],
 )
 
 cc_library(
     name = "roscpp_core",
+    visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
-        ":roscpp_traits",
         ":roscpp_serialization",
+        ":roscpp_traits",
         ":rostime",
     ],
-    visibility = ["//visibility:public"],
 )

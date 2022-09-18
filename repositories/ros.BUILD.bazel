@@ -1,14 +1,15 @@
 """ Builds ros.
 """
 
+load("@rules_python//python:defs.bzl", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 py_library(
     name = "rosclean",
     srcs = ["tools/rosclean/src/rosclean/__init__.py"],
-    deps = [requirement("rospkg")],
     imports = ["tools/rosclean/src"],
     visibility = ["//visibility:public"],
+    deps = [requirement("rospkg")],
 )
 
 py_library(

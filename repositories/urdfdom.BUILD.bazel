@@ -9,23 +9,23 @@ load(
 
 cc_ros_library(
     name = "urdf_parser",
+    srcs = [
+        "urdf_parser/src/joint.cpp",
+        "urdf_parser/src/link.cpp",
+        "urdf_parser/src/model.cpp",
+        "urdf_parser/src/pose.cpp",
+        "urdf_parser/src/twist.cpp",
+        "urdf_parser/src/urdf_model_state.cpp",
+        "urdf_parser/src/world.cpp",
+    ],
     hdrs = glob(["urdf_parser/include/urdf_parser/*.h"]),
     includes = ["urdf_parser/include"],
-    srcs = [
-        "urdf_parser/src/pose.cpp",
-        "urdf_parser/src/model.cpp",
-        "urdf_parser/src/link.cpp",
-        "urdf_parser/src/joint.cpp",
-        "urdf_parser/src/world.cpp",
-        "urdf_parser/src/urdf_model_state.cpp",
-        "urdf_parser/src/twist.cpp",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "@console_bridge",
         "@tinyxml",
         "@urdfdom_headers",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_ros_binary(

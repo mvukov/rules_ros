@@ -10,30 +10,33 @@ load(
 
 ros_interface_library(
     name = "dynamic_reconfigure",
-    srcs = glob(["msg/*.msg", "srv/*.srv"]),
-    deps = ["@ros_std_msgs//:std_msgs"],
+    srcs = glob([
+        "msg/*.msg",
+        "srv/*.srv",
+    ]),
     visibility = ["//visibility:public"],
+    deps = ["@ros_std_msgs//:std_msgs"],
 )
 
 cc_ros_interface_library(
     name = "cc_dynamic_reconfigure",
-    deps = [":dynamic_reconfigure"],
     visibility = ["//visibility:public"],
+    deps = [":dynamic_reconfigure"],
 )
 
 cc_ros_library(
     name = "dynamic_reconfigure_lib",
+    srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/dynamic_reconfigure/*.h"]),
     includes = ["include"],
-    srcs = glob(["src/*.cpp"]),
+    ros_package_name = "dynamic_reconfigure",
+    visibility = ["//visibility:public"],
     deps = [
         ":cc_dynamic_reconfigure",
         "@boost//:chrono",
         "@boost//:thread",
         "@ros_comm//:roscpp_lib",
     ],
-    ros_package_name = "dynamic_reconfigure",
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
