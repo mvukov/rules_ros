@@ -1,7 +1,7 @@
-load("//build_tools:pylint.bzl", "pylint")
-load("//third_party:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+load("//build_tools:pylint.bzl", "pylint")
+load("//third_party:expand_template.bzl", "expand_template")
 
 expand_template(
     name = "deps",

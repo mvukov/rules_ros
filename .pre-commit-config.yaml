@@ -1,6 +1,6 @@
 default_stages: [commit]
 
-exclude: (.*\.patch)
+exclude: (.*\.patch|docs/.*\.md|third_party/.*\.py)
 
 repos:
   - repo: https://github.com/keith/pre-commit-buildifier
