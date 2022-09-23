@@ -1,3 +1,4 @@
+// Copyright 2021 Milan Vukov
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
