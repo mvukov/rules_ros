@@ -58,9 +58,9 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "com_github_nelhage_rules_boost",
-        strip_prefix = "rules_boost-98495a618246683c9058dd87c2c78a2c06087999",
-        sha256 = "fc2b63b293d0d5eebe7a6b3328bec8a13f4b0bc2b532f4e117b51c7f4e5d421b",
-        urls = ["https://github.com/nelhage/rules_boost/archive/98495a618246683c9058dd87c2c78a2c06087999.zip"],
+        strip_prefix = "rules_boost-4546e073fa5d493806f51537ccc5174403f3bd63",
+        sha256 = "0a9d91543f06f2510f760fe94e433d045f02d185ba763b6989d9122b52f45afb",
+        urls = ["https://github.com/nelhage/rules_boost/archive/4546e073fa5d493806f51537ccc5174403f3bd63.zip"],
     )
 
     maybe(
