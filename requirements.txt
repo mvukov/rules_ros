@@ -1,11 +1,12 @@
 # Here are packages necessary for the core functionality, i.e. running C++-based
 # nodes with ros_launch deployments. Those deps, and their deps, should not
 # have any deps with compiled extensions.
+setuptools==44.1.1
 python-dateutil
 defusedxml
 empy
 ifaddr
-rospkg
+rospkg==1.5.0
 # Versions >=5.4 ignore the global option. Should be investigated further.
 pyyaml==5.3 --global-option="--without-libyaml"
 
@@ -14,7 +15,7 @@ pyyaml==5.3 --global-option="--without-libyaml"
 # NOTE: Targets depending Python packages with compiled extensions should not
 # be used with cross-compilation deployments.
 gnupg
-numpy  # Compiled, only one file in rospy needs it.
+numpy==1.16.6  # Compiled, only one file in rospy needs it.
 pycryptodomex
 
 # Here are packages only needed for development.
