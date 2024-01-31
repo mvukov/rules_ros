@@ -6,7 +6,7 @@ ros_repositories()
 
 load("//repositories:deps.bzl", "ros_deps")
 
-PYTHON_INTERPRETER = "python3.8"
+PYTHON_INTERPRETER = "python3.7"
 
 ros_deps(
     python_interpreter = PYTHON_INTERPRETER,
