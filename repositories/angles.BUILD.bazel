@@ -1,0 +1,12 @@
+load(
+    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "cc_ros_binary",
+    "cc_ros_library",
+)
+
+cc_ros_library(
+    name = "angles",
+    hdrs = ["angles/include/angles/angles.h"],
+    includes = ["angles/include"],
+    visibility = ["//visibility:public"],
+)

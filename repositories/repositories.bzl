@@ -254,3 +254,35 @@ def ros_repositories():
         strip_prefix = "urdfdom-1.0.4",
         urls = ["https://github.com/ros/urdfdom/archive/refs/tags/1.0.4.tar.gz"],
     )
+    maybe(
+        http_archive,
+        name = "rospack",
+        build_file = "@com_github_mvukov_rules_ros//repositories:rospack.BUILD.bazel",
+        sha256 = "85e2cb33ada71eb67d26e84c149f8a5812f9a6e6a1329e4923b95ae74921613a",
+        strip_prefix = "rospack-2.6.2",
+        urls = ["https://github.com/ros/rospack/archive/refs/tags/2.6.2.tar.gz"],
+    )
+    maybe(
+        http_archive,
+        name = "tinyxml2",
+        build_file = "@com_github_mvukov_rules_ros//repositories:tinyxml2.BUILD.bazel",
+        sha256 = "3bdf15128ba16686e69bce256cc468e76c7b94ff2c7f391cc5ec09e40bff3839",
+        strip_prefix = "tinyxml2-10.0.0",
+        urls = ["https://github.com/leethomason/tinyxml2/archive/refs/tags/10.0.0.tar.gz"],
+    )
+    maybe(
+        http_archive,
+        name = "geometry",
+        build_file = "@com_github_mvukov_rules_ros//repositories:geometry.BUILD.bazel",
+        sha256 = "e3276e737daafef26f7899fd2c77dd2e0f01804c69869409290e49fbdadbc932",
+        strip_prefix = "geometry-1.0.1",
+        urls = ["https://github.com/bearrobotics/geometry/archive/refs/tags/v1.0.1.tar.gz"],
+    )
+    maybe(
+        http_archive,
+        name = "angles",
+        build_file = "@com_github_mvukov_rules_ros//repositories:angles.BUILD.bazel",
+        sha256 = "0e2982e9e4759614702f18f5c25cb7a0a88d382f4a4fab845ca1587305db2fd6",
+        strip_prefix = "angles-1.9.13",
+        urls = ["https://github.com/ros/angles/archive/refs/tags/1.9.13.tar.gz"],
+    )

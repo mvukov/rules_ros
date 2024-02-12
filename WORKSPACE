@@ -117,3 +117,17 @@ gcc_register_toolchain(
     target_arch = "aarch64",
     url = "https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--bleeding-edge-2018.02-1.tar.bz2",
 )
+
+new_local_repository(
+    name = "python_linux",
+    path = "/usr",
+    build_file_content = """
+    cc_library(
+        name = "python39_lib",
+        srcs = ["lib/python3.9/config-3.9-x86_64-linux-gnu/libpython3.9.so"],
+        hdrs = glob(["include/python3.9/*.h"]),
+        includes = ["include/python3.9"],
+        visibility = ["//visibility:public"]
+    )
+    """
+)

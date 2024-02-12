@@ -1,0 +1,55 @@
+load(
+    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "cc_ros_binary",
+    "cc_ros_library",
+)
+load(
+    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "cc_ros_interface_library",
+    "ros_interface_library",
+)
+
+ros_interface_library(
+    name = "tf_msgs",
+    srcs = glob([
+        "tf/msg/*",
+        "tf/srv/*"
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros_common_msgs//:actionlib_msgs",
+        "@ros_common_msgs//:geometry_msgs",
+    ],
+)
+
+cc_ros_interface_library(
+    name = "cc_tf_msgs",
+    deps = [":tf_msgs"],
+)
+
+cc_ros_library(
+    name = "tf",
+    srcs = [
+        "tf/src/tf.cpp",
+    ],
+    hdrs = glob(["tf/include/**/*.h"]),
+    includes = ["tf/include"],
+    visibility = ["//visibility:public"],
+    copts = [
+        "-Igeometry"
+    ],
+    deps = [
+        ":cc_tf_msgs",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_common_msgs//:cc_sensor_msgs",
+        "@roscpp_core//:rostime",
+        "@ros_comm//:roscpp_lib",
+        "@ros_geometry2//:tf2",
+        "@ros_geometry2//:tf2_ros",
+        "@angles//:angles",
+    ],
+)

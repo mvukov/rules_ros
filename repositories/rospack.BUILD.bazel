@@ -1,0 +1,25 @@
+load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+config_setting(
+    name = "linux_x86_64",
+    values = {"cpu": "k8"},
+    visibility = ["//visibility:public"],
+)
+
+cc_ros_library(
+    name = "rospack",
+    srcs = glob(["src/*.cpp"]),
+    hdrs = glob(["include/rospack/*.h", "src/*.h"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@python_linux//:python39_lib",
+        "@boost//:unordered",
+        "@boost//:program_options",
+        "@boost//:thread",
+        "@boost//:filesystem",
+        "@console_bridge",
+        "@tinyxml2//:tinyxml2",
+    ],
+)

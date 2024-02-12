@@ -16,6 +16,7 @@ exports_files(["COPYING.MPL2"])
 
 EIGEN_FILES = [
     "Eigen/**",
+    "Eigen/*",
     "unsupported/Eigen/CXX11/**",
     "unsupported/Eigen/FFT",
     "unsupported/Eigen/KroneckerProduct",

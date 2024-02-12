@@ -3,6 +3,7 @@
 
 load("@rules_python//python:defs.bzl", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
 
 py_library(
     name = "rosclean",
@@ -17,4 +18,15 @@ py_library(
     srcs = glob(["tools/rosunit/src/rosunit/*.py"]),
     imports = ["tools/rosunit/src"],
     visibility = ["//visibility:public"],
+)
+
+cc_ros_library(
+    name = "ros",
+    srcs = ["core/roslib/src/package.cpp"],
+    hdrs = ["core/roslib/include/ros/package.h"],
+    includes = ["core/roslib/include"],
+    visibility = ["//visibility:public"],
+    deps = [ 
+        "@rospack//:rospack"
+    ],
 )

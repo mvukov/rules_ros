@@ -2,11 +2,14 @@
 """
 
 load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
+load("@rules_python//python:defs.bzl", "py_library")
 load(
     "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "ros_interface_library",
 )
+
+
 
 ros_interface_library(
     name = "dynamic_reconfigure",
@@ -38,6 +41,12 @@ cc_ros_library(
         "@ros_comm//:roscpp_lib",
     ],
 )
+
+py_library(
+    name = "dynamic_reconfigure_py_lib",
+    srcs = glob(["src/dynamic_reconfigure/*"]),
+    visibility = ["//visibility:public"],
+)   
 
 filegroup(
     name = "cc_templates",
