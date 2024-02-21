@@ -274,9 +274,9 @@ def ros_repositories():
         http_archive,
         name = "geometry",
         build_file = "@com_github_mvukov_rules_ros//repositories:geometry.BUILD.bazel",
-        sha256 = "e3276e737daafef26f7899fd2c77dd2e0f01804c69869409290e49fbdadbc932",
-        strip_prefix = "geometry-1.0.1",
-        urls = ["https://github.com/bearrobotics/geometry/archive/refs/tags/v1.0.1.tar.gz"],
+        sha256 = "e8633fda3ae482945c572e312af2a340f638800f49df762f0c1c60a5cfa17b79",
+        strip_prefix = "geometry-1.0.5",
+        urls = ["https://github.com/bearrobotics/geometry/archive/refs/tags/v1.0.5.zip"],
     )
     maybe(
         http_archive,
