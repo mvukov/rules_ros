@@ -27,11 +27,16 @@ RosDynamicReconfigureInfo = provider(
 
 def _ros_dynamic_reconfigure_library_impl(ctx):
     src = ctx.files.src
+    ros_package_name = ctx.label.name
+
+    if ctx.attr.pkg_override:
+        ros_package_name = ctx.attr.pkg_override
+    
     return [
         DefaultInfo(files = depset(src)),
         RosDynamicReconfigureInfo(
             info = struct(
-                ros_package_name = ctx.label.name,
+                ros_package_name = ros_package_name,
                 src = src,
             ),
         ),
@@ -44,6 +49,9 @@ ros_dynamic_reconfigure_library = rule(
             mandatory = True,
             doc = "A configuration file (.cfg).",
         ),
+        "pkg_override": attr.string(
+            doc = "An override for pkg name."
+        )
     },
     implementation = _ros_dynamic_reconfigure_library_impl,
     doc = " Defines a rule for storing a dynamic_reconfigure configuration. ",

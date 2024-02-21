@@ -41,7 +41,9 @@ _ACTION_OUTPUT_MAPPING = [
 ]
 
 def _ros_interface_library_impl(ctx):
-    ros_package_name = ctx.label.name
+    ros_package_name = ctx.label.name 
+    if ctx.attr.ros_pkg_name:
+        ros_package_name = ctx.attrs.ros_pkg_name
     output_srcs = []  # Messages and services.
     for src in ctx.files.srcs:
         if src.extension == "action":
@@ -98,6 +100,9 @@ ros_interface_library = rule(
         "deps": attr.label_list(
             providers = [RosInterfaceInfo],
             doc = " A list of other `ros_interface_library` targets. ",
+        ),
+        "ros_pkg_name": attr.string(
+            doc = "An override to override the ros pkg name."
         ),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
