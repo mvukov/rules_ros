@@ -10,5 +10,9 @@ os.environ['ROS_TEST_RESULTS_DIR'] = test_outputs_dir
 LAUNCH_FILE = {launch_file}
 
 sys.argv = sys.argv + [LAUNCH_FILE]
+path_override = "{node_path_override}"
+
+if path_override:
+    os.symlink(path_override,path_override.split("/")[-1])
 
 rostest_main.rostestmain()

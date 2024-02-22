@@ -38,13 +38,13 @@ def ros_repositories():
         urls = ["https://github.com/google/glog/archive/d516278b1cd33cd148e8989aec488b6049a4ca0b.zip"],
     )
 
-    maybe(
-        http_archive,
-        name = "com_google_googletest",
-        sha256 = "b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5",
-        strip_prefix = "googletest-release-1.11.0",
-        urls = ["https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz"],
-    )
+    # maybe(
+    #     http_archive,
+    #     name = "com_google_googletest",
+    #     sha256 = "b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a032c1034eddc93d5",
+    #     strip_prefix = "googletest-release-1.14.0",
+    #     urls = ["https://github.com/google/googletest/archive/refs/tags/release-1.14.0.tar.gz"],
+    # )
 
     maybe(
         http_archive,

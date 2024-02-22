@@ -4,7 +4,7 @@
 load("@rules_python//python:defs.bzl", "py_test")
 load("//third_party:expand_template.bzl", "expand_template")
 
-def ros_test(name, nodes, launch_file, **kwargs):
+def ros_test(name, nodes, launch_file, node_path_override="", **kwargs):
     """ Defines a ROS test.
 
     Args:
@@ -16,6 +16,7 @@ def ros_test(name, nodes, launch_file, **kwargs):
     launch_file_path = "'$(location {})'".format(launch_file)
     substitutions = {
         "{launch_file}": launch_file_path,
+        "{node_path_override}": node_path_override,
     }
 
     launch_script = "{}_launch.py".format(name)
