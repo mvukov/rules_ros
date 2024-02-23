@@ -4,19 +4,24 @@
 load("@rules_python//python:defs.bzl", "py_test")
 load("//third_party:expand_template.bzl", "expand_template")
 
-def ros_test(name, nodes, launch_file, node_path_override="", **kwargs):
+def ros_test(name, nodes, launch_file, node_path_override=[], **kwargs):
     """ Defines a ROS test.
 
-    Args:
+    Args:Fd
         name: A unique target name.
         nodes: A list of ROS nodes used by the test.
         launch_file: A rostest-compatible launch file.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-tests
     """
     launch_file_path = "'$(location {})'".format(launch_file)
+
+    joined = []
+    for override in node_path_override:
+        joined.append("\"{}\"".format(override))
+    print(joined)
     substitutions = {
         "{launch_file}": launch_file_path,
-        "{node_path_override}": node_path_override,
+        "{node_path_override}": ",".join(joined),
     }
 
     launch_script = "{}_launch.py".format(name)
