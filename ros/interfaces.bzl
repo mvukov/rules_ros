@@ -43,7 +43,7 @@ _ACTION_OUTPUT_MAPPING = [
 def _ros_interface_library_impl(ctx):
     ros_package_name = ctx.label.name 
     if ctx.attr.ros_pkg_name:
-        ros_package_name = ctx.attrs.ros_pkg_name
+        ros_package_name = ctx.attr.ros_pkg_name
     output_srcs = []  # Messages and services.
     for src in ctx.files.srcs:
         if src.extension == "action":
@@ -146,6 +146,10 @@ def _cc_ros_generator_aspect_impl(target, ctx):
     all_srcs = _get_all_srcs(target, ctx)
 
     ros_package_name = target.label.name
+
+    if ctx.attr.pkg_override:
+        ros_package_name = ctx.attr.pkg_override
+
     srcs = target[RosInterfaceInfo].info.srcs
     all_headers = []
     for src in srcs:
@@ -194,13 +198,14 @@ def _cc_ros_generator_aspect_impl(target, ctx):
 
 cc_ros_generator_aspect = aspect(
     implementation = _cc_ros_generator_aspect_impl,
-    attr_aspects = ["deps"],
+    attr_aspects = ["deps" , "pkg_override"],
     attrs = {
         "_gencpp": attr.label(
             default = Label("@ros_gencpp//:gencpp"),
             executable = True,
             cfg = "exec",
         ),
+        "pkg_override": attr.string(values = ['']),
     },
     provides = [CcInfo],
 )
@@ -220,10 +225,11 @@ cc_ros_generator = rule(
             aspects = [cc_ros_generator_aspect],
             providers = [RosInterfaceInfo],
         ),
+        "pkg_override": attr.string(),
     },
 )
 
-def cc_ros_interface_library(name, deps, **kwargs):
+def cc_ros_interface_library(name, deps, pkg_override = None, **kwargs):
     """ Defines a C++ ROS interface library.
 
     Args:
@@ -235,6 +241,7 @@ def cc_ros_interface_library(name, deps, **kwargs):
     cc_ros_generator(
         name = name_gencpp,
         deps = deps,
+        pkg_override = pkg_override,
     )
     cc_library(
         name = name,
