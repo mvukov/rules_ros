@@ -181,6 +181,19 @@ py_binary(
 )
 
 py_library(
+    name = "roslaunch_lib",
+    srcs = glob(
+        ["tools/roslaunch/src/**/*.py"],
+    ),
+    imports = ["tools/roslaunch/src"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":rosgraph_lib",
+        requirement("defusedxml"),
+    ],
+)
+
+py_library(
     name = "rosmaster_lib",
     srcs = glob(
         ["tools/rosmaster/src/**/*.py"],
