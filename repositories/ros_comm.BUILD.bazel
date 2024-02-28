@@ -202,6 +202,20 @@ py_binary(
     deps = [":rosmaster_lib"],
 )
 
+py_library(
+    name = "rosnode_lib",
+    srcs = glob(
+        ["tools/rosnode/src/rosnode/*.py"],
+    ),
+    imports = ["tools/rosnode/src"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":rosgraph_lib",
+        ":rostopic_lib",
+        requirement("defusedxml"),
+    ],
+)
+
 cc_ros_library(
     name = "roslz4",
     srcs = [
