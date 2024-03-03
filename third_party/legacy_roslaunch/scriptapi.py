@@ -34,12 +34,12 @@
 """
 Scripting interface for roslaunch
 """
-
 import rosgraph.masterapi
 
 from third_party.legacy_roslaunch import parent
 from third_party.legacy_roslaunch import rlutil
-from third_party.legacy_roslaunch.core import Node, RLException
+from third_party.legacy_roslaunch.core import Node
+from third_party.legacy_roslaunch.core import RLException
 
 
 class ROSLaunch(object):
@@ -90,13 +90,13 @@ class ROSLaunch(object):
         @raise RLException: if launch fails
         """
         if not self.started:
-            raise RLException("please start ROSLaunch first")
+            raise RLException('please start ROSLaunch first')
         elif not isinstance(node, Node):
-            raise ValueError("arg must be of type Node")
+            raise ValueError('arg must be of type Node')
 
         proc, success = self.parent.runner.launch_node(node)
         if not success:
-            raise RLException("failed to launch %s/%s" %
+            raise RLException('failed to launch %s/%s' %
                               (node.package, node.type))
         return proc
 

@@ -34,18 +34,16 @@ Uncategorized utility routines for roslaunch.
 
 This API should not be considered stable.
 """
-
 # pylint: disable=bare-except,unnecessary-pass,invalid-name,global-statement
 # pylint: disable=line-too-long
-
 import os
 import platform
 import sys
 import time
 
 import rosclean
-import rospkg
 import rosgraph
+import rospkg
 
 from third_party.legacy_roslaunch import core
 from third_party.legacy_roslaunch import xmlloader
@@ -60,7 +58,7 @@ def check_log_disk_usage():
     try:
         d = rospkg.get_log_dir()
         core.printlog(
-            "Checking log directory for disk usage. This may take a while.\nPress Ctrl-C to interrupt"
+            'Checking log directory for disk usage. This may take a while.\nPress Ctrl-C to interrupt'
         )
         disk_usage = rosclean.get_disk_usage(d)
         # warn if over a gig
@@ -69,7 +67,7 @@ def check_log_disk_usage():
                 "WARNING: disk usage in log directory [%s] is over 1GB.\nIt's recommended that you use the 'rosclean' command."
                 % d)
         else:
-            core.printlog("Done checking log file disk usage. Usage is <1GB.")
+            core.printlog('Done checking log file disk usage. Usage is <1GB.')
     except:
         pass
 
@@ -96,14 +94,14 @@ def wait_for_master():
     is_running = m.is_running()
     if not is_running:
         core.printlog(
-            "roscore/master is not yet running, will wait for it to start")
+            'roscore/master is not yet running, will wait for it to start')
     while not is_running:
         time.sleep(0.1)
         is_running = m.is_running()
     if is_running:
-        core.printlog("master has started, initiating launch")
+        core.printlog('master has started, initiating launch')
     else:
-        raise RuntimeError("unknown error waiting for master to start")
+        raise RuntimeError('unknown error waiting for master to start')
 
 
 _terminal_name = None

@@ -35,14 +35,10 @@
 Interface for using rostest from other Python code as well as running
 Python unittests with additional reporting mechanisms.
 """
-
 # pylint: disable=invalid-name,consider-using-f-string,unspecified-encoding, global-statement
 # pylint: disable=line-too-long
-
-import os
 import sys
 import unittest
-import warnings
 import xmlrpc.client as xmlrpcclient
 
 import rosgraph
@@ -78,7 +74,7 @@ def is_subscriber(topic, subscriber_id):
     m = get_master()
     code, msg, state = m.getSystemState(_GLOBAL_CALLER_ID)
     if code != 1:
-        raise IOError("Unable to retrieve master state: %s" % msg)
+        raise IOError('Unable to retrieve master state: %s' % msg)
     _, subscribers, _ = state
     for t, l in subscribers:
         if t == topic:
@@ -96,7 +92,7 @@ def is_publisher(topic, publisher_id):
     m = get_master()
     code, msg, state = m.getSystemState(_GLOBAL_CALLER_ID)
     if code != 1:
-        raise IOError("Unable to retrieve master state: %s" % msg)
+        raise IOError('Unable to retrieve master state: %s' % msg)
     pubs, _, _ = state
     for t, l in pubs:
         if t == topic:

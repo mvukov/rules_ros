@@ -41,16 +41,15 @@ processes on remote machines. The parent can then invoke methods on
 this child process to launch remote processes, and the child can
 invoke methods on the parent to provide feedback.
 """
-
 # pylint: disable=line-too-long
-
 import logging
 import traceback
 
 from third_party.legacy_roslaunch import core
 from third_party.legacy_roslaunch import pmon
 from third_party.legacy_roslaunch import server
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 
 class ROSLaunchChild(object):
@@ -84,7 +83,7 @@ class ROSLaunchChild(object):
         """
         core.set_child_mode(True)
 
-        self.logger = logging.getLogger("roslaunch.child")
+        self.logger = logging.getLogger('roslaunch.child')
         self.run_id = run_id
         self.name = name
         self.server_uri = server_uri
@@ -107,8 +106,8 @@ class ROSLaunchChild(object):
         if self.pm is None:
             # this should only happen if a shutdown signal is received during startup
             raise core.RLException(
-                "cannot startup remote child: unable to start process monitor.")
-        self.logger.debug("started process monitor")
+                'cannot startup remote child: unable to start process monitor.')
+        self.logger.debug('started process monitor')
 
     def run(self):
         """
@@ -117,7 +116,7 @@ class ROSLaunchChild(object):
         try:
             try:
                 self.logger.info(
-                    "starting roslaunch child process [%s], server URI is [%s]",
+                    'starting roslaunch child process [%s], server URI is [%s]',
                     self.name, self.server_uri)
                 self._start_pm()
                 self.child_server = server.ROSLaunchChildNode(
@@ -127,12 +126,12 @@ class ROSLaunchChild(object):
                     self.pm,
                     sigint_timeout=self.sigint_timeout,
                     sigterm_timeout=self.sigterm_timeout)
-                self.logger.info("... creating XMLRPC server for child")
+                self.logger.info('... creating XMLRPC server for child')
                 self.child_server.start()
-                self.logger.info("... started XMLRPC server for child")
+                self.logger.info('... started XMLRPC server for child')
                 # block until process monitor is shutdown
                 self.pm.mainthread_spin()
-                self.logger.info("... process monitor is done spinning")
+                self.logger.info('... process monitor is done spinning')
             except:
                 self.logger.error(traceback.format_exc())
                 raise

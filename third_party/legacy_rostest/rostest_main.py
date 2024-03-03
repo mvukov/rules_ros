@@ -31,25 +31,24 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 # pylint: disable=deprecated-module,consider-using-f-string,unspecified-encoding,logging-not-lazy
 # pylint: disable=line-too-long
-
+import logging
 import os
 import socket
 import sys
 import unittest
-import logging
 from optparse import OptionParser
 
 import rosgraph.roslogging
 import rospkg
+
 import third_party.legacy_roslaunch as roslaunch
 from third_party.legacy_roslaunch.pmon import pmon_shutdown
 from third_party.legacy_rostest import runner
-from third_party.legacy_rostest.rostestutil import (createXMLRunner,
-                                                    printRostestSummary,
-                                                    rostest_name_from_path)
+from third_party.legacy_rostest.rostestutil import createXMLRunner
+from third_party.legacy_rostest.rostestutil import printRostestSummary
+from third_party.legacy_rostest.rostestutil import rostest_name_from_path
 
 _NAME = 'rostest'
 
@@ -59,7 +58,7 @@ def configure_logging():
     logfile_name = rosgraph.roslogging.configure_logging(
         'rostest', filename=logfile_basename)
     if logfile_name:
-        print("... logging to %s" % logfile_name)
+        print('... logging to %s' % logfile_name)
     return logfile_name
 
 
@@ -79,36 +78,36 @@ def write_bad_filename_failure(test_file, results_file, outname):
 
 
 def rostestmain():
-    parser = OptionParser(usage="usage: %prog [options] <filename>", prog=_NAME)
-    parser.add_option("-t",
-                      "--text",
-                      action="store_true",
-                      dest="text_mode",
+    parser = OptionParser(usage='usage: %prog [options] <filename>', prog=_NAME)
+    parser.add_option('-t',
+                      '--text',
+                      action='store_true',
+                      dest='text_mode',
                       default=False,
-                      help="Run with stdout output instead of XML output")
-    parser.add_option("--results-filename",
-                      metavar="RESULTS_FILENAME",
-                      dest="results_filename",
+                      help='Run with stdout output instead of XML output')
+    parser.add_option('--results-filename',
+                      metavar='RESULTS_FILENAME',
+                      dest='results_filename',
                       default=None,
-                      help="results_filename")
+                      help='results_filename')
     parser.add_option(
-        "-r",
-        "--reuse-master",
-        action="store_true",
+        '-r',
+        '--reuse-master',
+        action='store_true',
         help=
-        "Connect to an existing ROS master instead of spawning a new ROS master on a custom port"
+        'Connect to an existing ROS master instead of spawning a new ROS master on a custom port'
     )
     parser.add_option(
-        "-c",
-        "--clear",
-        action="store_true",
+        '-c',
+        '--clear',
+        action='store_true',
         help=
-        "Clear all parameters when connecting to an existing ROS master (only works with --reuse-master)"
+        'Clear all parameters when connecting to an existing ROS master (only works with --reuse-master)'
     )
     (options, args) = parser.parse_args()
 
     if options.clear and not options.reuse_master:
-        print("The --clear option is only valid with --reuse-master",
+        print('The --clear option is only valid with --reuse-master',
               file=sys.stderr)
         sys.exit(1)
 
@@ -126,9 +125,9 @@ def rostestmain():
 
     logger.info('rostest starting with options %s, args %s' % (options, args))
     if len(args) == 0:
-        parser.error("You must supply a test file argument to rostest.")
+        parser.error('You must supply a test file argument to rostest.')
     if len(args) != 1:
-        parser.error("rostest only accepts a single test file")
+        parser.error('rostest only accepts a single test file')
 
     # compute some common names we'll be using to generate test names and files
     if options.results_filename:
@@ -137,16 +136,16 @@ def rostestmain():
             outname = outname[:outname.rfind('.')]
     else:
         test_file = args[0]
-        outname = rostest_name_from_path("", test_file)
+        outname = rostest_name_from_path('', test_file)
 
     results_dir = rospkg.get_test_results_dir()
-    results_file = os.path.join(results_dir, "results.xml")
+    results_file = os.path.join(results_dir, 'results.xml')
 
     # #1140
     if not os.path.isfile(test_file):
         write_bad_filename_failure(test_file, results_file, outname)
         parser.error(
-            "test file is invalid. Generated failure case result file in %s" %
+            'test file is invalid. Generated failure case result file in %s' %
             results_file)
 
     try:
@@ -159,7 +158,7 @@ def rostestmain():
             result = unittest.TextTestRunner(verbosity=2).run(suite)
         else:
             is_rostest = True
-            xml_runner = createXMLRunner("",
+            xml_runner = createXMLRunner('',
                                          outname,
                                          results_file=results_file,
                                          is_rostest=is_rostest)
@@ -168,20 +167,20 @@ def rostestmain():
         # really make sure that all of our processes have been killed
         test_parents = runner.getRostestParents()
         for r in test_parents:
-            logger.info("finally rostest parent tearDown [%s]", r)
+            logger.info('finally rostest parent tearDown [%s]', r)
             r.tearDown()
         del test_parents[:]
-        logger.info("calling pmon_shutdown")
+        logger.info('calling pmon_shutdown')
         pmon_shutdown()
-        logger.info("... done calling pmon_shutdown")
+        logger.info('... done calling pmon_shutdown')
 
     # print config errors after test has run so that we don't get caught up in .xml results
     config = runner.getConfig()
     if config:
         if config.config_errors:
-            print("\n[ROSTEST WARNINGS]" + '-' * 62 + '\n', file=sys.stderr)
+            print('\n[ROSTEST WARNINGS]' + '-' * 62 + '\n', file=sys.stderr)
         for err in config.config_errors:
-            print(" * %s" % err, file=sys.stderr)
+            print(' * %s' % err, file=sys.stderr)
         print('')
 
     # summary is worthless if textMode is on as we cannot scrape .xml results
@@ -190,11 +189,11 @@ def rostestmain():
         printRostestSummary(result, subtest_results)
     else:
         print(
-            "WARNING: overall test result is not accurate when --text is enabled"
+            'WARNING: overall test result is not accurate when --text is enabled'
         )
 
     if logfile_name:
-        print("rostest log file is in %s" % logfile_name)
+        print('rostest log file is in %s' % logfile_name)
 
     if not result.wasSuccessful():
         sys.exit(1)

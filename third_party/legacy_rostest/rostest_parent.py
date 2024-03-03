@@ -31,12 +31,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 # pylint: disable=raise-missing-from,consider-using-f-string,invalid-name
 # pylint: disable=line-too-long
-
 import rosgraph
 from rosmaster.master import Master
+
 from third_party.legacy_roslaunch import core
 from third_party.legacy_roslaunch import parent
 
@@ -50,7 +49,7 @@ class ROSTestLaunchParent(parent.ROSLaunchParent):
                  reuse_master=False,
                  clear=False):
         if config is None:
-            raise Exception("config not initialized")
+            raise Exception('config not initialized')
         # we generate a run_id for each test
         if reuse_master:
             param_server = rosgraph.Master('/roslaunch')
@@ -59,12 +58,12 @@ class ROSTestLaunchParent(parent.ROSLaunchParent):
             except Exception as e:
                 # The user asked us to connect to an existing ROS master, and
                 # we can't. Throw an exception and die
-                raise Exception("Could not connect to existing ROS master. " +
-                                "Original exception was: %s" % str(e))
+                raise Exception('Could not connect to existing ROS master. ' +
+                                'Original exception was: %s' % str(e))
             except:
                 # oh boy; we got something that wasn't an exception.
                 # Throw an exception and die
-                raise Exception("Could not connect to existing ROS master.")
+                raise Exception('Could not connect to existing ROS master.')
 
             if clear:
                 params = param_server.getParamNames()
@@ -122,7 +121,7 @@ class ROSTestLaunchParent(parent.ROSLaunchParent):
         if self.runner is not None:
             return self.runner.launch()
         else:
-            raise Exception("no runner to launch")
+            raise Exception('no runner to launch')
 
     def run_test(self, test):
         """
@@ -132,4 +131,4 @@ class ROSTestLaunchParent(parent.ROSLaunchParent):
             # run the test, blocks until completion
             return self.runner.run_test(test)
         else:
-            raise Exception("no runner")
+            raise Exception('no runner')

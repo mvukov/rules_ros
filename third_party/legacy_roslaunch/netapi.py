@@ -34,12 +34,9 @@
 """
 Convience methods for manipulating XML-RPC APIs
 """
-
 # pylint: disable=bare-except,
-
 from xmlrpc.client import ServerProxy
 
-import rosgraph
 import rosgraph.network
 
 _ID = '/roslaunch_netapi'

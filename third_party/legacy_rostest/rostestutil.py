@@ -34,14 +34,11 @@
 """
 rostest helper routines.
 """
-
 # pylint: disable=invalid-name,global-statement
 # pylint: disable=line-too-long
-
 # IMPORTANT: no routine here can in anyway cause rospy to be loaded (that includes roslaunch)
-
-import sys
 import logging
+import sys
 
 import rosunit
 
@@ -50,14 +47,14 @@ def printlog(msg, *args):
     if args:
         msg = msg % args
     logging.getLogger('rostest').info(msg)
-    print("[ROSTEST]" + msg)
+    print('[ROSTEST]' + msg)
 
 
 def printlogerr(msg, *args):
     if args:
         msg = msg % args
     logging.getLogger('rostest').error(msg)
-    print("[ROSTEST]" + msg, file=sys.stderr)
+    print('[ROSTEST]' + msg, file=sys.stderr)
 
 
 # Most of this code has been moved down into rosunit

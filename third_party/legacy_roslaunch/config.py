@@ -35,10 +35,8 @@
 Defines the L{ROSLaunchConfig} object, which holds and the state of
 the roslaunch file.
 """
-
 # pylint: disable=raise-missing-from,logging-not-lazy,
 # pylint: disable=line-too-long
-
 import logging
 
 import rosgraph.names
@@ -46,7 +44,10 @@ import rosgraph.network
 
 from third_party.legacy_roslaunch import deps
 from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.core import Master, local_machine, is_machine_local, RLException
+from third_party.legacy_roslaunch.core import is_machine_local
+from third_party.legacy_roslaunch.core import local_machine
+from third_party.legacy_roslaunch.core import Master
+from third_party.legacy_roslaunch.core import RLException
 
 
 def namespaces_of(name):
@@ -75,7 +76,7 @@ def _summary_name(node):
     Generate summary label for node based on its package, type, and name
     """
     if node.name:
-        return "%s (%s)" % (node.name, node.type)
+        return '%s (%s)' % (node.name, node.type)
     else:
         return node.type
 
@@ -145,7 +146,7 @@ class ROSLaunchConfig(object):
         """
         if not self._assign_machines_complete:
             raise RLException(
-                "ERROR: has_remote_nodes() cannot be called until prelaunch check is complete"
+                'ERROR: has_remote_nodes() cannot be called until prelaunch check is complete'
             )
         return self._remote_nodes_present
 
@@ -176,14 +177,14 @@ class ROSLaunchConfig(object):
                 new_m = machine_unify_dict[config_key]
                 if m != new_m:
                     self.logger.info(
-                        "... changing machine assignment from [%s] to [%s] as they are equivalent",
+                        '... changing machine assignment from [%s] to [%s] as they are equivalent',
                         m.name, new_m.name)
                     m = new_m
             else:
                 machine_unify_dict[config_key] = m
             n.machine = m
             self.logger.info(
-                "... selected machine [%s] for node of type [%s/%s]", m.name,
+                '... selected machine [%s] for node of type [%s/%s]', m.name,
                 n.package, n.type)
 
         # determine whether or not there are any machines we will need
@@ -260,7 +261,7 @@ class ROSLaunchConfig(object):
         @raises ValueError
         """
         if not exe:
-            raise ValueError("exe is None")
+            raise ValueError('exe is None')
         self.executables.append(exe)
 
     def add_clear_param(self, param):
@@ -282,27 +283,27 @@ class ROSLaunchConfig(object):
         # check for direct overrides
         if key in self.params and self.params[key] != p:
             if filename:
-                self.logger.debug("[%s] overriding parameter [%s]" %
+                self.logger.debug('[%s] overriding parameter [%s]' %
                                   (filename, p.key))
             else:
-                self.logger.debug("overriding parameter [%s]" % p.key)
+                self.logger.debug('overriding parameter [%s]' % p.key)
         # check for parent conflicts
         for parent_key in [
                 pk for pk in namespaces_of(key) if pk in self.params
         ]:
             self.add_config_error(
-                "parameter [%s] conflicts with parent parameter [%s]" %
+                'parameter [%s] conflicts with parent parameter [%s]' %
                 (key, parent_key))
 
         self.params[key] = p
         if verbose:
-            print("Added parameter [%s]" % key)
+            print('Added parameter [%s]' % key)
         t = type(p.value)
         if t in [bool, int, float]:
-            self.logger.debug("add_param[%s]: type [%s] value [%s]" %
+            self.logger.debug('add_param[%s]: type [%s] value [%s]' %
                               (p.key, t, p.value))
         else:
-            self.logger.debug("add_param[%s]: type [%s]" % (p.key, t))
+            self.logger.debug('add_param[%s]: type [%s]' % (p.key, t))
 
     def add_machine(self, m, verbose=True):
         """
@@ -318,18 +319,18 @@ class ROSLaunchConfig(object):
         if m.address == 'localhost':  #simplify address comparison
             address = rosgraph.network.get_local_address()
             self.logger.info(
-                "addMachine[%s]: remapping localhost address to %s" %
+                'addMachine[%s]: remapping localhost address to %s' %
                 (name, address))
         if name in self.machines:
             if m != self.machines[name]:
                 raise RLException(
-                    "Machine [%s] already added and does not match duplicate entry"
+                    'Machine [%s] already added and does not match duplicate entry'
                     % name)
             return False
         else:
             self.machines[name] = m
             if verbose:
-                print("Added machine [%s]" % name)
+                print('Added machine [%s]' % name)
             return True
 
     def add_test(self, test, verbose=True):
@@ -365,20 +366,20 @@ class ROSLaunchConfig(object):
         if not core:
             self.nodes.append(node)
             if verbose:
-                print("Added node of type [%s/%s] in namespace [%s]" %
+                print('Added node of type [%s/%s] in namespace [%s]' %
                       (node.package, node.type, node.namespace))
-            self.logger.info("Added node of type [%s/%s] in namespace [%s]",
+            self.logger.info('Added node of type [%s/%s] in namespace [%s]',
                              node.package, node.type, node.namespace)
         else:
             if not node.name:
-                raise RLException("ROS core nodes must have a name. [%s/%s]" %
+                raise RLException('ROS core nodes must have a name. [%s/%s]' %
                                   (node.package, node.type))
             self.nodes_core.append(node)
             if verbose:
-                print("Added core node of type [%s/%s] in namespace [%s]" %
+                print('Added core node of type [%s/%s] in namespace [%s]' %
                       (node.package, node.type, node.namespace))
             self.logger.info(
-                "Added core node of type [%s/%s] in namespace [%s]",
+                'Added core node of type [%s/%s] in namespace [%s]',
                 node.package, node.type, node.namespace)
 
     def _select_machine(self, node):
@@ -396,8 +397,8 @@ class ROSLaunchConfig(object):
         machine = node.machine_name
         #Lookup machine
         if machine:
-            if not machine in self.machines:
-                raise RLException("ERROR: unknown machine [%s]" % machine)
+            if machine not in self.machines:
+                raise RLException('ERROR: unknown machine [%s]' % machine)
             return self.machines[machine]
         else:
             # assign to local machine

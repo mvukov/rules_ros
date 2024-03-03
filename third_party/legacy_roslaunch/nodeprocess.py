@@ -34,10 +34,8 @@
 """
 Local process implementation for running and monitoring nodes.
 """
-
 # pylint: disable=invalid-name,global-statement,logging-not-lazy,raise-missing-from,broad-except,subprocess-popen-preexec-fn,bare-except
 # pylint: disable=line-too-long
-
 import errno
 import logging
 import os
@@ -52,11 +50,16 @@ import rospkg
 from rosmaster.master_api import NUM_WORKERS
 
 from third_party.legacy_roslaunch import deps
-from third_party.legacy_roslaunch.core import RLException, setup_env, is_child_mode, printerrlog, printlog_bold
+from third_party.legacy_roslaunch.core import is_child_mode
+from third_party.legacy_roslaunch.core import printerrlog
+from third_party.legacy_roslaunch.core import printlog_bold
+from third_party.legacy_roslaunch.core import RLException
+from third_party.legacy_roslaunch.core import setup_env
 from third_party.legacy_roslaunch.node_args import create_local_process_args
-from third_party.legacy_roslaunch.pmon import Process, FatalProcessLaunch
+from third_party.legacy_roslaunch.pmon import FatalProcessLaunch
+from third_party.legacy_roslaunch.pmon import Process
 
-_logger = logging.getLogger("roslaunch")
+_logger = logging.getLogger('roslaunch')
 
 DEFAULT_TIMEOUT_SIGINT = 15.0  #seconds
 DEFAULT_TIMEOUT_SIGTERM = 2.0  #seconds
@@ -97,9 +100,9 @@ def create_master_process(run_id,
     @raise RLException: if type_ or port is invalid or sigint_timeout or sigterm_timeout are nonpositive.
     """
     if port < 1 or port > 65535:
-        raise RLException("invalid port assignment: %s" % port)
+        raise RLException('invalid port assignment: %s' % port)
 
-    _logger.info("create_master_process: %s, %s, %s, %s, %s", ros_root, port,
+    _logger.info('create_master_process: %s, %s, %s, %s, %s', ros_root, port,
                  num_workers, timeout, master_logger_level)
 
     package = ''
@@ -113,7 +116,7 @@ def create_master_process(run_id,
     if master_logger_level:
         args += ['--master-logger-level', str(master_logger_level)]
 
-    _logger.info("process[master]: launching with args [%s]" % args)
+    _logger.info('process[master]: launching with args [%s]' % args)
     log_output = False
     return LocalProcess(run_id,
                         package,
@@ -153,27 +156,27 @@ def create_node_process(run_id,
     @raise RLException: If sigint_timeout or sigterm_timeout are nonpositive.
     """
     _logger.info(
-        "create_node_process: package[%s] type[%s] machine[%s] master_uri[%s]",
+        'create_node_process: package[%s] type[%s] machine[%s] master_uri[%s]',
         node.package, node.type, node.machine, master_uri)
     # check input args
     machine = node.machine
     if machine is None:
         raise RLException(
-            "Internal error: no machine selected for node of type [%s/%s]" %
+            'Internal error: no machine selected for node of type [%s/%s]' %
             (node.package, node.type))
     if not node.name:
-        raise ValueError("node name must be assigned")
+        raise ValueError('node name must be assigned')
 
     # - setup env for process (vars must be strings for os.environ)
     env = setup_env(node, machine, master_uri)
 
     if not node.name:
-        raise ValueError("node name must be assigned")
+        raise ValueError('node name must be assigned')
 
     # we have to include the counter to prevent potential name
     # collisions between the two branches
 
-    name = "%s-%s" % (rosgraph.names.ns_join(node.namespace,
+    name = '%s-%s' % (rosgraph.names.ns_join(node.namespace,
                                              node.name), _next_counter())
     if name[0] == '/':
         name = name[1:]
@@ -245,14 +248,14 @@ class LocalProcess(Process):
                                            respawn_delay, required)
 
         if cwd:
-            raise RLException("cwd usage is deprecated and should not be used!")
+            raise RLException('cwd usage is deprecated and should not be used!')
         if sigint_timeout <= 0:
             raise RLException(
-                "sigint_timeout must be a positive number, received %f" %
+                'sigint_timeout must be a positive number, received %f' %
                 sigint_timeout)
         if sigterm_timeout <= 0:
             raise RLException(
-                "sigterm_timeout must be a positive number, received %f" %
+                'sigterm_timeout must be a positive number, received %f' %
                 sigterm_timeout)
 
         self.run_id = run_id
@@ -294,11 +297,11 @@ class LocalProcess(Process):
             except OSError as e:
                 if e.errno == errno.EACCES:
                     raise RLException(
-                        "unable to create directory for log file [%s].\nPlease check permissions."
+                        'unable to create directory for log file [%s].\nPlease check permissions.'
                         % log_dir)
                 else:
                     raise RLException(
-                        "unable to create directory for log file [%s]: %s" %
+                        'unable to create directory for log file [%s]: %s' %
                         (log_dir, e.strerror))
         # #973: save log dir for error messages
         self.log_dir = log_dir
@@ -327,7 +330,7 @@ class LocalProcess(Process):
         if self.is_node:
             # #1595: on respawn, these keep appending
             self.args = _cleanup_remappings(self.args, '__log:=')
-            self.args.append("__log:=%s" % os.path.join(log_dir, "%s.log" %
+            self.args.append('__log:=%s' % os.path.join(log_dir, '%s.log' %
                                                         (logfname)))
 
         return logfileout, logfileerr
@@ -343,9 +346,9 @@ class LocalProcess(Process):
         try:
             self.lock.acquire()
             if self.started:
-                _logger.info("process[%s]: restarting os process", self.name)
+                _logger.info('process[%s]: restarting os process', self.name)
             else:
-                _logger.info("process[%s]: starting os process", self.name)
+                _logger.info('process[%s]: starting os process', self.name)
             self.started = self.stopped = False
 
             full_env = self.env
@@ -355,14 +358,14 @@ class LocalProcess(Process):
                 logfileout, logfileerr = self._configure_logging()
             except Exception as e:
                 _logger.error(traceback.format_exc())
-                printerrlog("[%s] ERROR: unable to configure logging [%s]" %
+                printerrlog('[%s] ERROR: unable to configure logging [%s]' %
                             (self.name, str(e)))
                 # it's not safe to inherit from this process as
                 # rostest changes stdout to a StringIO, which is not a
                 # proper file.
                 logfileout, logfileerr = subprocess.PIPE, subprocess.PIPE
 
-            _logger.info("process[%s]: start w/ args [%s]", self.name,
+            _logger.info('process[%s]: start w/ args [%s]', self.name,
                          self.args)
 
             try:
@@ -381,7 +384,7 @@ class LocalProcess(Process):
                                               preexec_fn=preexec_function)
             except OSError as e:
                 self.started = True  # must set so is_alive state is correct
-                _logger.error("OSError(%d, %s)", e.errno, e.strerror)
+                _logger.error('OSError(%d, %s)', e.errno, e.strerror)
                 if e.errno == errno.ENOEXEC:  #Exec format error
                     raise FatalProcessLaunch(
                         "Unable to launch [%s]. \nIf it is a script, you may be missing a '#!' declaration at the top."
@@ -396,7 +399,7 @@ Please make sure that all the executables in this command exist and have
 executable permission. This is often caused by a bad launch-prefix.""" %
                         (e.strerror, ' '.join(self.args)))
                 else:
-                    raise FatalProcessLaunch("unable to launch [%s]: %s" %
+                    raise FatalProcessLaunch('unable to launch [%s]: %s' %
                                              (' '.join(self.args), e.strerror))
 
             self.started = True
@@ -406,11 +409,11 @@ executable permission. This is often caused by a bad launch-prefix.""" %
             poll_result = self.popen.poll()
             if poll_result is None or poll_result == 0:
                 self.pid = self.popen.pid
-                printlog_bold("process[%s]: started with pid [%s]" %
+                printlog_bold('process[%s]: started with pid [%s]' %
                               (self.name, self.pid))
                 return True
             else:
-                printerrlog("failed to start local process: %s" %
+                printerrlog('failed to start local process: %s' %
                             (' '.join(self.args)))
                 return False
         finally:
@@ -466,7 +469,7 @@ executable permission. This is often caused by a bad launch-prefix.""" %
         """
         self.exit_code = self.popen.poll()
         if self.exit_code is not None:
-            _logger.debug("process[%s].stop(): process has already returned %s",
+            _logger.debug('process[%s].stop(): process has already returned %s',
                           self.name, self.exit_code)
             #print "process[%s].stop(): process has already returned %s"%(self.name, self.exit_code)
             self.popen = None
@@ -475,14 +478,14 @@ executable permission. This is often caused by a bad launch-prefix.""" %
 
         pid = self.popen.pid
         pgid = os.getpgid(pid)
-        _logger.info("process[%s]: killing os process with pid[%s] pgid[%s]",
+        _logger.info('process[%s]: killing os process with pid[%s] pgid[%s]',
                      self.name, pid, pgid)
 
         try:
             # Start with SIGINT and escalate from there.
-            _logger.info("[%s] sending SIGINT to pgid [%s]", self.name, pgid)
+            _logger.info('[%s] sending SIGINT to pgid [%s]', self.name, pgid)
             os.killpg(pgid, signal.SIGINT)
-            _logger.info("[%s] sent SIGINT to pgid [%s]", self.name, pgid)
+            _logger.info('[%s] sent SIGINT to pgid [%s]', self.name, pgid)
             timeout_t = time.time() + self.sigint_timeout
             retcode = self.popen.poll()
             while time.time() < timeout_t and retcode is None:
@@ -490,10 +493,10 @@ executable permission. This is often caused by a bad launch-prefix.""" %
                 retcode = self.popen.poll()
             # Escalate non-responsive process
             if retcode is None:
-                printerrlog("[%s] escalating to SIGTERM" % self.name)
+                printerrlog('[%s] escalating to SIGTERM' % self.name)
                 timeout_t = time.time() + self.sigterm_timeout
                 os.killpg(pgid, signal.SIGTERM)
-                _logger.info("[%s] sent SIGTERM to pgid [%s]" %
+                _logger.info('[%s] sent SIGTERM to pgid [%s]' %
                              (self.name, pgid))
                 retcode = self.popen.poll()
                 while time.time() < timeout_t and retcode is None:
@@ -501,33 +504,33 @@ executable permission. This is often caused by a bad launch-prefix.""" %
                     _logger.debug('poll for retcode')
                     retcode = self.popen.poll()
                 if retcode is None:
-                    printerrlog("[%s] escalating to SIGKILL" % self.name)
+                    printerrlog('[%s] escalating to SIGKILL' % self.name)
                     errors.append(
-                        "process[%s, pid %s]: required SIGKILL. May still be running."
+                        'process[%s, pid %s]: required SIGKILL. May still be running.'
                         % (self.name, pid))
                     try:
                         os.killpg(pgid, signal.SIGKILL)
-                        _logger.info("[%s] sent SIGKILL to pgid [%s]" %
+                        _logger.info('[%s] sent SIGKILL to pgid [%s]' %
                                      (self.name, pgid))
                         # #2096: don't block on SIGKILL, because this results in more orphaned processes overall
                         #self.popen.wait()
                         #os.wait()
-                        _logger.info("process[%s]: sent SIGKILL", self.name)
+                        _logger.info('process[%s]: sent SIGKILL', self.name)
                     except OSError as e:
                         if e.args[0] == 3:
-                            printerrlog("no [%s] process with pid [%s]" %
+                            printerrlog('no [%s] process with pid [%s]' %
                                         (self.name, pid))
                         else:
                             printerrlog(
-                                "errors shutting down [%s], see log for details"
+                                'errors shutting down [%s], see log for details'
                                 % self.name)
                             _logger.error(traceback.format_exc())
                 else:
                     _logger.info(
-                        "process[%s]: SIGTERM killed with return value %s",
+                        'process[%s]: SIGTERM killed with return value %s',
                         self.name, retcode)
             else:
-                _logger.info("process[%s]: SIGINT killed with return value %s",
+                _logger.info('process[%s]: SIGINT killed with return value %s',
                              self.name, retcode)
 
         finally:
@@ -548,7 +551,7 @@ executable permission. This is often caused by a bad launch-prefix.""" %
         """
         self.exit_code = self.popen.poll()
         if self.exit_code is not None:
-            _logger.debug("process[%s].stop(): process has already returned %s",
+            _logger.debug('process[%s].stop(): process has already returned %s',
                           self.name, self.exit_code)
             self.popen = None
             self.stopped = True
@@ -556,26 +559,26 @@ executable permission. This is often caused by a bad launch-prefix.""" %
 
         pid = self.popen.pid
         _logger.info(
-            "process[%s]: killing os process/subprocesses with pid[%s]",
+            'process[%s]: killing os process/subprocesses with pid[%s]',
             self.name, pid)
         # windows has no group id's :(
         try:
             # Start with SIGINT and escalate from there.
-            _logger.info("[%s] running taskkill pid tree [%s]", self.name, pid)
+            _logger.info('[%s] running taskkill pid tree [%s]', self.name, pid)
             subprocess.call(['taskkill', '/F', '/T', '/PID', str(pid)])
-            _logger.info("[%s] run taskkill pid tree [%s]", self.name, pid)
+            _logger.info('[%s] run taskkill pid tree [%s]', self.name, pid)
             timeout_t = time.time() + self.sigint_timeout
             retcode = self.popen.poll()
             while time.time() < timeout_t and retcode is None:
                 time.sleep(0.1)
                 retcode = self.popen.poll()
             if retcode is None:
-                printerrlog("errors shutting down [%s], see log for details" %
+                printerrlog('errors shutting down [%s], see log for details' %
                             self.name)
-                _logger.error("errors shutting down [%s], see log for details" %
+                _logger.error('errors shutting down [%s], see log for details' %
                               self.name)
             else:
-                _logger.info("process[%s]: SIGINT killed with return value %s",
+                _logger.info('process[%s]: SIGINT killed with return value %s',
                              self.name, retcode)
         finally:
             self.popen = None
@@ -593,10 +596,10 @@ executable permission. This is often caused by a bad launch-prefix.""" %
         self.lock.acquire()
         try:
             try:
-                _logger.debug("process[%s].stop() starting", self.name)
+                _logger.debug('process[%s].stop() starting', self.name)
                 if self.popen is None:
                     _logger.debug(
-                        "process[%s].stop(): popen is None, nothing to kill")
+                        'process[%s].stop(): popen is None, nothing to kill')
                     return
                 if sys.platform in ['win32']:  # cygwin seems to be ok
                     self._stop_win32(errors)
@@ -604,7 +607,7 @@ executable permission. This is often caused by a bad launch-prefix.""" %
                     self._stop_unix(errors)
             except:
                 #traceback.print_exc()
-                _logger.error("[%s] EXCEPTION %s", self.name,
+                _logger.error('[%s] EXCEPTION %s', self.name,
                               traceback.format_exc())
         finally:
             self.stopped = True

@@ -31,13 +31,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 """
 Warning: do not use this library.  It is unstable and most of the routines
 here have been superceded by other libraries (e.g. genmsg).  These
 routines will likely be *deleted* in future releases.
 """
-
 import os
 import re
 import sys
@@ -52,9 +50,11 @@ REMAP = ':='
 ANYTYPE = '*'
 
 if sys.hexversion > 0x03000000:  # Python3
+
     def isstring(s):
         return isinstance(s, str)  # Python 3.x
 else:
+
     def isstring(s):
         """
         Small helper version to check an object is a string in a way that works
@@ -161,7 +161,7 @@ def namespace(name):
         return SEP
     elif name[-1] == SEP:
         name = name[:-1]
-    return name[:name.rfind(SEP)+1] or SEP
+    return name[:name.rfind(SEP) + 1] or SEP
 
 
 def ns_join(ns, name):
@@ -209,13 +209,15 @@ def load_mappings(argv):
                     else:
                         mappings[src] = dst
             except Exception:
-                sys.stderr.write("ERROR: Invalid remapping argument '%s'\n" % arg)
+                sys.stderr.write("ERROR: Invalid remapping argument '%s'\n" %
+                                 arg)
     return mappings
 
 
 #######################################################################
 # RESOURCE NAMES
 # resource names refer to entities in a file system
+
 
 def resource_name(res_pkg_name, name, my_pkg=None):
     """
@@ -233,7 +235,7 @@ def resource_name(res_pkg_name, name, my_pkg=None):
     @rtype: str
     """
     if res_pkg_name != my_pkg:
-        return res_pkg_name+PRN_SEPARATOR+name
+        return res_pkg_name + PRN_SEPARATOR + name
     return name
 
 
@@ -248,7 +250,7 @@ def resource_name_base(name):
     @rtype: str
     """
 
-    return name[name.rfind(PRN_SEPARATOR)+1:]
+    return name[name.rfind(PRN_SEPARATOR) + 1:]
 
 
 def resource_name_package(name):
@@ -342,7 +344,8 @@ def is_legal_name(name):
     return m is not None and m.group(0) == name and '//' not in name
 
 
-BASE_NAME_LEGAL_CHARS_P = re.compile(r'^[A-Za-z][\w_]*$')  # ascii char followed by (alphanumeric, _)
+BASE_NAME_LEGAL_CHARS_P = re.compile(
+    r'^[A-Za-z][\w_]*$')  # ascii char followed by (alphanumeric, _)
 
 
 def is_legal_base_name(name):
@@ -356,7 +359,8 @@ def is_legal_base_name(name):
     return m is not None and m.group(0) == name
 
 
-BASE_RESOURCE_NAME_LEGAL_CHARS_P = re.compile(r'^[A-Za-z][\w_]*$')  # ascii char followed by (alphanumeric, _)
+BASE_RESOURCE_NAME_LEGAL_CHARS_P = re.compile(
+    r'^[A-Za-z][\w_]*$')  # ascii char followed by (alphanumeric, _)
 
 
 def is_legal_resource_base_name(name):
@@ -430,7 +434,8 @@ def anonymous_name(id):
     """
     import random
     import socket
-    name = '%s_%s_%s_%s' % (id, socket.gethostname(), os.getpid(), random.randint(0, sys.maxsize))
+    name = '%s_%s_%s_%s' % (id, socket.gethostname(), os.getpid(),
+                            random.randint(0, sys.maxsize))
     # RFC 952 allows hyphens, IP addrs can have '.'s, both
     # of which are illegal for ROS names. For good
     # measure, screen ipv6 ':'.

@@ -34,24 +34,28 @@
 """
 Process monitoring implementation for roslaunch.
 """
-
 # pylint: disable=unnecessary-pass,invalid-name,global-statement,broad-except,logging-not-lazy,broad-except,comparison-with-callable,expression-not-assigned,bare-except
 # pylint: disable=line-too-long
-
 import atexit
 import logging
 import signal
 import sys
 import time
 import traceback
-from threading import Thread, RLock, Lock
-from queue import Empty, Queue
+from queue import Empty
+from queue import Queue
+from threading import Lock
+from threading import RLock
+from threading import Thread
 
 import roslib
 
-from third_party.legacy_roslaunch.core import printlog, printlog_bold, printerrlog, RLException
+from third_party.legacy_roslaunch.core import printerrlog
+from third_party.legacy_roslaunch.core import printlog
+from third_party.legacy_roslaunch.core import printlog_bold
+from third_party.legacy_roslaunch.core import RLException
 
-logger = logging.getLogger("roslaunch.pmon")
+logger = logging.getLogger('roslaunch.pmon')
 
 
 class FatalProcessLaunch(RLException):
@@ -74,8 +78,8 @@ def start_process_monitor():
         #logger.error("start_process_monitor: cannot start new ProcessMonitor (shutdown initiated)")
         return None
     _pmon_counter += 1
-    name = "ProcessMonitor-%s" % _pmon_counter
-    logger.info("start_process_monitor: creating ProcessMonitor")
+    name = 'ProcessMonitor-%s' % _pmon_counter
+    logger.info('start_process_monitor: creating ProcessMonitor')
     process_monitor = ProcessMonitor(name)
     try:
         # prevent race condition with pmon_shutdown() being triggered
@@ -84,7 +88,7 @@ def start_process_monitor():
         _shutdown_lock.acquire()
         _pmons.append(process_monitor)
         process_monitor.start()
-        logger.info("start_process_monitor: ProcessMonitor started")
+        logger.info('start_process_monitor: ProcessMonitor started')
     finally:
         _shutdown_lock.release()
 
@@ -116,14 +120,14 @@ def shutdown_process_monitor(process_monitor):
         process_monitor.join(20.0)
         if process_monitor.is_alive():
             logger.error(
-                "shutdown_process_monitor: ProcessMonitor shutdown failed!")
+                'shutdown_process_monitor: ProcessMonitor shutdown failed!')
             return False
         else:
             logger.debug(
-                "shutdown_process_monitor: ProcessMonitor shutdown succeeded")
+                'shutdown_process_monitor: ProcessMonitor shutdown succeeded')
             return True
     except Exception as e:
-        print("exception in shutdown_process_monitor: %s" % e, file=sys.stderr)
+        print('exception in shutdown_process_monitor: %s' % e, file=sys.stderr)
         traceback.print_exc()
         return False
 
@@ -142,7 +146,7 @@ def pmon_shutdown():
                 shutdown_process_monitor(p)
             del _pmons[:]
         except:
-            print("exception in pmon_shutdown")
+            print('exception in pmon_shutdown')
             traceback.print_exc()
     finally:
         _shutdown_lock.release()
@@ -223,7 +227,7 @@ class Process(object):
         _init_signal_handlers()
 
     def __str__(self):
-        return "Process<%s>" % (self.name)
+        return 'Process<%s>' % (self.name)
 
     # NOTE: get_info() is going to have to be sufficient for
     # generating respawn requests, so we must be complete about it
@@ -308,7 +312,7 @@ class DeadProcess(Process):
         return self.info
 
     def start(self):
-        raise Exception("cannot call start on a dead process!")
+        raise Exception('cannot call start on a dead process!')
 
     def is_alive(self):
         return False
@@ -336,7 +340,7 @@ class ProcessListener(object):
 
 class ProcessMonitor(Thread):
 
-    def __init__(self, name="ProcessMonitor"):
+    def __init__(self, name='ProcessMonitor'):
         Thread.__init__(self, name=name)
         self.procs = []
         self.plock = RLock()
@@ -351,7 +355,7 @@ class ProcessMonitor(Thread):
         # #642: flag to prevent process monitor exiting prematurely
         self._registrations_complete = False
 
-        logger.info("created process monitor %s" % self)
+        logger.info('created process monitor %s' % self)
 
     def add_process_listener(self, l):
         """
@@ -369,7 +373,7 @@ class ProcessMonitor(Thread):
         @type  p: L{Process}
         @raise RLException: if process with same name is already registered
         """
-        logger.info("ProcessMonitor.register[%s]" % p.name)
+        logger.info('ProcessMonitor.register[%s]' % p.name)
         e = None
         with self.plock:
             if self.has_process(p.name):
@@ -377,15 +381,15 @@ class ProcessMonitor(Thread):
                                 p.name)
             elif self.is_shutdown:
                 e = RLException(
-                    "cannot add process [%s] after process monitor has been shut down"
+                    'cannot add process [%s] after process monitor has been shut down'
                     % p.name)
             else:
                 self.procs.append(p)
         if e:
-            logger.error("ProcessMonitor.register[%s] failed %s" % (p.name, e))
+            logger.error('ProcessMonitor.register[%s] failed %s' % (p.name, e))
             raise e
         else:
-            logger.info("ProcessMonitor.register[%s] complete" % p.name)
+            logger.info('ProcessMonitor.register[%s] complete' % p.name)
 
     def register_core_proc(self, p):
         """
@@ -406,13 +410,13 @@ class ProcessMonitor(Thread):
         will exit if there are no processes left to monitor.
         """
         self._registrations_complete = True
-        logger.info("registrations completed %s" % self)
+        logger.info('registrations completed %s' % self)
 
     def unregister(self, p):
-        logger.info("ProcessMonitor.unregister[%s] starting" % p.name)
+        logger.info('ProcessMonitor.unregister[%s] starting' % p.name)
         with self.plock:
             self.procs.remove(p)
-        logger.info("ProcessMonitor.unregister[%s] complete" % p.name)
+        logger.info('ProcessMonitor.unregister[%s] complete' % p.name)
 
     def has_process(self, name):
         """
@@ -474,9 +478,9 @@ class ProcessMonitor(Thread):
 
         if not isstring(name):
             raise RLException(
-                "kill_process takes in a process name but was given: %s" % name)
-        logger.debug("ProcessMonitor.kill_process[%s]" % name)
-        printlog("[%s] kill requested" % name)
+                'kill_process takes in a process name but was given: %s' % name)
+        logger.debug('ProcessMonitor.kill_process[%s]' % name)
+        printlog('[%s] kill requested' % name)
         with self.plock:
             p = self.get_process(name)
             if p:
@@ -493,7 +497,7 @@ class ProcessMonitor(Thread):
         """
         Shutdown the process monitor thread
         """
-        logger.info("ProcessMonitor.shutdown %s" % self)
+        logger.info('ProcessMonitor.shutdown %s' % self)
         self.is_shutdown = True
 
     def get_active_names(self):
@@ -593,22 +597,22 @@ class ProcessMonitor(Thread):
                 try:
                     if not p.is_alive():
                         logger.debug(
-                            "Process[%s] has died, respawn=%s, required=%s, exit_code=%s",
-                            p.name, "True(%f)" %
+                            'Process[%s] has died, respawn=%s, required=%s, exit_code=%s',
+                            p.name, 'True(%f)' %
                             p.respawn_delay if p.respawn else p.respawn,
                             p.required, p.exit_code)
                         exit_code_str = p.get_exit_description()
                         if p.required:
                             printerrlog(
                                 '=' * 80 +
-                                "REQUIRED process [%s] has died!\n%s\nInitiating shutdown!\n"
+                                'REQUIRED process [%s] has died!\n%s\nInitiating shutdown!\n'
                                 % (p.name, exit_code_str) + '=' * 80)
                             self.is_shutdown = True
-                        elif not p in respawn:
+                        elif p not in respawn:
                             if p.exit_code:
-                                printerrlog("[%s] %s" % (p.name, exit_code_str))
+                                printerrlog('[%s] %s' % (p.name, exit_code_str))
                             else:
-                                printlog_bold("[%s] %s" %
+                                printlog_bold('[%s] %s' %
                                               (p.name, exit_code_str))
                             dead.append(p)
 
@@ -643,7 +647,7 @@ class ProcessMonitor(Thread):
             # waits until its had at least one process before exiting
             if self._registrations_complete and dead and not self.procs and not respawn:
                 printlog(
-                    "all processes on machine have died, roslaunch will exit")
+                    'all processes on machine have died, roslaunch will exit')
                 self.is_shutdown = True
             del dead[:]
             _respawn = []
@@ -652,7 +656,7 @@ class ProcessMonitor(Thread):
                     if self.is_shutdown:
                         break
                     if r.should_respawn() <= 0.0:
-                        printlog("[%s] restarting process" % r.name)
+                        printlog('[%s] restarting process' % r.name)
                         # stop process, don't accumulate errors
                         r.stop([])
                         r.start()
@@ -661,14 +665,14 @@ class ProcessMonitor(Thread):
                         _respawn.append(r)
                 except:
                     traceback.print_exc()
-                    logger.error("Restart failed %s", traceback.format_exc())
+                    logger.error('Restart failed %s', traceback.format_exc())
             respawn = _respawn
             time.sleep(0.1)  #yield thread
         #moved this to finally block of _post_run
         #self._post_run() #kill all processes
 
     def _post_run(self):
-        logger.info("ProcessMonitor._post_run %s" % self)
+        logger.info('ProcessMonitor._post_run %s' % self)
         # this is already true entering, but go ahead and make sure
         self.is_shutdown = True
         # killall processes on run exit
@@ -679,12 +683,12 @@ class ProcessMonitor(Thread):
         with self.plock:
             # make copy of core_procs for threadsafe usage
             core_procs = self.core_procs[:]
-            logger.info("ProcessMonitor._post_run %s: remaining procs are %s" %
+            logger.info('ProcessMonitor._post_run %s: remaining procs are %s' %
                         (self, self.procs))
 
             # enqueue all non-core procs in reverse order for parallel kill
             # #526/885: ignore core procs
-            [q.put(p) for p in reversed(self.procs) if not p in core_procs]
+            [q.put(p) for p in reversed(self.procs) if p not in core_procs]
 
         # use 10 workers
         killers = []
@@ -709,7 +713,7 @@ class ProcessMonitor(Thread):
 
         # delete everything except dead_list
         logger.info(
-            "ProcessMonitor exit: cleaning up data structures and signals")
+            'ProcessMonitor exit: cleaning up data structures and signals')
         with self.plock:
             del core_procs[:]
             del self.procs[:]
@@ -718,12 +722,12 @@ class ProcessMonitor(Thread):
         reacquire_signals = self.reacquire_signals
         if reacquire_signals:
             reacquire_signals.clear()
-        logger.info("ProcessMonitor exit: pmon has shutdown")
+        logger.info('ProcessMonitor exit: pmon has shutdown')
         self.done = True
 
         if shutdown_errors:
-            printerrlog("Shutdown errors:\n" +
-                        '\n'.join([" * %s" % e for e in shutdown_errors]))
+            printerrlog('Shutdown errors:\n' +
+                        '\n'.join([' * %s' % e for e in shutdown_errors]))
 
 
 def _kill_process(p, errors):
@@ -736,8 +740,8 @@ def _kill_process(p, errors):
     @type  errors: [str]
     """
     try:
-        logger.info("ProcessMonitor exit: killing %s", p.name)
-        printlog("[%s] killing on exit" % p.name)
+        logger.info('ProcessMonitor exit: killing %s', p.name)
+        printlog('[%s] killing on exit' % p.name)
         # we accumulate errors from each process so that we can print these at the end
         p.stop(errors)
     except:
@@ -748,7 +752,7 @@ def _kill_process(p, errors):
 class _ProcessKiller(Thread):
 
     def __init__(self, q, i):
-        Thread.__init__(self, name="ProcessKiller-%s" % i)
+        Thread.__init__(self, name='ProcessKiller-%s' % i)
         self.q = q
         self.errors = []
 

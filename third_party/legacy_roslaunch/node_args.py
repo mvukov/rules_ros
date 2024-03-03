@@ -35,22 +35,21 @@
 Utility module of roslaunch that computes the command-line arguments
 for a node.
 """
-
 # pylint: disable=unnecessary-pass,unidiomatic-typecheck,
 # pylint: disable=line-too-long
-
 import os
 import shlex
 import sys
 
-import rosgraph
 import rosgraph.names
 from rosgraph.names import script_resolve_name
 
 from third_party.legacy_roslaunch import substitution_args
 from third_party.legacy_roslaunch import xmlloader
 from third_party.legacy_roslaunch.config import load_config_default
-from third_party.legacy_roslaunch.core import setup_env, local_machine, RLException
+from third_party.legacy_roslaunch.core import local_machine
+from third_party.legacy_roslaunch.core import RLException
+from third_party.legacy_roslaunch.core import setup_env
 
 
 class NodeParamsException(Exception):
@@ -147,7 +146,7 @@ def print_node_filename(node_name, roslaunch_files):
 
         if len(nodes) > 1:
             raise RLException(
-                "ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."
+                'ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed.'
                 % (node_name, ', '.join(roslaunch_files)))
         if not nodes:
             print(
@@ -193,13 +192,13 @@ def get_node_args(node_name, roslaunch_files):
         [n for n in config.tests if _resolved_name(n) == node_name]
     if not node:
         node_list = get_node_list(config)
-        node_list_str = '\n'.join([" * %s" % x for x in node_list])
+        node_list_str = '\n'.join([' * %s' % x for x in node_list])
         raise RLException(
-            "ERROR: Cannot find node named [%s] in [%s].\nNode names are:\n%s" %
+            'ERROR: Cannot find node named [%s] in [%s].\nNode names are:\n%s' %
             (node_name, ', '.join(roslaunch_files), node_list_str))
     elif len(node) > 1:
         raise RLException(
-            "ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed."
+            'ERROR: multiple nodes named [%s] in [%s].\nPlease fix the launch files as duplicate names are not allowed.'
             % (node_name, ', '.join(roslaunch_files)))
     node = node[0]
 
@@ -217,10 +216,10 @@ def get_node_args(node_name, roslaunch_files):
 
     # resolve node name for generating args
     args = create_local_process_args(node, machine)
-    if sys.platform == "win32":
+    if sys.platform == 'win32':
         # set command can be used with environment variables that contain space without double quotes
         # https://ss64.com/nt/set.html
-        return ["set %s=%s&&" % (k, v) for k, v in env.items()] + args
+        return ['set %s=%s&&' % (k, v) for k, v in env.items()] + args
     else:
         # sys.platform.startswith('linux')
         # join environment vars are bash prefix args, wrap with double quotes for variables that contains space
@@ -235,7 +234,7 @@ def _launch_prefix_args(node):
                 prefix = prefix.encode('UTF-8')
         except NameError:
             pass
-        os_posix = os.name == "posix"
+        os_posix = os.name == 'posix'
         return shlex.split(prefix, posix=os_posix)
     else:
         return []
@@ -253,7 +252,7 @@ def create_local_process_args(node, _machine, _env=None):
     """
 
     # - Construct rosrun command
-    remap_args = ["%s:=%s" % (src, dst) for src, dst in node.remap_args]
+    remap_args = ['%s:=%s' % (src, dst) for src, dst in node.remap_args]
     resolve_dict = {}
 
     #resolve args evaluates substitution commands
@@ -275,12 +274,12 @@ def create_local_process_args(node, _machine, _env=None):
                 'UTF-8')  #attempt to force to string for shlex/subprocess
     except NameError:
         pass
-    os_posix = os.name == "posix"
+    os_posix = os.name == 'posix'
     args = shlex.split(resolved, posix=os_posix) + remap_args
     cmd = node.type
     if not cmd:
         raise NodeParamsException(
-            "Cannot locate node of type [%s] in package [%s]" %
+            'Cannot locate node of type [%s] in package [%s]' %
             (node.type, node.package))
     cmd = [cmd]
 

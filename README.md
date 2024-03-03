@@ -14,6 +14,7 @@ And no, you don't have to install any ROS packages via `apt`.
 ## What works?
 
 So far a subset of ros-base packages can be built, including support for
+
 - messages,
 - services,
 - actions, and
@@ -74,22 +75,22 @@ defining and usage of ROS actions (and actionlib).
 
 ## Documentation
 
-* C++
-  * [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
-  * [ros_cc_library](docs/cc_defs_docs.md#ros_cc_library)
-* Interfaces (handling messages, services and actions)
-  * [ros_interface_library](docs/interfaces_docs.md#ros_interface_library)
-  * [cc_ros_interface_library](docs/interfaces_docs.md#cc_ros_interface_library)
-  * [py_ros_interface_library](docs/interfaces_docs.md#py_ros_interface_library)
-* Dynamic reconfiguration
-  * [ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#ros_dynamic_reconfigure_library)
-  * [cc_ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#cc_ros_dynamic_reconfigure_library)
-* Deployment
-  * [ros_launch](docs/launch_docs.md#ros_launch)
-* Testing
-  * [ros_test](docs/test_docs.md#ros_test)
-* Utilities
-  * [ros_topic](docs/topic_docs.md#ros_topic)
+- C++
+  - [ros_cc_binary](docs/cc_defs_docs.md#ros_cc_binary)
+  - [ros_cc_library](docs/cc_defs_docs.md#ros_cc_library)
+- Interfaces (handling messages, services and actions)
+  - [ros_interface_library](docs/interfaces_docs.md#ros_interface_library)
+  - [cc_ros_interface_library](docs/interfaces_docs.md#cc_ros_interface_library)
+  - [py_ros_interface_library](docs/interfaces_docs.md#py_ros_interface_library)
+- Dynamic reconfiguration
+  - [ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#ros_dynamic_reconfigure_library)
+  - [cc_ros_dynamic_reconfigure_library](docs/dynamic_reconfigure_docs.md#cc_ros_dynamic_reconfigure_library)
+- Deployment
+  - [ros_launch](docs/launch_docs.md#ros_launch)
+- Testing
+  - [ros_test](docs/test_docs.md#ros_test)
+- Utilities
+  - [ros_topic](docs/topic_docs.md#ros_topic)
 
 ## Background and design decisions
 

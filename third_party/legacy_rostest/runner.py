@@ -29,21 +29,20 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
 # pylint: disable=invalid-name,consider-using-f-string,global-statement,global-variable-not-assigned,unused-argument
 # pylint: disable=line-too-long
-
+import logging
 import os
 import sys
-import logging
 import unittest
 
 import rospkg
 import rosunit.junitxml
-import third_party.legacy_roslaunch as roslaunch
 
-from third_party.legacy_rostest.rostestutil import printlog, printlogerr
+import third_party.legacy_roslaunch as roslaunch
 from third_party.legacy_rostest.rostest_parent import ROSTestLaunchParent
+from third_party.legacy_rostest.rostestutil import printlog
+from third_party.legacy_rostest.rostestutil import printlogerr
 
 # NOTE: ignoring Python style guide as unittest is sadly written with Java-like camel casing
 
@@ -74,7 +73,7 @@ _config = None
 
 def _addRostestParent(runner):
     global _test_parents, _config
-    logging.getLogger('rostest').info("_addRostestParent [%s]", runner)
+    logging.getLogger('rostest').info('_addRostestParent [%s]', runner)
     _test_parents.append(runner)
     _config = runner.config
 
@@ -94,8 +93,8 @@ def getRostestParents():
 def failDuplicateRunner(testName):
 
     def fn(self):
-        print("Duplicate tests named [%s] in rostest suite" % testName)
-        self.fail("Duplicate tests named [%s] in rostest suite" % testName)
+        print('Duplicate tests named [%s] in rostest suite' % testName)
+        self.fail('Duplicate tests named [%s] in rostest suite' % testName)
 
     return fn
 
@@ -127,21 +126,21 @@ def rostestRunner(test, results_base_dir=None):
         done = False
         while not done:
             self.assert_(self.test_parent is not None,
-                         "ROSTestParent initialization failed")
+                         'ROSTestParent initialization failed')
 
             test_name = test.test_name
 
-            printlog("Running test [%s]", test_name)
+            printlog('Running test [%s]', test_name)
 
             #launch the other nodes
             _, failed = self.test_parent.launch()
             self.assert_(not failed,
-                         "Test Fixture Nodes %s failed to launch" % failed)
+                         'Test Fixture Nodes %s failed to launch' % failed)
 
             #setup the test
 
             test_file = os.path.join(rospkg.get_test_results_dir(),
-                                     "{}.xml".format(test_name))
+                                     '{}.xml'.format(test_name))
 
             # TODO: have to redeclare this due to a bug -- this file
             # needs to be renamed as it aliases the module where the
@@ -149,13 +148,13 @@ def rostestRunner(test, results_base_dir=None):
             # rostest.py
             XML_OUTPUT_FLAG = '--gtest_output=xml:'  #use gtest-compatible flag
 
-            test.args = "%s %s%s" % (test.args, XML_OUTPUT_FLAG, test_file)
+            test.args = '%s %s%s' % (test.args, XML_OUTPUT_FLAG, test_file)
             if _textMode:
                 test.output = 'screen'
-                test.args = test.args + " --text"
+                test.args = test.args + ' --text'
 
             # run the test, blocks until completion
-            printlog("running test %s" % test_name)
+            printlog('running test %s' % test_name)
             timeout_failure = False
             try:
                 self.test_parent.run_test(test)
@@ -166,9 +165,9 @@ def rostestRunner(test, results_base_dir=None):
                     raise
 
             if not timeout_failure:
-                printlog("test [%s] finished" % test_name)
+                printlog('test [%s] finished' % test_name)
             else:
-                printlogerr("test [%s] timed out" % test_name)
+                printlogerr('test [%s] timed out' % test_name)
 
             # load in test_file
             if not _textMode or timeout_failure:
@@ -176,8 +175,8 @@ def rostestRunner(test, results_base_dir=None):
                 if not timeout_failure:
                     self.assert_(
                         os.path.isfile(test_file),
-                        "test [%s] did not generate test results" % test_name)
-                    printlog("test [%s] results are in [%s]", test_name,
+                        'test [%s] did not generate test results' % test_name)
+                    printlog('test [%s] results are in [%s]', test_name,
                              test_file)
                     results = rosunit.junitxml.read(test_file, test_name)
                     test_fail = results.num_errors or results.num_failures
@@ -186,7 +185,7 @@ def rostestRunner(test, results_base_dir=None):
 
                 if test.retry > 0 and test_fail:
                     test.retry -= 1
-                    printlog("test [%s] failed, retrying. Retries left: %s" %
+                    printlog('test [%s] failed, retrying. Retries left: %s' %
                              (test_name, test.retry))
                     self.tearDown()
                     self.setUp()
@@ -194,15 +193,15 @@ def rostestRunner(test, results_base_dir=None):
                     done = True
                     _accumulateResults(results)
                     printlog(
-                        "test [%s] results summary: %s errors, %s failures, %s tests",
+                        'test [%s] results summary: %s errors, %s failures, %s tests',
                         test_name, results.num_errors, results.num_failures,
                         results.num_tests)
 
             else:
                 if test.retry:
-                    printlogerr("retry is disabled in --text mode")
+                    printlogerr('retry is disabled in --text mode')
                 done = True
-        printlog("[ROSTEST] test [%s] done", test_name)
+        printlog('[ROSTEST] test [%s] done', test_name)
 
     return fn
 
@@ -216,7 +215,7 @@ def setUp(self):
                                            reuse_master=self.reuse_master,
                                            clear=self.clear)
 
-    printlog("setup[%s] run_id[%s] starting", self.test_file,
+    printlog('setup[%s] run_id[%s] starting', self.test_file,
              self.test_parent.run_id)
 
     self.test_parent.setUp()
@@ -226,18 +225,18 @@ def setUp(self):
 
     _addRostestParent(self.test_parent)
 
-    printlog("setup[%s] run_id[%s] done", self.test_file,
+    printlog('setup[%s] run_id[%s] done', self.test_file,
              self.test_parent.run_id)
 
 
 ## Function that becomes TestCase.tearDown()
 def tearDown(self):
-    printlog("tearDown[%s]", self.test_file)
+    printlog('tearDown[%s]', self.test_file)
 
     if self.test_parent:
         self.test_parent.tearDown()
 
-    printlog("rostest teardown %s complete", self.test_file)
+    printlog('rostest teardown %s complete', self.test_file)
 
 
 def createUnitTest(test_file,
@@ -273,7 +272,7 @@ def createUnitTest(test_file,
         node_exists = os.path.isfile(test.type) and os.access(
             test.type, os.X_OK)
         if not node_exists:
-            err_msg = "Test node {} does not exist".format(test.type)
+            err_msg = 'Test node {} does not exist'.format(test.type)
 
         testName = 'test%s' % (test.test_name)
         if err_msg:

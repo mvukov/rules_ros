@@ -51,10 +51,8 @@ below parameters must be set:
 
 Author: Kentaro Wada <www.kentaro.wada@gmail.com>
 """
-
 # pylint: disable=bad-super-call,consider-using-f-string
 # pylint: disable=line-too-long
-
 import sys
 import time
 import unittest

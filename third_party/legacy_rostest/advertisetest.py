@@ -63,10 +63,8 @@ below parameters must be set:
 
 Author: Yuki Furuta <me@furushchev.ru>
 """
-
 # pylint: disable=bad-super-call,consider-using-f-string
 # pylint: disable=line-too-long
-
 import sys
 import time
 import unittest

@@ -31,12 +31,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 # pylint: disable=bare-except,broad-except
 # pylint: disable=line-too-long
-
-import os
 import logging
+import os
 import socket
 import sys
 import traceback
@@ -55,7 +53,8 @@ from third_party.legacy_roslaunch import param_dump
 from third_party.legacy_roslaunch import parent
 from third_party.legacy_roslaunch import rlutil
 from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 NAME = 'roslaunch'
 
@@ -71,7 +70,7 @@ def configure_logging(uuid):
         logfile_name = rosgraph.roslogging.configure_logging(
             NAME, filename=logfile_basename)
         if logfile_name:
-            print("... logging to %s" % logfile_name)
+            print('... logging to %s' % logfile_name)
 
         # add logger to internal roslaunch logging infrastructure
         logger = logging.getLogger('roslaunch')
@@ -79,7 +78,7 @@ def configure_logging(uuid):
         core.add_printerrlog_handler(logger.error)
     except:
         print(
-            "WARNING: unable to configure logging. No log files will be generated",
+            'WARNING: unable to configure logging. No log files will be generated',
             file=sys.stderr)
 
 
@@ -101,166 +100,166 @@ def write_pid_file(options_pid_fn, options_core, port):
             if not os.path.exists(ros_home):
                 os.makedirs(ros_home)
 
-        with open(pid_fn, "w") as f:
+        with open(pid_fn, 'w') as f:
             f.write(str(os.getpid()))
 
 
 def _get_optparse():
-    usage = "usage: %prog [options] [package] <filename> [arg_name:=value...]\n"
-    usage += "       %prog [options] <filename> [<filename>...] [arg_name:=value...]\n\n"
+    usage = 'usage: %prog [options] [package] <filename> [arg_name:=value...]\n'
+    usage += '       %prog [options] <filename> [<filename>...] [arg_name:=value...]\n\n'
     usage += "If <filename> is a single dash ('-'), launch XML is read from standard input."
     parser = OptionParser(usage=usage, prog=NAME)
     parser.add_option(
-        "--files",
-        dest="file_list",
+        '--files',
+        dest='file_list',
         default=False,
-        action="store_true",
+        action='store_true',
         help=
-        "Print list files loaded by launch file, including launch file itself")
-    parser.add_option("--args",
-                      dest="node_args",
+        'Print list files loaded by launch file, including launch file itself')
+    parser.add_option('--args',
+                      dest='node_args',
                       default=None,
-                      help="Print command-line arguments for node",
-                      metavar="NODE_NAME")
-    parser.add_option("--nodes",
-                      dest="node_list",
+                      help='Print command-line arguments for node',
+                      metavar='NODE_NAME')
+    parser.add_option('--nodes',
+                      dest='node_list',
                       default=False,
-                      action="store_true",
-                      help="Print list of node names in launch file")
-    parser.add_option("--find-node",
-                      dest="find_node",
+                      action='store_true',
+                      help='Print list of node names in launch file')
+    parser.add_option('--find-node',
+                      dest='find_node',
                       default=None,
-                      help="Find launch file that node is defined in",
-                      metavar="NODE_NAME")
-    parser.add_option("-c",
-                      "--child",
-                      dest="child_name",
+                      help='Find launch file that node is defined in',
+                      metavar='NODE_NAME')
+    parser.add_option('-c',
+                      '--child',
+                      dest='child_name',
                       default=None,
                       help="Run as child service 'NAME'. Required with -u",
-                      metavar="NAME")
-    parser.add_option("--local",
-                      dest="local_only",
+                      metavar='NAME')
+    parser.add_option('--local',
+                      dest='local_only',
                       default=False,
-                      action="store_true",
-                      help="Do not launch remote nodes")
+                      action='store_true',
+                      help='Do not launch remote nodes')
     # #2370
-    parser.add_option("--screen",
-                      dest="force_screen",
+    parser.add_option('--screen',
+                      dest='force_screen',
                       default=False,
-                      action="store_true",
-                      help="Force output of all local nodes to screen")
-    parser.add_option("--required",
-                      dest="force_required",
+                      action='store_true',
+                      help='Force output of all local nodes to screen')
+    parser.add_option('--required',
+                      dest='force_required',
                       default=False,
-                      action="store_true",
-                      help="Force all nodes to be required")
-    parser.add_option("--log",
-                      dest="force_log",
+                      action='store_true',
+                      help='Force all nodes to be required')
+    parser.add_option('--log',
+                      dest='force_log',
                       default=False,
-                      action="store_true",
-                      help="Force output of all local nodes to log")
-    parser.add_option("-u",
-                      "--server_uri",
-                      dest="server_uri",
+                      action='store_true',
+                      help='Force output of all local nodes to log')
+    parser.add_option('-u',
+                      '--server_uri',
+                      dest='server_uri',
                       default=None,
-                      help="URI of server. Required with -c",
-                      metavar="URI")
-    parser.add_option("--run_id",
-                      dest="run_id",
+                      help='URI of server. Required with -c',
+                      metavar='URI')
+    parser.add_option('--run_id',
+                      dest='run_id',
                       default=None,
-                      help="run_id of session. Required with -c",
-                      metavar="RUN_ID")
+                      help='run_id of session. Required with -c',
+                      metavar='RUN_ID')
     # #1254: wait until master comes online before starting
-    parser.add_option("--wait",
-                      action="store_true",
-                      dest="wait_for_master",
+    parser.add_option('--wait',
+                      action='store_true',
+                      dest='wait_for_master',
                       default=False,
-                      help="wait for master to start before launching")
-    parser.add_option("-p",
-                      "--port",
-                      dest="port",
+                      help='wait for master to start before launching')
+    parser.add_option('-p',
+                      '--port',
+                      dest='port',
                       default=None,
-                      help="master port. Only valid if master is launched",
-                      metavar="PORT")
-    parser.add_option("--core",
-                      action="store_true",
-                      dest="core",
+                      help='master port. Only valid if master is launched',
+                      metavar='PORT')
+    parser.add_option('--core',
+                      action='store_true',
+                      dest='core',
                       default=False,
-                      help="Launch core services only")
-    parser.add_option("--pid",
-                      dest="pid_fn",
-                      default="",
-                      help="write the roslaunch pid to filename")
-    parser.add_option("-v",
-                      action="store_true",
-                      dest="verbose",
+                      help='Launch core services only')
+    parser.add_option('--pid',
+                      dest='pid_fn',
+                      default='',
+                      help='write the roslaunch pid to filename')
+    parser.add_option('-v',
+                      action='store_true',
+                      dest='verbose',
                       default=False,
-                      help="verbose printing")
-    parser.add_option("--no-summary",
-                      action="store_true",
-                      dest="no_summary",
+                      help='verbose printing')
+    parser.add_option('--no-summary',
+                      action='store_true',
+                      dest='no_summary',
                       default=False,
-                      help="hide summary printing")
+                      help='hide summary printing')
     # 2685 - Dump parameters of launch files
-    parser.add_option("--dump-params",
+    parser.add_option('--dump-params',
                       default=False,
-                      action="store_true",
-                      dest="dump_params",
-                      help="Dump parameters of all roslaunch files to stdout")
-    parser.add_option("--skip-log-check",
+                      action='store_true',
+                      dest='dump_params',
+                      help='Dump parameters of all roslaunch files to stdout')
+    parser.add_option('--skip-log-check',
                       default=False,
-                      action="store_true",
-                      dest="skip_log_check",
-                      help="skip check size of log folder")
+                      action='store_true',
+                      dest='skip_log_check',
+                      help='skip check size of log folder')
     parser.add_option(
-        "--ros-args",
+        '--ros-args',
         default=False,
-        action="store_true",
-        dest="ros_args",
-        help="Display command-line arguments for this launch file")
-    parser.add_option("--disable-title",
+        action='store_true',
+        dest='ros_args',
+        help='Display command-line arguments for this launch file')
+    parser.add_option('--disable-title',
                       default=False,
-                      action="store_true",
-                      dest="disable_title",
-                      help="Disable setting of terminal title")
+                      action='store_true',
+                      dest='disable_title',
+                      help='Disable setting of terminal title')
     parser.add_option(
-        "-w",
-        "--numworkers",
-        dest="num_workers",
+        '-w',
+        '--numworkers',
+        dest='num_workers',
         default=NUM_WORKERS,
         type=int,
-        help="override number of worker threads. Only valid for core services.",
-        metavar="NUM_WORKERS")
+        help='override number of worker threads. Only valid for core services.',
+        metavar='NUM_WORKERS')
     parser.add_option(
-        "-t",
-        "--timeout",
-        dest="timeout",
+        '-t',
+        '--timeout',
+        dest='timeout',
         help=
-        "override the socket connection timeout (in seconds). Only valid for core services.",
-        metavar="TIMEOUT")
+        'override the socket connection timeout (in seconds). Only valid for core services.',
+        metavar='TIMEOUT')
     parser.add_option(
-        "--master-logger-level",
-        dest="master_logger_level",
+        '--master-logger-level',
+        dest='master_logger_level',
         default=False,
         type=str,
         help=
         "set rosmaster.master logger level ('debug', 'info', 'warn', 'error', 'fatal')"
     )
     parser.add_option(
-        "--sigint-timeout",
-        dest="sigint_timeout",
+        '--sigint-timeout',
+        dest='sigint_timeout',
         default=DEFAULT_TIMEOUT_SIGINT,
         type=float,
-        help="the SIGINT timeout used when killing nodes (in seconds).",
-        metavar="SIGINT_TIMEOUT")
+        help='the SIGINT timeout used when killing nodes (in seconds).',
+        metavar='SIGINT_TIMEOUT')
     parser.add_option(
-        "--sigterm-timeout",
-        dest="sigterm_timeout",
+        '--sigterm-timeout',
+        dest='sigterm_timeout',
         default=DEFAULT_TIMEOUT_SIGTERM,
         type=float,
         help=
-        "the SIGTERM timeout used when killing nodes if SIGINT does not stop the node (in seconds).",
-        metavar="SIGTERM_TIMEOUT")
+        'the SIGTERM timeout used when killing nodes if SIGINT does not stop the node (in seconds).',
+        metavar='SIGTERM_TIMEOUT')
 
     return parser
 
@@ -270,27 +269,27 @@ def _validate_args(parser, options, args):
     if options.child_name:
         if not options.server_uri:
             parser.error(
-                "--child option requires --server_uri to be set as well")
+                '--child option requires --server_uri to be set as well')
         if not options.run_id:
-            parser.error("--child option requires --run_id to be set as well")
+            parser.error('--child option requires --run_id to be set as well')
         if options.port:
-            parser.error("port option cannot be used with roslaunch child mode")
+            parser.error('port option cannot be used with roslaunch child mode')
         if args:
-            parser.error("Input files are not allowed when run in child mode")
+            parser.error('Input files are not allowed when run in child mode')
     elif options.core:
         if options.run_id:
             parser.error(
-                "--run_id should only be set for child roslaunches (-c)")
+                '--run_id should only be set for child roslaunches (-c)')
 
         # we don't actually do anything special for core as the roscore.xml file
         # is an implicit include for any roslaunch
 
     elif len(args) == 0:
-        parser.error("you must specify at least one input file")
+        parser.error('you must specify at least one input file')
     else:
         missing_files = [f for f in args if not (f == '-' or os.path.exists(f))]
         if missing_files:
-            parser.error("The following input files do not exist: %s" %
+            parser.error('The following input files do not exist: %s' %
                          ', '.join(missing_files))
 
     if args.count('-') > 1:
@@ -304,7 +303,7 @@ def _validate_args(parser, options, args):
             ] if x
     ]) > 1:
         parser.error(
-            "only one of [--nodes, --find-node, --args --ros-args] may be specified"
+            'only one of [--nodes, --find-node, --args --ros-args] may be specified'
         )
 
 
@@ -333,7 +332,7 @@ def main(argv):
                 options.dump_params, options.file_list, options.ros_args
         ]):
             if options.node_args and not args:
-                parser.error("please specify a launch file")
+                parser.error('please specify a launch file')
 
             if options.node_args:
                 node_args.print_node_args(options.node_args, args)
@@ -353,7 +352,7 @@ def main(argv):
         # we have to wait for the master here because we don't have the run_id yet
         if options.wait_for_master:
             if options.core:
-                parser.error("--wait cannot be used with roscore")
+                parser.error('--wait cannot be used with roscore')
             rlutil.wait_for_master()
 
         # write the pid to a file
@@ -370,8 +369,8 @@ def main(argv):
             rlutil.check_log_disk_usage()
 
         logger = logging.getLogger('roslaunch')
-        logger.info("roslaunch starting with args %s", str(argv))
-        logger.info("roslaunch env is %s", os.environ)
+        logger.info('roslaunch starting with args %s', str(argv))
+        logger.info('roslaunch env is %s', os.environ)
 
         if options.child_name:
             logger.info('starting in child mode')
@@ -399,7 +398,7 @@ def main(argv):
                     "Passed '-' as file argument, attempting to read roslaunch XML from stdin."
                 )
                 roslaunch_strs.append(sys.stdin.read())
-                core.printlog("... %d bytes read successfully.\n" %
+                core.printlog('... %d bytes read successfully.\n' %
                               len(roslaunch_strs[-1]))
                 args.remove('-')
 
@@ -429,13 +428,13 @@ def main(argv):
             p.spin()
 
     except RLException as e:
-        handle_exception(core, logger, "RLException: ", e)
+        handle_exception(core, logger, 'RLException: ', e)
     except ValueError as e:
         # TODO: need to trap better than this high-level trap
-        handle_exception(core, logger, "Value error: ", e)
+        handle_exception(core, logger, 'Value error: ', e)
     except rospkg.ResourceNotFound as e:
-        handle_exception(core, logger, "Resource not found: ", e)
-    except Exception as e:
+        handle_exception(core, logger, 'Resource not found: ', e)
+    except Exception:
         traceback.print_exc()
         sys.exit(1)
     finally:

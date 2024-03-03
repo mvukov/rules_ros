@@ -35,10 +35,8 @@
 Library for processing XML substitution args. This is currently used
 by roslaunch and xacro, but it is not yet a top-level ROS feature.
 """
-
 # pylint: disable=eval-used
 # pylint: disable=line-too-long
-
 import math
 import os
 from io import StringIO  # Python 3.x
@@ -64,7 +62,7 @@ def _eval_env(name):
     try:
         return os.environ[name]
     except KeyError as e:
-        raise SubstitutionException("environment variable %s is not set" %
+        raise SubstitutionException('environment variable %s is not set' %
                                     str(e)) from e
 
 
@@ -77,8 +75,8 @@ def _env(resolved, a, args, _context):
     """
     if len(args) != 1:
         raise SubstitutionException(
-            "$(env var) command only accepts one argument [%s]" % a)
-    return resolved.replace("$(%s)" % a, _eval_env(args[0]))
+            '$(env var) command only accepts one argument [%s]' % a)
+    return resolved.replace('$(%s)' % a, _eval_env(args[0]))
 
 
 def _eval_optenv(name, default=''):
@@ -96,8 +94,8 @@ def _optenv(resolved, a, args, _context):
     """
     if len(args) == 0:
         raise SubstitutionException(
-            "$(optenv var) must specify an environment variable [%s]" % a)
-    return resolved.replace("$(%s)" % a,
+            '$(optenv var) must specify an environment variable [%s]' % a)
+    return resolved.replace('$(%s)' % a,
                             _eval_optenv(args[0], default=' '.join(args[1:])))
 
 
@@ -118,21 +116,21 @@ def _anon(resolved, a, args, context):
     """
     # #1559 #1660
     if len(args) == 0:
-        raise SubstitutionException("$(anon var) must specify a name [%s]" % a)
+        raise SubstitutionException('$(anon var) must specify a name [%s]' % a)
     elif len(args) > 1:
         raise SubstitutionException(
-            "$(anon var) may only specify one name [%s]" % a)
+            '$(anon var) may only specify one name [%s]' % a)
     if 'anon' not in context:
         context['anon'] = {}
     anon_context = context['anon']
-    return resolved.replace("$(%s)" % a,
+    return resolved.replace('$(%s)' % a,
                             _eval_anon(idd=args[0], anons=anon_context))
 
 
 def _eval_dirname(filename):
     if not filename:
         raise SubstitutionException(
-            "Cannot substitute $(dirname), no file/directory information available."
+            'Cannot substitute $(dirname), no file/directory information available.'
         )
     return os.path.abspath(os.path.dirname(filename))
 
@@ -145,12 +143,12 @@ def _dirname(resolved, a, _args, context):
     @raise SubstitutionException: if no information about the current launch file is available, for example
            if XML was passed via stdin, or this is a remote launch.
     """
-    return resolved.replace("$(%s)" % a,
+    return resolved.replace('$(%s)' % a,
                             _eval_dirname(context.get('filename', None)))
 
 
 def _eval_find(pkg):
-    raise SubstitutionException("`find` is deprecated!")
+    raise SubstitutionException('`find` is deprecated!')
 
 
 def _find(resolved, a, args, context):
@@ -163,7 +161,7 @@ def _find(resolved, a, args, context):
     :raises: :exc:SubstitutionException: if PKG invalidly specified
     :raises: :exc:`rospkg.ResourceNotFound` If PKG requires resource (e.g. package) that does not exist
     """
-    raise SubstitutionException("$(find pkg) is deprecated!")
+    raise SubstitutionException('$(find pkg) is deprecated!')
 
 
 def _find_executable(resolved, a, args, _context, source_path_to_packages=None):
@@ -174,7 +172,7 @@ def _find_executable(resolved, a, args, _context, source_path_to_packages=None):
     :returns: updated resolved argument, ``str``
     :raises: :exc:SubstitutionException: if PKG/PATH invalidly specified or executable is not found for PKG
     """
-    raise SubstitutionException("$(find-executable pkg path) is deprecated!")
+    raise SubstitutionException('$(find-executable pkg path) is deprecated!')
 
 
 def _find_resource(resolved, a, args, _context, source_path_to_packages=None):
@@ -184,7 +182,7 @@ def _find_resource(resolved, a, args, _context, source_path_to_packages=None):
     :returns: updated resolved argument, ``str``
     :raises: :exc:SubstitutionException: if PKG and PATH invalidly specified or relative PATH is not found for PKG
     """
-    raise SubstitutionException("$(find-resource pkg path) is deprecated!")
+    raise SubstitutionException('$(find-resource pkg path) is deprecated!')
 
 
 def _split_command(resolved, command_with_args):
@@ -232,14 +230,14 @@ def _arg(resolved, a, args, context):
     """
     if len(args) == 0:
         raise SubstitutionException(
-            "$(arg var) must specify a variable name [%s]" % (a))
+            '$(arg var) must specify a variable name [%s]' % (a))
     elif len(args) > 1:
-        raise SubstitutionException("$(arg var) may only specify one arg [%s]" %
+        raise SubstitutionException('$(arg var) may only specify one arg [%s]' %
                                     (a))
 
     if 'arg' not in context:
         context['arg'] = {}
-    return resolved.replace("$(%s)" % a,
+    return resolved.replace('$(%s)' % a,
                             _eval_arg(name=args[0], args=context['arg']))
 
 
@@ -306,7 +304,7 @@ def _eval(s, context):
     # http://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
     if s.find('__') >= 0:
         raise SubstitutionException(
-            "$(eval ...) may not contain double underscore expressions")
+            '$(eval ...) may not contain double underscore expressions')
     return str(eval(s, {}, _DictWrapper(context['arg'], functions)))
 
 
@@ -362,9 +360,9 @@ def _resolve_args(arg_str, context, _resolve_anon, commands):
     resolved = arg_str
     for a in _collect_args(arg_str):
         splits = [s for s in a.split(' ') if s]
-        if not splits[0] in valid:
+        if splits[0] not in valid:
             raise SubstitutionException(
-                "Unknown substitution command [%s]. Valid commands are %s" %
+                'Unknown substitution command [%s]. Valid commands are %s' %
                 (a, valid))
         command = splits[0]
         args = splits[1:]

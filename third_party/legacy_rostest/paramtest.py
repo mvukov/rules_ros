@@ -30,7 +30,6 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
 # Original copied from hztest node
 # https://github.com/ros/ros_comm/blob/24e45419bdd4b0d588321e3b376650c7a51bf11c/tools/rostest/nodes/hztest
 # Integration test node that checks if a designated parameter is already
@@ -39,10 +38,8 @@
 #  * ~/param_name_target: expected parameter name
 #  * ~/test_duration: time (in secs) to run test
 #
-
 # pylint: disable=bad-super-call,consider-using-f-string,deprecated-method
 # pylint: disable=line-too-long
-
 import sys
 import threading
 import time
@@ -74,20 +71,20 @@ class ParamTest(unittest.TestCase):
         # Fetch parameters
         try:
             # Getting the attributes of the test.
-            testattr_paramname_target = rospy.get_param("~param_name_target")
+            testattr_paramname_target = rospy.get_param('~param_name_target')
             paramvalue_expected = rospy.get_param(
-                "~param_value_expected",
+                '~param_value_expected',
                 None)  # This is the expected param value.
             # length of test
-            testattr_duration = float(rospy.get_param("~test_duration", 5))
+            testattr_duration = float(rospy.get_param('~test_duration', 5))
             # time to wait before
-            wait_time = rospy.get_param("~wait_time", 20)
+            wait_time = rospy.get_param('~wait_time', 20)
         except KeyError as e:
             self.fail(
-                "ParamTest not initialized properly. Parameter [%s] not set. Caller ID: [%s] Resolved name: [%s]"
+                'ParamTest not initialized properly. Parameter [%s] not set. Caller ID: [%s] Resolved name: [%s]'
                 %
                 (str(e), rospy.get_caller_id(), rospy.resolve_name(e.args[0])))
-        print("Parameter: %s Test Duration: %s" %
+        print('Parameter: %s Test Duration: %s' %
               (testattr_paramname_target, testattr_duration))
         self._test_param(testattr_paramname_target, testattr_duration,
                          wait_time, paramvalue_expected)
@@ -97,11 +94,11 @@ class ParamTest(unittest.TestCase):
                     testattr_duration,
                     wait_time,
                     paramvalue_expected=None):
-        self.assert_(testattr_duration > 0.0, "bad parameter (test_duration)")
+        self.assert_(testattr_duration > 0.0, 'bad parameter (test_duration)')
         self.assert_(len(testattr_paramname_target),
-                     "bad parameter (testattr_paramname_target)")
+                     'bad parameter (testattr_paramname_target)')
 
-        print("Waiting for parameters")
+        print('Waiting for parameters')
 
         wallclock_timeout_t = time.time() + wait_time
         param_obtained = None
@@ -126,4 +123,4 @@ if __name__ == '__main__':
         rostest.run('rostest', CLASSNAME, ParamTest, sys.argv)
     except KeyboardInterrupt:
         pass
-    print("{} exiting".format(CLASSNAME))
+    print('{} exiting'.format(CLASSNAME))

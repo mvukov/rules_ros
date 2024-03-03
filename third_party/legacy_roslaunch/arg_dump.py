@@ -35,7 +35,6 @@
 Utility module of roslaunch that computes the command-line arguments
 for a launch file.
 """
-
 import sys
 
 from third_party.legacy_roslaunch import xmlloader
@@ -66,7 +65,7 @@ def dump_args(roslaunch_files):
         args = get_args(roslaunch_files)
 
         if len(args) == 0:
-            print("No arguments.")
+            print('No arguments.')
         else:
             required_args = [(name, (doc or 'undocumented', default))
                              for (name, (doc, default)) in args.items()
@@ -76,12 +75,12 @@ def dump_args(roslaunch_files):
                              if default]
 
             if len(required_args) > 0:
-                print("Required Arguments:")
+                print('Required Arguments:')
                 for (name, (doc, _)) in sorted(required_args):
-                    print("  %s: %s" % (name, doc))
+                    print('  %s: %s' % (name, doc))
 
             if len(optional_args) > 0:
-                print("Optional Arguments:")
+                print('Optional Arguments:')
                 for (name, (doc, default)) in sorted(optional_args):
                     print("  %s (default \"%s\"): %s" % (name, default, doc))
 

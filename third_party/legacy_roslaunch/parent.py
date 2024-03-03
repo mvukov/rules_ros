@@ -43,10 +43,8 @@ remote machines. The parent can then invoke methods on this child
 process to launch remote processes, and the child can invoke methods
 on the parent to provide feedback.
 """
-
 # pylint: disable=bare-except
 # pylint: disable=line-too-long
-
 import logging
 
 from rosmaster.master_api import NUM_WORKERS
@@ -55,8 +53,11 @@ from third_party.legacy_roslaunch import config
 from third_party.legacy_roslaunch import launch
 from third_party.legacy_roslaunch import pmon
 from third_party.legacy_roslaunch import server
-from third_party.legacy_roslaunch.core import printlog_bold, printerrlog, RLException
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT, DEFAULT_TIMEOUT_SIGTERM
+from third_party.legacy_roslaunch.core import printerrlog
+from third_party.legacy_roslaunch.core import printlog_bold
+from third_party.legacy_roslaunch.core import RLException
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 
 class ROSLaunchParent(object):
@@ -131,11 +132,11 @@ class ROSLaunchParent(object):
         """
         if sigint_timeout <= 0:
             raise RLException(
-                "sigint_timeout must be a positive number, received %f" %
+                'sigint_timeout must be a positive number, received %f' %
                 sigint_timeout)
         if sigterm_timeout <= 0:
             raise RLException(
-                "sigterm_timeout must be a positive number, received %f" %
+                'sigterm_timeout must be a positive number, received %f' %
                 sigterm_timeout)
 
         self.logger = logging.getLogger('roslaunch.parent')
@@ -187,7 +188,7 @@ class ROSLaunchParent(object):
                 n.required = True
                 if n.respawn and n.required:
                     raise ValueError(
-                        "respawn and required cannot both be set to true")
+                        'respawn and required cannot both be set to true')
 
     def _start_pm(self):
         """
@@ -200,11 +201,11 @@ class ROSLaunchParent(object):
         Initialize the roslaunch runner
         """
         if self.config is None:
-            raise RLException("config is not initialized")
+            raise RLException('config is not initialized')
         if self.pm is None:
-            raise RLException("pm is not initialized")
+            raise RLException('pm is not initialized')
         if self.server is None:
-            raise RLException("server is not initialized")
+            raise RLException('server is not initialized')
         self.runner = launch.ROSLaunchRunner(
             self.run_id,
             self.config,
@@ -223,23 +224,23 @@ class ROSLaunchParent(object):
             print(self.config.summary(local=self.remote_runner is None))
         if self.config:
             for err in self.config.config_errors:
-                printerrlog("WARNING: %s" % err)
+                printerrlog('WARNING: %s' % err)
 
     def _start_server(self):
         """
         Initialize the roslaunch parent XML-RPC server
         """
         if self.config is None:
-            raise RLException("config is not initialized")
+            raise RLException('config is not initialized')
         if self.pm is None:
-            raise RLException("pm is not initialized")
+            raise RLException('pm is not initialized')
 
-        self.logger.info("starting parent XML-RPC server")
+        self.logger.info('starting parent XML-RPC server')
         self.server = server.ROSLaunchParentNode(self.config, self.pm)
         self.server.start()
         if not self.server.uri:
-            raise RLException("server URI did not initialize")
-        self.logger.info("... parent XML-RPC server started")
+            raise RLException('server URI did not initialize')
+        self.logger.info('... parent XML-RPC server started')
 
     def _init_remote(self):
         """
@@ -247,17 +248,17 @@ class ROSLaunchParent(object):
         of _start_remote, separated out for easier testing
         """
         if self.config is None:
-            raise RLException("config is not initialized")
+            raise RLException('config is not initialized')
         if self.pm is None:
-            raise RLException("pm is not initialized")
+            raise RLException('pm is not initialized')
         if self.server is None:
-            raise RLException("server is not initialized")
+            raise RLException('server is not initialized')
 
         if not self.local_only and self.config.has_remote_nodes():
-            raise RuntimeError("Running without support for remote ROS runner!")
+            raise RuntimeError('Running without support for remote ROS runner!')
         elif self.local_only:
             printlog_bold(
-                "LOCAL\nlocal only launch specified, will not launch remote nodes\nLOCAL\n"
+                'LOCAL\nlocal only launch specified, will not launch remote nodes\nLOCAL\n'
             )
 
     def _start_remote(self):
@@ -304,7 +305,7 @@ class ROSLaunchParent(object):
 
         if self.server:
             try:
-                self.server.shutdown("roslaunch parent complete")
+                self.server.shutdown('roslaunch parent complete')
             except:
                 # don't let exceptions halt the rest of the shutdown
                 pass
@@ -323,7 +324,7 @@ class ROSLaunchParent(object):
         roslauch infrastructure up regardless of processes being
         monitored.
         """
-        self.logger.info("starting roslaunch parent run")
+        self.logger.info('starting roslaunch parent run')
 
         # load config, start XMLRPC servers and process monitor
         try:
@@ -345,7 +346,7 @@ class ROSLaunchParent(object):
             self.pm.registrations_complete()
 
         self.logger.info(
-            "... roslaunch parent running, waiting for process exit")
+            '... roslaunch parent running, waiting for process exit')
         if self.process_listeners:
             for l in self.process_listeners:
                 self.runner.pm.add_process_listener(l)
@@ -365,7 +366,7 @@ class ROSLaunchParent(object):
         Run the parent roslaunch until exit
         """
         if not self.runner:
-            raise RLException("parent not started yet")
+            raise RLException('parent not started yet')
         try:
             # Blocks until all processes dead/shutdown
             self.runner.spin()

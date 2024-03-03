@@ -33,9 +33,7 @@
 """
 Dumps parameters from ROSLaunch files to stdout as YAML.
 """
-
 # pylint: disable=broad-except
-
 import sys
 
 import yaml
@@ -60,7 +58,7 @@ def dump_params(files):
         try:
             loader.load(f, launch_config, verbose=False)
         except Exception as e:
-            sys.stderr.write("Unable to load file %s: %s" % (f, e))
+            sys.stderr.write('Unable to load file %s: %s' % (f, e))
             return False
 
     # Now print params in YAML format.

@@ -34,23 +34,30 @@
 """
 Roslaunch XML file parser.
 """
-
 # pylint: disable=logging-not-lazy,raise-missing-from,unnecessary-pass
 # pylint: disable=line-too-long
-
 import itertools
 import logging
 import sys
 import traceback
 from xml.dom import Node as DomNode  # Avoid aliasing.
-from xml.dom.minidom import parse, parseString
+from xml.dom.minidom import parse
+from xml.dom.minidom import parseString
 
-from rosgraph.names import make_global_ns, ns_join, is_private, is_legal_name, get_ros_namespace
+from rosgraph.names import get_ros_namespace
+from rosgraph.names import is_legal_name
+from rosgraph.names import is_private
+from rosgraph.names import make_global_ns
+from rosgraph.names import ns_join
 from rospkg import ResourceNotFound
 
 from third_party.legacy_roslaunch import loader
 from third_party.legacy_roslaunch import substitution_args
-from third_party.legacy_roslaunch.core import Param, Node, Test, Machine, RLException
+from third_party.legacy_roslaunch.core import Machine
+from third_party.legacy_roslaunch.core import Node
+from third_party.legacy_roslaunch.core import Param
+from third_party.legacy_roslaunch.core import RLException
+from third_party.legacy_roslaunch.core import Test
 
 # use in our namespace
 SubstitutionException = substitution_args.SubstitutionException
@@ -132,9 +139,9 @@ def _bool_attr(v, default, label):
     elif v.lower() == 'false':
         return False
     elif not v:
-        raise XmlParseException("bool value for %s must be non-empty" % (label))
+        raise XmlParseException('bool value for %s must be non-empty' % (label))
     else:
-        raise XmlParseException("invalid bool value for %s: %s" % (label, v))
+        raise XmlParseException('invalid bool value for %s: %s' % (label, v))
 
 
 def _float_attr(v, default, label):
@@ -153,11 +160,11 @@ def _float_attr(v, default, label):
     if v is None:
         return default
     if not v:
-        raise XmlParseException("bool value for %s must be non-empty" % (label))
+        raise XmlParseException('bool value for %s must be non-empty' % (label))
     try:
         x = float(v)
     except ValueError:
-        raise XmlParseException("invalid float value for %s: %s" % (label, v))
+        raise XmlParseException('invalid float value for %s: %s' % (label, v))
     return x
 
 
@@ -237,7 +244,7 @@ class XmlLoader(loader.Loader):
     def _check_attrs(self, tag, context, ros_config, attrs):
         tag_attrs = tag.attributes.keys()
         for t_a in tag_attrs:
-            if not t_a in attrs and not t_a in ['if', 'unless']:
+            if t_a not in attrs and t_a not in ['if', 'unless']:
                 ros_config.add_config_error(
                     "[%s] unknown <%s> attribute '%s'" %
                     (context.filename, tag.tagName, t_a))
@@ -274,8 +281,8 @@ class XmlLoader(loader.Loader):
                                subst_function=subst_function)
 
         except ValueError as e:
-            raise loader.LoadException("error loading <rosparam> tag: \n\t" +
-                                       str(e) + "\nXML is %s" % tag.toxml())
+            raise loader.LoadException('error loading <rosparam> tag: \n\t' +
+                                       str(e) + '\nXML is %s' % tag.toxml())
 
     PARAM_ATTRS = ('name', 'value', 'type', 'value', 'textfile', 'binfile',
                    'command')
@@ -301,7 +308,7 @@ class XmlLoader(loader.Loader):
                                   ('value', 'textfile', 'binfile', 'command'))
             if len([v for v in vals if v is not None]) != 1:
                 raise XmlParseException(
-                    "<param> tag must have one and only one of value/textfile/binfile."
+                    '<param> tag must have one and only one of value/textfile/binfile.'
                 )
 
             # compute name. if name is a tilde name, it is placed in
@@ -322,11 +329,11 @@ class XmlLoader(loader.Loader):
 
         except KeyError as e:
             raise XmlParseException(
-                "<param> tag is missing required attribute: %s. \n\nParam xml is %s"
+                '<param> tag is missing required attribute: %s. \n\nParam xml is %s'
                 % (e, tag.toxml()))
         except ValueError as e:
             raise XmlParseException(
-                "Invalid <param> tag: %s. \n\nParam xml is %s" %
+                'Invalid <param> tag: %s. \n\nParam xml is %s' %
                 (e, tag.toxml()))
 
     ARG_ATTRS = ('name', 'value', 'default', 'doc')
@@ -344,7 +351,7 @@ class XmlLoader(loader.Loader):
 
             if value is not None and default is not None:
                 raise XmlParseException(
-                    "<arg> tag must have one and only one of value/default.")
+                    '<arg> tag must have one and only one of value/default.')
 
             context.add_arg(name, value=value, default=default, doc=doc)
 
@@ -353,10 +360,10 @@ class XmlLoader(loader.Loader):
                 "arg '%s' is not defined. \n\nArg xml is %s" % (e, tag.toxml()))
         except ResourceNotFound as e:
             raise ResourceNotFound(
-                "The following package was not found in {}: {}".format(
+                'The following package was not found in {}: {}'.format(
                     tag.toxml(), e))
         except Exception as e:
-            raise XmlParseException("Invalid <arg> tag: %s. \n\nArg xml is %s" %
+            raise XmlParseException('Invalid <arg> tag: %s. \n\nArg xml is %s' %
                                     (e, tag.toxml()))
 
     def _test_attrs(self, tag, context):
@@ -539,14 +546,14 @@ class XmlLoader(loader.Loader):
                             filename=context.filename)
         except KeyError as e:
             raise XmlParseException(
-                "<%s> tag is missing required attribute: %s. Node xml is %s" %
+                '<%s> tag is missing required attribute: %s. Node xml is %s' %
                 (tag.tagName, e, tag.toxml()))
         except XmlParseException as e:
             raise XmlParseException(
-                "Invalid <node> tag: %s. \n\nNode xml is %s" % (e, tag.toxml()))
+                'Invalid <node> tag: %s. \n\nNode xml is %s' % (e, tag.toxml()))
         except ValueError as e:
             raise XmlParseException(
-                "Invalid <node> tag: %s. \n\nNode xml is %s" % (e, tag.toxml()))
+                'Invalid <node> tag: %s. \n\nNode xml is %s' % (e, tag.toxml()))
 
     MACHINE_ATTRS = ('name', 'address', 'env-loader', 'ssh-port', 'user',
                      'password', 'default', 'timeout')
@@ -563,7 +570,7 @@ class XmlLoader(loader.Loader):
                 ('ros-root', 'ros-package-path', 'ros-ip', 'ros-hostname'))
             if any(attrs):
                 raise XmlParseException(
-                    "<machine>: ros-* attributes are not supported since ROS Fuerte.\nPlease use env-loader instead"
+                    '<machine>: ros-* attributes are not supported since ROS Fuerte.\nPlease use env-loader instead'
                 )
 
             self._check_attrs(tag, context, ros_config, XmlLoader.MACHINE_ATTRS)
@@ -583,7 +590,7 @@ class XmlLoader(loader.Loader):
             try:
                 assignable = _assignable[default]
                 is_default = _is_default[default]
-            except KeyError as e:
+            except KeyError:
                 raise XmlParseException("Invalid value for 'attribute': %s" %
                                         default)
 
@@ -594,7 +601,7 @@ class XmlLoader(loader.Loader):
             ]:
                 if t.tagName == 'env':
                     raise XmlParseException(
-                        "<machine>: <env> tag is not supported since ROS Fuerte.\nPlease use env-loader instead"
+                        '<machine>: <env> tag is not supported since ROS Fuerte.\nPlease use env-loader instead'
                     )
                 else:
                     ros_config.add_config_error(
@@ -623,12 +630,12 @@ class XmlLoader(loader.Loader):
             return (m, is_default)
         except KeyError as e:
             raise XmlParseException(
-                "<machine> tag is missing required attribute: %s" % e)
+                '<machine> tag is missing required attribute: %s' % e)
         except SubstitutionException as e:
-            raise XmlParseException("%s. \n\nMachine xml is %s" %
+            raise XmlParseException('%s. \n\nMachine xml is %s' %
                                     (e, tag.toxml()))
         except RLException as e:
-            raise XmlParseException("%s. \n\nMachine xml is %s" %
+            raise XmlParseException('%s. \n\nMachine xml is %s' %
                                     (e, tag.toxml()))
 
     REMAP_ATTRS = ('from', 'to')
@@ -640,7 +647,7 @@ class XmlLoader(loader.Loader):
             return self.reqd_attrs(tag, context, XmlLoader.REMAP_ATTRS)
         except KeyError:
             raise XmlParseException(
-                "<remap> tag is missing required from/to attributes: %s" %
+                '<remap> tag is missing required from/to attributes: %s' %
                 tag.toxml())
 
     ENV_ATTRS = ('name', 'value')
@@ -652,11 +659,11 @@ class XmlLoader(loader.Loader):
             self.load_env(context, ros_config,
                           *self.reqd_attrs(tag, context, XmlLoader.ENV_ATTRS))
         except ValueError as e:
-            raise XmlParseException("Invalid <env> tag: %s. \nXML is %s" %
+            raise XmlParseException('Invalid <env> tag: %s. \nXML is %s' %
                                     (str(e), tag.toxml()))
-        except KeyError as e:
+        except KeyError:
             raise XmlParseException(
-                "<env> tag is missing required name/value attributes: %s" %
+                '<env> tag is missing required name/value attributes: %s' %
                 tag.toxml())
 
     def _ns_clear_params_attr(self,
@@ -719,10 +726,10 @@ class XmlLoader(loader.Loader):
         deprecated = tag.getAttribute('deprecated')
         if deprecated:
             if filename:
-                ros_config.add_config_error("[%s] DEPRECATED: %s" %
+                ros_config.add_config_error('[%s] DEPRECATED: %s' %
                                             (filename, deprecated))
             else:
-                ros_config.add_config_error("Deprecation Warning: " +
+                ros_config.add_config_error('Deprecation Warning: ' +
                                             deprecated)
 
     INCLUDE_ATTRS = ('file', NS, CLEAR_PARAMS, 'pass_all_args')
@@ -790,10 +797,10 @@ class XmlLoader(loader.Loader):
                     "included file [%s] requires the '%s' arg to be set" %
                     (inc_filename, str(e)))
         except XmlParseException as e:
-            raise XmlParseException("while processing %s:\n%s" %
+            raise XmlParseException('while processing %s:\n%s' %
                                     (inc_filename, str(e)))
         if verbose:
-            print("... done importing include file [%s]" % inc_filename)
+            print('... done importing include file [%s]' % inc_filename)
         return default_machine
 
     GROUP_ATTRS = (NS, CLEAR_PARAMS)
@@ -849,7 +856,7 @@ class XmlLoader(loader.Loader):
                         context.add_remap(r)
                 except RLException as e:
                     raise XmlParseException(
-                        "Invalid <remap> tag: %s.\nXML is %s" %
+                        'Invalid <remap> tag: %s.\nXML is %s' %
                         (str(e), tag.toxml()))
             elif name == 'machine':
                 val = self._machine_tag(tag, context, ros_config)
@@ -870,7 +877,7 @@ class XmlLoader(loader.Loader):
             elif name == 'env':
                 self._env_tag(tag, context, ros_config)
             else:
-                ros_config.add_config_error("unrecognized tag " + tag.tagName)
+                ros_config.add_config_error('unrecognized tag ' + tag.tagName)
         return default_machine
 
     def _load_launch(self,
@@ -904,20 +911,20 @@ class XmlLoader(loader.Loader):
         loader.load_sysargs_into_context(self.root_context, argv)
 
         if len(launch.getElementsByTagName('master')) > 0:
-            print("WARNING: ignoring defunct <master /> tag", file=sys.stderr)
+            print('WARNING: ignoring defunct <master /> tag', file=sys.stderr)
         self._recurse_load(ros_config, launch.childNodes, self.root_context,
                            None, is_core, verbose)
 
     def _parse_launch(self, filename, verbose):
         try:
             if verbose:
-                print("... loading XML file [%s]" % filename)
+                print('... loading XML file [%s]' % filename)
             root = parse(filename).getElementsByTagName('launch')
         except Exception as e:
-            raise XmlParseException("Invalid roslaunch XML syntax: %s" % e)
+            raise XmlParseException('Invalid roslaunch XML syntax: %s' % e)
         if len(root) != 1:
             raise XmlParseException(
-                "Invalid roslaunch XML syntax: no root <launch> tag")
+                'Invalid roslaunch XML syntax: no root <launch> tag')
         return root[0]
 
     def load(self, filename, ros_config, core=False, argv=None, verbose=True):
@@ -960,7 +967,7 @@ class XmlLoader(loader.Loader):
         """
         try:
             if verbose:
-                print("... loading XML")
+                print('... loading XML')
             try:
                 if hasattr(xml_text, 'encode') and isinstance(
                         xml_text, unicode):
@@ -973,13 +980,13 @@ class XmlLoader(loader.Loader):
             root = parseString(xml_text).getElementsByTagName('launch')
         except Exception as e:
             logging.getLogger('roslaunch').error(
-                "Invalid roslaunch XML syntax:\nstring[%s]\ntraceback[%s]" %
+                'Invalid roslaunch XML syntax:\nstring[%s]\ntraceback[%s]' %
                 (xml_text, traceback.format_exc()))
-            raise XmlParseException("Invalid roslaunch XML syntax: %s" % e)
+            raise XmlParseException('Invalid roslaunch XML syntax: %s' % e)
 
         if len(root) != 1:
             raise XmlParseException(
-                "Invalid roslaunch XML syntax: no root <launch> tag")
+                'Invalid roslaunch XML syntax: no root <launch> tag')
         self._load_launch(root[0],
                           ros_config,
                           core,

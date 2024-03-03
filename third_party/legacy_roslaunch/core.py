@@ -32,10 +32,8 @@
 """
 Core roslaunch model and lower-level utility routines.
 """
-
 # pylint: disable=invalid-name,unnecessary-pass,global-statement,bare-except,raise-missing-from,logging-not-lazy,dangerous-default-value,len-as-condition,singleton-comparison,useless-super-delegation
 # pylint: disable=line-too-long
-
 import getpass
 import logging
 import os
@@ -44,12 +42,12 @@ import socket
 import sys
 import uuid
 from xml.sax.saxutils import escape
-from xmlrpc.client import MultiCall, ServerProxy
+from xmlrpc.client import MultiCall
+from xmlrpc.client import ServerProxy
 
-import rospkg
-import rosgraph
 import rosgraph.names
 import rosgraph.network
+import rospkg
 
 basestring = unicode = str
 
@@ -99,7 +97,7 @@ def is_machine_local(machine):
             if isinstance(host[4][0], str)
         ]
     except socket.gaierror:
-        raise RLException("cannot resolve host address for machine [%s]" %
+        raise RLException('cannot resolve host address for machine [%s]' %
                           machine.address)
     local_addresses = ['localhost'] + rosgraph.network.get_local_addresses()
     # check 127/8 and local addresses
@@ -245,7 +243,7 @@ def rle_wrapper(fn):
             return fn(*args)
         except Exception as e:
             # we specifically catch RLExceptions and print their messages differently
-            raise RLException("ERROR: %s" % e)
+            raise RLException('ERROR: %s' % e)
 
     return wrapped_fn
 
@@ -337,7 +335,7 @@ class Master(object):
                                                     self.uri)
                 code, _, _ = self.get().getPid('/roslaunch')
                 if code != 1:
-                    raise RLException("ERROR: master failed status check")
+                    raise RLException('ERROR: master failed status check')
                 logging.getLogger('roslaunch.core').debug(
                     'master.is_running[%s]: True' % self.uri)
                 return True
@@ -393,7 +391,7 @@ class Machine(object):
         self.timeout = timeout or _DEFAULT_REGISTER_TIMEOUT
 
     def __str__(self):
-        return "Machine(name[%s] env_loader[%s] address[%s] ssh_port[%s] user[%s] assignable[%s] timeout[%s])" % (
+        return 'Machine(name[%s] env_loader[%s] address[%s] ssh_port[%s] user[%s] assignable[%s] timeout[%s])' % (
             self.name, self.env_loader, self.address, self.ssh_port, self.user,
             self.assignable, self.timeout)
 
@@ -412,7 +410,7 @@ class Machine(object):
 
         :returns:: configuration key, ``str``
         """
-        return "Machine(address[%s] env_loader[%s] ssh_port[%s] user[%s] password[%s] timeout[%s])" % (
+        return 'Machine(address[%s] env_loader[%s] ssh_port[%s] user[%s] password[%s] timeout[%s])' % (
             self.address, self.env_loader, self.ssh_port, self.user or
             '', self.password or '', self.timeout)
 
@@ -448,10 +446,10 @@ class Param(object):
         return not self.__eq__(p)
 
     def __str__(self):
-        return "%s=%s" % (self.key, self.value)
+        return '%s=%s' % (self.key, self.value)
 
     def __repr__(self):
-        return "%s=%s" % (self.key, self.value)
+        return '%s=%s' % (self.key, self.value)
 
 
 _local_m = None
@@ -513,7 +511,7 @@ class Node(object):
         self.type = node_type
         self.name = name or None
         self.namespace = rosgraph.names.make_global_ns(namespace or '/')
-        self.namespace = re.sub("//+", "/", self.namespace)
+        self.namespace = re.sub('//+', '/', self.namespace)
         self.machine_name = machine_name or None
         self.respawn = respawn
         self.respawn_delay = respawn_delay
@@ -526,14 +524,14 @@ class Node(object):
         self.filename = filename
 
         if self.respawn and self.required:
-            raise ValueError("respawn and required cannot both be set to true")
+            raise ValueError('respawn and required cannot both be set to true')
 
         # validation
         if self.name and rosgraph.names.SEP in self.name:  # #1821, namespaces in nodes need to be banned
-            raise ValueError("node name cannot contain a namespace")
+            raise ValueError('node name cannot contain a namespace')
         if not len(self.type.strip()):
-            raise ValueError("type must be non-empty")
-        if not self.output in ['log', 'screen', None]:
+            raise ValueError('type must be non-empty')
+        if self.output not in ['log', 'screen', None]:
             raise ValueError("output must be one of 'log', 'screen'")
 
         # Extra slots for assigning later
@@ -588,7 +586,7 @@ class Node(object):
         xmlstr += ''.join([
             '  <env name="%s" value="%s" />\n' % tuple(e) for e in self.env_args
         ])
-        xmlstr += "</%s>" % t
+        xmlstr += '</%s>' % t
         return xmlstr
 
     def to_remote_xml(self):
@@ -610,7 +608,7 @@ class Node(object):
         xmlstr += ''.join([
             '  <env name="%s" value="%s" />\n' % tuple(e) for e in self.env_args
         ])
-        xmlstr += "</%s>" % t
+        xmlstr += '</%s>' % t
         return xmlstr
 
 
@@ -643,7 +641,7 @@ class Test(Node):
     def __init__(self, test_name, package, node_type, name=None, \
                  namespace='/', machine_name=None, args='', \
                  remap_args=None, env_args=None, time_limit=None, cwd=None,
-                 launch_prefix=None, retry=None, filename="<unknown>"):
+                 launch_prefix=None, retry=None, filename='<unknown>'):
         """
         Construct a new test node.
         :param test_name: name of test for recording in test results, ``str``
@@ -667,7 +665,7 @@ class Test(Node):
             number_types.append(long)
         except NameError:
             pass
-        if not type(time_limit) in number_types:
+        if type(time_limit) not in number_types:
             raise ValueError("'time-limit' must be a number")
         time_limit = float(time_limit)  #force to floating point
         if time_limit <= 0:
@@ -712,10 +710,10 @@ class Executable(object):
         self.phase = phase
 
     def __repr__(self):
-        return "%s %s" % (self.command, ' '.join(self.args))
+        return '%s %s' % (self.command, ' '.join(self.args))
 
     def __str__(self):
-        return "%s %s" % (self.command, ' '.join(self.args))
+        return '%s %s' % (self.command, ' '.join(self.args))
 
 
 class RosbinExecutable(Executable):
@@ -727,10 +725,10 @@ class RosbinExecutable(Executable):
         super(RosbinExecutable, self).__init__(cmd, args, phase)
 
     def __repr__(self):
-        return "ros/bin/%s %s" % (self.command, ' '.join(self.args))
+        return 'ros/bin/%s %s' % (self.command, ' '.join(self.args))
 
     def __str__(self):
-        return "ros/bin/%s %s" % (self.command, ' '.join(self.args))
+        return 'ros/bin/%s %s' % (self.command, ' '.join(self.args))
 
 
 def generate_run_id():

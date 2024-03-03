@@ -32,7 +32,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
-
 ## Integration test node that subscribes to any topic and verifies
 ## the publishing rate to be within a specified bounds. The following
 ## parameters must be set:
@@ -41,10 +40,8 @@
 ##  * ~/hzerror: errors bound for hz
 ##  * ~/test_duration: time (in secs) to run test
 ##
-
 # pylint: disable=bad-super-call,consider-using-f-string,deprecated-method,attribute-defined-outside-init,unused-argument
 # pylint: disable=line-too-long
-
 import sys
 import threading
 import time
@@ -125,10 +122,10 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
         self._test_hz(hz, hzerror, topic, test_duration, wait_time)
 
     def _test_hz(self, hz, hzerror, topic, test_duration, wait_time):
-        self.assert_(hz >= 0.0, "bad parameter (hz)")
-        self.assert_(hzerror >= 0.0, "bad parameter (hzerror)")
-        self.assert_(test_duration > 0.0, "bad parameter (test_duration)")
-        self.assert_(len(topic), "bad parameter (topic)")
+        self.assert_(hz >= 0.0, 'bad parameter (hz)')
+        self.assert_(hzerror >= 0.0, 'bad parameter (hzerror)')
+        self.assert_(test_duration > 0.0, 'bad parameter (test_duration)')
+        self.assert_(len(topic), 'bad parameter (topic)')
 
         if hz == 0:
             self.min_rate = 0.0
@@ -146,9 +143,9 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
 
         # Start actual test
         sub = rospy.Subscriber(topic, rospy.AnyMsg, self.callback)
-        self.assert_(not self.errors, "bad initialization state (errors)")
+        self.assert_(not self.errors, 'bad initialization state (errors)')
 
-        print("Waiting for messages")
+        print('Waiting for messages')
         # we have to wait until the first message is received before measuring the rate
         # as time can advance too much before publisher is up
 
@@ -157,11 +154,11 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
         while not self.message_received and time.time() < wallclock_timeout_t:
             time.sleep(0.1)
         if hz > 0.:
-            self.assert_(self.message_received, "no messages before timeout")
+            self.assert_(self.message_received, 'no messages before timeout')
         else:
-            self.failIf(self.message_received, "message received")
+            self.failIf(self.message_received, 'message received')
 
-        print("Starting rate measurement")
+        print('Starting rate measurement')
         if self.wall_clock:
             timeout_t = time.time() + test_duration
             while time.time() < timeout_t:
@@ -170,12 +167,12 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
             timeout_t = rospy.get_time() + test_duration
             while rospy.get_time() < timeout_t:
                 rospy.sleep(0.1)
-        print("Done waiting, validating results")
+        print('Done waiting, validating results')
         sub.unregister()
 
         # Check that we got at least one message
         if hz > 0:
-            self.assert_(self.msg_count > 0, "no messages received")
+            self.assert_(self.msg_count > 0, 'no messages received')
         else:
             self.assertEquals(0, self.msg_count)
         # Check whether inter-message intervals were violated (if we were
@@ -185,18 +182,18 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
         # If we have a non-zero rate target, make sure that we hit it on
         # average
         if hz > 0.0:
-            self.assert_(self.msg_t0 >= 0.0, "no first message received")
-            self.assert_(self.msg_tn >= 0.0, "no last message received")
+            self.assert_(self.msg_t0 >= 0.0, 'no first message received')
+            self.assert_(self.msg_tn >= 0.0, 'no last message received')
             dt = self.msg_tn - self.msg_t0
-            self.assert_(dt > 0.0, "only one message received")
+            self.assert_(dt > 0.0, 'only one message received')
             rate = (self.msg_count - 1) / dt
             self.assert_(
                 rate >= self.min_rate,
-                "average rate (%.3fHz) exceeded minimum (%.3fHz)" %
+                'average rate (%.3fHz) exceeded minimum (%.3fHz)' %
                 (rate, self.min_rate))
             self.assert_(
                 rate <= self.max_rate,
-                "average rate (%.3fHz) exceeded maximum (%.3fHz)" %
+                'average rate (%.3fHz) exceeded maximum (%.3fHz)' %
                 (rate, self.max_rate))
 
     def callback(self, msg):
@@ -229,10 +226,10 @@ Test Duration: %s""" % (hz, hzerror, topic, test_duration))
             if self.check_intervals and last > 0:
                 interval = curr - last
                 if interval < self.min_interval:
-                    print("CURR", str(curr), file=sys.stderr)
-                    print("LAST", str(last), file=sys.stderr)
-                    print("msg_count", str(self.msg_count), file=sys.stderr)
-                    print("msg_tn", str(self.msg_tn), file=sys.stderr)
+                    print('CURR', str(curr), file=sys.stderr)
+                    print('LAST', str(last), file=sys.stderr)
+                    print('msg_count', str(self.msg_count), file=sys.stderr)
+                    print('msg_tn', str(self.msg_tn), file=sys.stderr)
                     self.errors.append(
                         'min_interval exceeded: %s [actual] vs. %s [min]'%\
                         (interval, self.min_interval))
@@ -255,4 +252,4 @@ if __name__ == '__main__':
         rostest.run('rostest', NAME, HzTest, sys.argv)
     except KeyboardInterrupt:
         pass
-    print("exiting")
+    print('exiting')

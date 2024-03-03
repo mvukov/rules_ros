@@ -33,21 +33,20 @@
 Utility module of roslaunch that extracts dependency information from
 roslaunch files, including calculating missing package dependencies.
 """
-
 # pylint: disable=unnecessary-pass,singleton-comparison,redefined-builtin,raise-missing-from,len-as-condition,dangerous-default-value
 # pylint: disable=line-too-long
-
 import os
 import sys
-from xml.dom.minidom import parse
 from xml.dom import Node as DomNode
+from xml.dom.minidom import parse
 
 import rospkg
 
-from third_party.legacy_roslaunch.loader import convert_value, load_mappings
+from third_party.legacy_roslaunch.loader import convert_value
+from third_party.legacy_roslaunch.loader import load_mappings
 from third_party.legacy_roslaunch.substitution_args import resolve_args
 
-NAME = "roslaunch-deps"
+NAME = 'roslaunch-deps'
 
 
 class RoslaunchDepsException(Exception):
@@ -81,11 +80,11 @@ class RoslaunchDeps(object):
                set(self.pkgs) == set(other.pkgs)
 
     def __repr__(self):
-        return "nodes: %s\nincludes: %s\npkgs: %s" % (str(
+        return 'nodes: %s\nincludes: %s\npkgs: %s' % (str(
             self.nodes), str(self.includes), str(self.pkgs))
 
     def __str__(self):
-        return "nodes: %s\nincludes: %s\npkgs: %s" % (str(
+        return 'nodes: %s\nincludes: %s\npkgs: %s' % (str(
             self.nodes), str(self.includes), str(self.pkgs))
 
 
@@ -98,7 +97,7 @@ def _get_arg_value(tag, context):
     elif 'default' in tag.attributes.keys():
         return resolve_args(tag.attributes['default'].value, context)
     else:
-        raise RoslaunchDepsException("No value for arg [%s]" % (name))
+        raise RoslaunchDepsException('No value for arg [%s]' % (name))
 
 
 def _check_ifunless(tag, context):
@@ -152,25 +151,25 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
                                                context)
             except KeyError as e:
                 raise RoslaunchDepsException(
-                    "Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"
+                    'Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s'
                     % (tag.tagName, str(e), tag.toxml()))
 
             # Check if an empty file is included, and skip if so.
             # This will allow a default-empty <include> inside a conditional to pass
             if sub_launch_file == '':
                 if verbose:
-                    print("Empty <include> in %s. Skipping <include> of %s" %
+                    print('Empty <include> in %s. Skipping <include> of %s' %
                           (launch_file, tag.attributes['file'].value))
                 continue
 
             if verbose:
-                print("processing included launch %s" % sub_launch_file)
+                print('processing included launch %s' % sub_launch_file)
 
             # determine package dependency for included file
             sub_pkg = rospkg.get_package_name(
                 os.path.dirname(os.path.abspath(sub_launch_file)))
             if sub_pkg is None:
-                print("ERROR: cannot determine package for [%s]" %
+                print('ERROR: cannot determine package for [%s]' %
                       sub_launch_file,
                       file=sys.stderr)
 
@@ -184,7 +183,7 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
             try:
                 dom = parse(sub_launch_file).getElementsByTagName('launch')
                 if not len(dom):
-                    print("ERROR: %s is not a valid roslaunch file" %
+                    print('ERROR: %s is not a valid roslaunch file' %
                           sub_launch_file,
                           file=sys.stderr)
                 else:
@@ -192,15 +191,15 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
                     sub_context = _parse_subcontext(tag.childNodes, context)
                     try:
                         if tag.attributes['pass_all_args']:
-                            sub_context["arg"] = context["arg"]
-                            sub_context["arg"].update(
+                            sub_context['arg'] = context['arg']
+                            sub_context['arg'].update(
                                 _parse_subcontext(tag.childNodes,
-                                                  context)["arg"])
-                    except KeyError as e:
+                                                  context)['arg'])
+                    except KeyError:
                         pass
                     _parse_launch(launch_tag.childNodes, sub_launch_file,
                                   file_deps, verbose, sub_context)
-            except IOError as e:
+            except IOError:
                 raise RoslaunchDepsException(
                     "Cannot load roslaunch include '%s' in '%s'" %
                     (sub_launch_file, launch_file))
@@ -213,7 +212,7 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
                 ]
             except KeyError as e:
                 raise RoslaunchDepsException(
-                    "Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s"
+                    'Cannot load roslaunch <%s> tag: missing required attribute %s.\nXML is %s'
                     % (tag.tagName, str(e), tag.toxml()))
             if (pkg, type) not in file_deps[launch_file].nodes:
                 file_deps[launch_file].nodes.append((pkg, type))
@@ -225,14 +224,14 @@ def _parse_launch(tags, launch_file, file_deps, verbose, context):
 
 def parse_launch(launch_file, file_deps, verbose):
     if verbose:
-        print("processing launch %s" % launch_file)
+        print('processing launch %s' % launch_file)
 
     try:
         dom = parse(launch_file).getElementsByTagName('launch')
     except:
-        raise RoslaunchDepsException("invalid XML in %s" % (launch_file))
+        raise RoslaunchDepsException('invalid XML in %s' % (launch_file))
     if not len(dom):
-        raise RoslaunchDepsException("invalid XML in %s" % (launch_file))
+        raise RoslaunchDepsException('invalid XML in %s' % (launch_file))
 
     file_deps[launch_file] = RoslaunchDeps()
     launch_tag = dom[0]

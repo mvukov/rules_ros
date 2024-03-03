@@ -31,7 +31,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id: rosservice.py 3813 2009-02-11 21:16:34Z sfkwc $
-
 """
 Command-line utility for querying ROS services, along with library
 calls for similar functionality. The main benefit of the rosservice
@@ -41,9 +40,7 @@ introspecting information about services, as well as using this
 introspection to dynamically call services.
 """
 
-from __future__ import print_function
-
-NAME='rosservice'
+NAME = 'rosservice'
 
 import os
 import sys
@@ -65,16 +62,20 @@ import rosgraph.network
 
 from optparse import OptionParser
 
+
 class ROSServiceException(Exception):
     """Base class for rosservice-related exceptions"""
     pass
+
 
 class ROSServiceIOException(ROSServiceException):
     """rosservice related to network I/O failure"""
     pass
 
+
 def _get_master():
     return rosgraph.Master('/rosservice')
+
 
 def _succeed(args):
     """
@@ -87,8 +88,9 @@ def _succeed(args):
     """
     code, msg, val = args
     if code != 1:
-        raise ROSServiceException("remote call failed: %s"%msg)
+        raise ROSServiceException('remote call failed: %s' % msg)
     return val
+
 
 def get_service_headers(service_name, service_uri):
     """
@@ -107,7 +109,8 @@ def get_service_headers(service_name, service_uri):
     try:
         dest_addr, dest_port = rospy.parse_rosrpc_uri(service_uri)
     except:
-        raise ROSServiceException("service [%s] has an invalid RPC URI [%s]"%(service_name, service_uri))
+        raise ROSServiceException('service [%s] has an invalid RPC URI [%s]' %
+                                  (service_name, service_uri))
     if rosgraph.network.use_ipv6():
         s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     else:
@@ -117,15 +120,23 @@ def get_service_headers(service_name, service_uri):
             # connect to service and probe it to get the headers
             s.settimeout(5.0)
             s.connect((dest_addr, dest_port))
-            header = { 'probe':'1', 'md5sum':'*',
-                       'callerid':'/rosservice', 'service':service_name}
+            header = {
+                'probe': '1',
+                'md5sum': '*',
+                'callerid': '/rosservice',
+                'service': service_name
+            }
             rosgraph.network.write_ros_handshake_header(s, header)
-            return rosgraph.network.read_ros_handshake_header(s, BufferType(), 2048)
+            return rosgraph.network.read_ros_handshake_header(
+                s, BufferType(), 2048)
         except socket.error:
-            raise ROSServiceIOException("Unable to communicate with service [%s], address [%s]"%(service_name, service_uri))
+            raise ROSServiceIOException(
+                'Unable to communicate with service [%s], address [%s]' %
+                (service_name, service_uri))
     finally:
         if s is not None:
             s.close()
+
 
 def get_service_type(service_name):
     """
@@ -139,13 +150,16 @@ def get_service_type(service_name):
     try:
         service_uri = master.lookupService(service_name)
     except socket.error:
-        raise ROSServiceIOException("Unable to communicate with master!")
+        raise ROSServiceIOException('Unable to communicate with master!')
     except rosgraph.MasterError:
         return None
     try:
         return get_service_headers(service_name, service_uri).get('type', None)
     except socket.error:
-        raise ROSServiceIOException("Unable to communicate with service [%s]! Service address is [%s]"%(service_name, service_uri))
+        raise ROSServiceIOException(
+            'Unable to communicate with service [%s]! Service address is [%s]' %
+            (service_name, service_uri))
+
 
 def _rosservice_type(service_name):
     """
@@ -156,10 +170,11 @@ def _rosservice_type(service_name):
     """
     service_type = get_service_type(service_name)
     if service_type is None:
-        print("Unknown service [%s]"%service_name, file=sys.stderr)
+        print('Unknown service [%s]' % service_name, file=sys.stderr)
         sys.exit(1)
     else:
         print(service_type)
+
 
 def get_service_uri(service_name):
     """
@@ -175,7 +190,8 @@ def get_service_uri(service_name):
         except rosgraph.MasterException:
             return None
     except socket.error:
-        raise ROSServiceIOException("Unable to communicate with master!")
+        raise ROSServiceIOException('Unable to communicate with master!')
+
 
 def _rosservice_uri(service_name):
     """
@@ -189,8 +205,9 @@ def _rosservice_uri(service_name):
     if uri:
         print(uri)
     else:
-        print("Unknown service: %s"%service_name, file=sys.stderr)
+        print('Unknown service: %s' % service_name, file=sys.stderr)
         sys.exit(1)
+
 
 def get_service_node(service_name):
     """
@@ -204,6 +221,7 @@ def get_service_node(service_name):
             return s[0][1][0]
     return None
 
+
 def _rosservice_node(service_name):
     """
     Implements rosservice node command. Will cause system exit with error if service is unknown.
@@ -216,8 +234,9 @@ def _rosservice_node(service_name):
     if n:
         print(n)
     else:
-        print("Unknown service: %s"%service_name, file=sys.stderr)
+        print('Unknown service: %s' % service_name, file=sys.stderr)
         sys.exit(1)
+
 
 def get_service_list(node=None, namespace=None, include_nodes=False):
     """
@@ -241,20 +260,25 @@ def get_service_list(node=None, namespace=None, include_nodes=False):
         # filter srvs to namespace
         if namespace:
             g_ns = rosgraph.names.make_global_ns(namespace)
-            srvs = [x for x in srvs if x[0] == namespace or x[0].startswith(g_ns)]
+            srvs = [
+                x for x in srvs if x[0] == namespace or x[0].startswith(g_ns)
+            ]
 
         if include_nodes:
             if node is None:
                 return srvs
             else:
-                return [(s, nodelist) for s, nodelist in srvs if node in nodelist]
+                return [
+                    (s, nodelist) for s, nodelist in srvs if node in nodelist
+                ]
         else:
             if node is None:
-                return [s for s,_ in srvs]
+                return [s for s, _ in srvs]
             else:
-                return [s for s,nodelist in srvs if node in nodelist]
+                return [s for s, nodelist in srvs if node in nodelist]
     except socket.error:
-        raise ROSServiceIOException("Unable to communicate with master!")
+        raise ROSServiceIOException('Unable to communicate with master!')
+
 
 def _rosservice_list(namespace=None, print_nodes=False):
     """
@@ -275,9 +299,10 @@ def _rosservice_list(namespace=None, print_nodes=False):
         srvs.sort()
     for s in srvs:
         if print_nodes:
-            print(s[0]+' '+','.join(s[1]))
+            print(s[0] + ' ' + ','.join(s[1]))
         else:
             print(s)
+
 
 def _rosservice_info(service_name):
     """
@@ -289,24 +314,25 @@ def _rosservice_info(service_name):
     """
     n = get_service_node(service_name)
     if not n:
-        print("ERROR: unknown service", file=sys.stderr)
+        print('ERROR: unknown service', file=sys.stderr)
         sys.exit(1)
-    print("Node: %s"%n)
+    print('Node: %s' % n)
     uri = get_service_uri(service_name)
     if not uri:
-        print("ERROR: service is no longer available", file=sys.stderr)
+        print('ERROR: service is no longer available', file=sys.stderr)
         return
-    print("URI: %s"%uri)
+    print('URI: %s' % uri)
     t = get_service_type(service_name)
     if not t:
-        print("ERROR: service is no longer available", file=sys.stderr)
+        print('ERROR: service is no longer available', file=sys.stderr)
         return
-    print("Type: %s"%t)
+    print('Type: %s' % t)
     args = get_service_args(service_name)
     if args is None:
-        print("ERROR: service is no longer available", file=sys.stderr)
+        print('ERROR: service is no longer available', file=sys.stderr)
         return
-    print("Args: %s"%args)
+    print('Args: %s' % args)
+
 
 def rosservice_find(service_type):
     """
@@ -328,8 +354,9 @@ def rosservice_find(service_type):
             if t == service_type:
                 matches.append(s)
     except socket.error:
-        raise ROSServiceIOException("Unable to communicate with master!")
+        raise ROSServiceIOException('Unable to communicate with master!')
     return matches
+
 
 def _rosservice_cmd_find(argv=sys.argv):
     """
@@ -339,13 +366,14 @@ def _rosservice_cmd_find(argv=sys.argv):
     @type  argv: [str]
     """
     args = argv[2:]
-    parser = OptionParser(usage="usage: %prog find msg-type", prog=NAME)
+    parser = OptionParser(usage='usage: %prog find msg-type', prog=NAME)
     options, args = parser.parse_args(args)
     if not len(args):
-        parser.error("please specify a message type")
+        parser.error('please specify a message type')
     if len(args) > 1:
-        parser.error("you may only specify one message type")
+        parser.error('you may only specify one message type')
     print('\n'.join(rosservice_find(args[0])))
+
 
 def _resource_name_package(name):
     """
@@ -354,9 +382,10 @@ def _resource_name_package(name):
     :param name: package resource name, e.g. 'std_msgs/String', ``str``
     :returns: package name of resource, ``str``
     """
-    if not '/' in name:
+    if '/' not in name:
         return None
     return name[:name.find('/')]
+
 
 def get_service_class_by_name(service_name):
     """
@@ -374,24 +403,27 @@ def get_service_class_by_name(service_name):
         # diagnose error
         srvs = get_service_list()
         if service_name not in srvs:
-            raise ROSServiceException("Service [%s] is not available."%service_name)
+            raise ROSServiceException('Service [%s] is not available.' %
+                                      service_name)
         else:
-            raise ROSServiceException("Unable to determine type of service [%s]."%service_name)
+            raise ROSServiceException(
+                'Unable to determine type of service [%s].' % service_name)
 
     # get the Service class so we can populate the request
     service_class = roslib.message.get_service_class(service_type)
 
     # #1083: roscpp services are currently returning the wrong type
     if service_class and service_type.endswith('Request') and \
-            not hasattr(service_class, "_request_class"):
+            not hasattr(service_class, '_request_class'):
         service_type = service_type[:-7]
         service_class = roslib.message.get_service_class(service_type)
 
     if service_class is None:
         pkg = _resource_name_package(service_type)
-        raise ROSServiceException("Unable to load type [%s].\n"%service_type+
-                                  "Have you typed 'make' in [%s]?"%pkg)
+        raise ROSServiceException('Unable to load type [%s].\n' % service_type +
+                                  "Have you typed 'make' in [%s]?" % pkg)
     return service_class
+
 
 def call_service(service_name, service_args, service_class=None):
     """
@@ -417,28 +449,37 @@ def call_service(service_name, service_args, service_class=None):
     request = service_class._request_class()
     try:
         now = rospy.get_rostime()
-        keys = { 'now': now, 'auto': std_msgs.msg.Header(stamp=now) }
+        keys = {'now': now, 'auto': std_msgs.msg.Header(stamp=now)}
         genpy.message.fill_message_args(request, service_args, keys=keys)
     except genpy.MessageException as e:
+
         def argsummary(args):
             if type(args) in [tuple, list]:
-                return '\n'.join([' * %s (type %s)'%(a, type(a).__name__) for a in args])
+                return '\n'.join(
+                    [' * %s (type %s)' % (a, type(a).__name__) for a in args])
             else:
-                return ' * %s (type %s)'%(args, type(args).__name__)
+                return ' * %s (type %s)' % (args, type(args).__name__)
 
-        raise ROSServiceException("Incompatible arguments to call service:\n%s\nProvided arguments are:\n%s\n\nService arguments are: [%s]"%(e, argsummary(service_args), genpy.message.get_printable_message_args(request)))
+        raise ROSServiceException(
+            'Incompatible arguments to call service:\n%s\nProvided arguments are:\n%s\n\nService arguments are: [%s]'
+            % (e, argsummary(service_args),
+               genpy.message.get_printable_message_args(request)))
     try:
         return request, rospy.ServiceProxy(service_name, service_class)(request)
     except rospy.ServiceException as e:
         raise ROSServiceException(str(e))
     except genpy.SerializationError as e:
-        raise ROSServiceException("Unable to send request. One of the fields has an incorrect type:\n"+\
-                                      "  %s\n"%(e))
+        raise ROSServiceException('Unable to send request. One of the fields has an incorrect type:\n'+\
+                                      '  %s\n'%(e))
     except rospy.ROSSerializationException as e:
-        raise ROSServiceException("Unable to send request. One of the fields has an incorrect type:\n"+\
-                                      "  %s\n"%(e))
+        raise ROSServiceException('Unable to send request. One of the fields has an incorrect type:\n'+\
+                                      '  %s\n'%(e))
 
-def _rosservice_call(service_name, service_args, verbose=False, service_class=None):
+
+def _rosservice_call(service_name,
+                     service_args,
+                     verbose=False,
+                     service_class=None):
     """
     Implements 'rosservice call'
     @param service_name: name of service to call
@@ -453,12 +494,16 @@ def _rosservice_call(service_name, service_args, verbose=False, service_class=No
     @type  service_class: Message class
     @raise ROSServiceException: if call command cannot be executed
     """
-    service_name = rosgraph.names.script_resolve_name('rosservice', service_name)
-    request, response = call_service(service_name, service_args, service_class=service_class)
+    service_name = rosgraph.names.script_resolve_name('rosservice',
+                                                      service_name)
+    request, response = call_service(service_name,
+                                     service_args,
+                                     service_class=service_class)
     if verbose:
         print(str(request))
         print('---')
     print(str(response))
+
 
 def has_service_args(service_name, service_class=None):
     """
@@ -471,10 +516,12 @@ def has_service_args(service_name, service_class=None):
     @return: True if service_name has request arguments
     @rtype: bool
     """
-    service_name = rosgraph.names.script_resolve_name('rosservice', service_name)
+    service_name = rosgraph.names.script_resolve_name('rosservice',
+                                                      service_name)
     if service_class is None:
         service_class = get_service_class_by_name(service_name)
     return len(service_class._request_class.__slots__) > 0
+
 
 def _rosservice_args(service_name):
     """
@@ -485,6 +532,7 @@ def _rosservice_args(service_name):
     """
     print(get_service_args(service_name))
 
+
 def get_service_args(service_name):
     """
     Implements 'get service args'
@@ -492,12 +540,16 @@ def get_service_args(service_name):
     @type  service_name: str
     @raise ROSServiceException: if call command cannot be executed
     """
-    service_name = rosgraph.names.script_resolve_name('rosservice', service_name)
+    service_name = rosgraph.names.script_resolve_name('rosservice',
+                                                      service_name)
     service_class = get_service_class_by_name(service_name)
-    return genpy.message.get_printable_message_args(service_class._request_class)
+    return genpy.message.get_printable_message_args(
+        service_class._request_class)
+
 
 ##########################################################################################
 # COMMAND PROCESSING #####################################################################
+
 
 def _optparse_service_only(cmd, argv=sys.argv):
     """
@@ -510,13 +562,14 @@ def _optparse_service_only(cmd, argv=sys.argv):
     @type  argv: [str]
     """
     args = argv[2:]
-    parser = OptionParser(usage="usage: %%prog %s /service"%cmd, prog=NAME)
+    parser = OptionParser(usage='usage: %%prog %s /service' % cmd, prog=NAME)
     (options, args) = parser.parse_args(args)
     if len(args) == 0:
-        parser.error("service must be specified")
+        parser.error('service must be specified')
     if len(args) > 1:
-        parser.error("you may only specify one input service")
+        parser.error('you may only specify one input service')
     return rosgraph.names.script_resolve_name('rosservice', args[0])
+
 
 def _rosservice_cmd_type(argv):
     """
@@ -528,7 +581,8 @@ def _rosservice_cmd_type(argv):
     """
     _rosservice_type(_optparse_service_only('type', argv=argv))
 
-def _rosservice_cmd_uri(argv, ):
+
+def _rosservice_cmd_uri(argv,):
     """
     Parse 'uri' command arguments and run command.  Will cause a system
     exit if command-line argument parsing fails.
@@ -538,7 +592,8 @@ def _rosservice_cmd_uri(argv, ):
     """
     _rosservice_uri(_optparse_service_only('uri', argv=argv))
 
-def _rosservice_cmd_node(argv, ):
+
+def _rosservice_cmd_node(argv,):
     """
     Parse 'node' command arguments and run command. Will cause a system
     exit if command-line argument parsing fails.
@@ -548,7 +603,8 @@ def _rosservice_cmd_node(argv, ):
     """
     _rosservice_node(_optparse_service_only('node', argv=argv))
 
-def _rosservice_cmd_args(argv, ):
+
+def _rosservice_cmd_args(argv,):
     """
     Parse 'args' command arguments and run command.  Will cause a system
     exit if command-line argument parsing fails.
@@ -557,6 +613,7 @@ def _rosservice_cmd_args(argv, ):
     @raise ROSServiceException: if args command cannot be executed
     """
     _rosservice_args(_optparse_service_only('args', argv=argv))
+
 
 def _rosservice_cmd_call(argv):
     """
@@ -568,21 +625,28 @@ def _rosservice_cmd_call(argv):
     """
     try:
         import yaml
-    except ImportError as e:
-        raise ROSServiceException("Cannot import yaml. Please make sure the pyyaml system dependency is installed")
+    except ImportError:
+        raise ROSServiceException(
+            'Cannot import yaml. Please make sure the pyyaml system dependency is installed'
+        )
 
     args = argv[2:]
-    parser = OptionParser(usage="usage: %prog call /service [args...]", prog=NAME)
-    parser.add_option("-v", dest="verbose", default=False,
-                      action="store_true",
-                      help="print verbose output")
-    parser.add_option("--wait", dest="wait", default=False,
-                      action="store_true",
-                      help="wait for service to be advertised")
+    parser = OptionParser(usage='usage: %prog call /service [args...]',
+                          prog=NAME)
+    parser.add_option('-v',
+                      dest='verbose',
+                      default=False,
+                      action='store_true',
+                      help='print verbose output')
+    parser.add_option('--wait',
+                      dest='wait',
+                      default=False,
+                      action='store_true',
+                      help='wait for service to be advertised')
 
     (options, args) = parser.parse_args(args)
     if len(args) == 0:
-        parser.error("service must be specified")
+        parser.error('service must be specified')
     service_name = args[0]
 
     if options.wait:
@@ -593,7 +657,7 @@ def _rosservice_cmd_call(argv):
         try:
             service_uri = master.getPid()
         except socket.error:
-            raise ROSServiceIOException("Unable to communicate with master!")
+            raise ROSServiceIOException('Unable to communicate with master!')
         rospy.wait_for_service(service_name)
 
     # optimization: in order to prevent multiple probe calls against a service, lookup the service_class
@@ -607,9 +671,10 @@ def _rosservice_cmd_call(argv):
         if arg == '':
             arg = "''"
         service_args.append(yaml.safe_load(arg))
-    if not service_args and has_service_args(service_name, service_class=service_class):
+    if not service_args and has_service_args(service_name,
+                                             service_class=service_class):
         if sys.stdin.isatty():
-            parser.error("Please specify service arguments")
+            parser.error('Please specify service arguments')
         import rostopic
         for service_args in rostopic.stdin_yaml_arg():
             if service_args:
@@ -617,12 +682,19 @@ def _rosservice_cmd_call(argv):
                 if type(service_args) != list:
                     service_args = [service_args]
                 try:
-                    _rosservice_call(service_name, service_args, verbose=options.verbose, service_class=service_class)
+                    _rosservice_call(service_name,
+                                     service_args,
+                                     verbose=options.verbose,
+                                     service_class=service_class)
                 except ValueError as e:
                     print(str(e), file=sys.stderr)
                     break
     else:
-        _rosservice_call(service_name, service_args, verbose=options.verbose, service_class=service_class)
+        _rosservice_call(service_name,
+                         service_args,
+                         verbose=options.verbose,
+                         service_class=service_class)
+
 
 def _stdin_yaml_arg():
     """
@@ -651,7 +723,7 @@ def _stdin_yaml_arg():
             try:
                 loaded = yaml.safe_load(buff.rstrip())
             except Exception as e:
-                print("Invalid YAML: %s"%str(e), file=sys.stderr)
+                print('Invalid YAML: %s' % str(e), file=sys.stderr)
             if loaded is not None:
                 yield loaded
             else:
@@ -661,7 +733,8 @@ def _stdin_yaml_arg():
             # reset arg
             arg = 'x'
     except select.error:
-        return # most likely ctrl-c interrupt
+        return  # most likely ctrl-c interrupt
+
 
 def _rosservice_cmd_list(argv):
     """
@@ -672,18 +745,22 @@ def _rosservice_cmd_list(argv):
     @raise ROSServiceException: if list command cannot be executed
     """
     args = argv[2:]
-    parser = OptionParser(usage="usage: %prog list [/namespace]", prog=NAME)
-    parser.add_option("-n", "--nodes",
-                      dest="print_nodes", default=False, action="store_true",
-                      help="print nodes that provide service(s)")
+    parser = OptionParser(usage='usage: %prog list [/namespace]', prog=NAME)
+    parser.add_option('-n',
+                      '--nodes',
+                      dest='print_nodes',
+                      default=False,
+                      action='store_true',
+                      help='print nodes that provide service(s)')
     (options, args) = parser.parse_args(args)
 
     namespace = None
     if len(args) == 1:
         namespace = rosgraph.names.script_resolve_name('rosservice', args[0])
     elif len(args) > 1:
-        parser.error("you may only specify one input namespace")
+        parser.error('you may only specify one input namespace')
     _rosservice_list(namespace, print_nodes=options.print_nodes)
+
 
 def _rosservice_cmd_info(argv):
     """
@@ -694,17 +771,18 @@ def _rosservice_cmd_info(argv):
     @raise ROSServiceException: if list command cannot be executed
     """
     args = argv[2:]
-    parser = OptionParser(usage="usage: %prog info /service", prog=NAME)
+    parser = OptionParser(usage='usage: %prog info /service', prog=NAME)
     (options, args) = parser.parse_args(args)
 
     name = None
     if len(args) == 1:
         name = rosgraph.names.script_resolve_name('rosservice', args[0])
     elif len(args) > 1:
-        parser.error("you may only specify one service")
+        parser.error('you may only specify one service')
     elif not len(args):
-        parser.error("you must specify a service name")
+        parser.error('you must specify a service name')
     _rosservice_info(name)
+
 
 def _fullusage():
     """Print generic usage for rosservice"""
@@ -720,6 +798,7 @@ def _fullusage():
 Type rosservice <command> -h for more detailed usage, e.g. 'rosservice call -h'
 """)
     sys.exit(getattr(os, 'EX_USAGE', 1))
+
 
 def rosservicemain(argv=sys.argv):
     """
@@ -753,13 +832,14 @@ def rosservicemain(argv=sys.argv):
         else:
             _fullusage()
     except socket.error:
-        print("Network communication failed with the master or a node.", file=sys.stderr)
+        print('Network communication failed with the master or a node.',
+              file=sys.stderr)
         sys.exit(1)
     except ROSServiceException as e:
-        print("ERROR: "+str(e), file=sys.stderr)
+        print('ERROR: ' + str(e), file=sys.stderr)
         sys.exit(2)
     except rosgraph.MasterException as e:
-        print("ERROR: "+str(e), file=sys.stderr)
+        print('ERROR: ' + str(e), file=sys.stderr)
         sys.exit(2)
     except KeyboardInterrupt:
         pass

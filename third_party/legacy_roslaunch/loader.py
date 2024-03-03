@@ -34,10 +34,8 @@
 """
 General routines and representations for loading roslaunch model.
 """
-
 # pylint: disable=broad-except,unnecessary-pass,raise-missing-from,unidiomatic-typecheck,
 # pylint: disable=line-too-long
-
 import errno
 import os
 import shlex
@@ -48,9 +46,17 @@ from copy import deepcopy
 from xmlrpc.client import Binary
 
 import yaml
-from rosgraph.names import make_global_ns, ns_join, PRIV_NAME, load_mappings, is_legal_name, canonicalize_name
+from rosgraph.names import canonicalize_name
+from rosgraph.names import is_legal_name
+from rosgraph.names import load_mappings
+from rosgraph.names import make_global_ns
+from rosgraph.names import ns_join
+from rosgraph.names import PRIV_NAME
 
-from third_party.legacy_roslaunch.core import Param, RosbinExecutable, RLException, PHASE_SETUP
+from third_party.legacy_roslaunch.core import Param
+from third_party.legacy_roslaunch.core import PHASE_SETUP
+from third_party.legacy_roslaunch.core import RLException
+from third_party.legacy_roslaunch.core import RosbinExecutable
 
 
 class LoadException(RLException):
@@ -82,7 +88,7 @@ def convert_value(value, type_):
             # Here, we want to handle literals with underscores as plain strings.
             if '_' not in value:
                 return int(value)
-        except ValueError as e:
+        except ValueError:
             pass
         #bool
         lval = value.lower()
@@ -123,8 +129,8 @@ def process_include_args(context):
     # are cleared when the context was initially created.
     arg_dict = context.include_resolve_dict.get('arg', {})
     for arg in context.arg_names:
-        if not arg in arg_dict:
-            raise LoadException("include args must have declared values")
+        if arg not in arg_dict:
+            raise LoadException('include args must have declared values')
 
     # save args that were passed so we can check for unused args in post-processing
     context.args_passed = list(arg_dict.keys())
@@ -139,7 +145,7 @@ def process_include_args(context):
 def post_process_include_args(context):
     bad = [a for a in context.args_passed if a not in context.arg_names]
     if bad:
-        raise LoadException("unused args [%s] for include of [%s]" %
+        raise LoadException('unused args [%s] for include of [%s]' %
                             (', '.join(bad), context.filename))
 
 
@@ -219,12 +225,12 @@ class LoaderContext(object):
         """
         remap = [canonicalize_name(x) for x in remap]
         if not remap[0] or not remap[1]:
-            raise RLException("remap from/to attributes cannot be empty")
+            raise RLException('remap from/to attributes cannot be empty')
         if not is_legal_name(remap[0]):
-            raise RLException("remap from [%s] is not a valid ROS name" %
+            raise RLException('remap from [%s] is not a valid ROS name' %
                               remap[0])
         if not is_legal_name(remap[1]):
-            raise RLException("remap to [%s] is not a valid ROS name" %
+            raise RLException('remap to [%s] is not a valid ROS name' %
                               remap[1])
 
         matches = [r for r in self._remap_args if r[0] == remap[0]]
@@ -374,7 +380,7 @@ class Loader(object):
 
         # shouldn't ever happen
         if not param_name:
-            raise ValueError("no parameter name specified")
+            raise ValueError('no parameter name specified')
 
         if param_name == '/' and type(param_value) != dict:
             raise ValueError(
@@ -415,11 +421,11 @@ class Loader(object):
         @type  text: str
         @raise ValueError: if parameters cannot be processed into valid rosparam setting
         """
-        if not cmd in ('load', 'dump', 'delete'):
+        if cmd not in ('load', 'dump', 'delete'):
             raise ValueError("command must be 'load', 'dump', or 'delete'")
         if file_ is not None:
             if cmd == 'load' and not os.path.isfile(file_):
-                raise ValueError("file does not exist [%s]" % file_)
+                raise ValueError('file does not exist [%s]' % file_)
             if cmd == 'delete':
                 raise ValueError(
                     "'file' attribute is invalid with 'delete' command.")
@@ -451,17 +457,17 @@ class Loader(object):
             except yaml.MarkedYAMLError as e:
                 if not file_:
                     raise ValueError(
-                        "Error within YAML block:\n\t%s\n\nYAML is:\n%s" %
+                        'Error within YAML block:\n\t%s\n\nYAML is:\n%s' %
                         (str(e), text))
                 else:
-                    raise ValueError("file %s contains invalid YAML:\n%s" %
+                    raise ValueError('file %s contains invalid YAML:\n%s' %
                                      (file_, str(e)))
             except Exception as e:
                 if not file_:
-                    raise ValueError("invalid YAML: %s\n\nYAML is:\n%s" %
+                    raise ValueError('invalid YAML: %s\n\nYAML is:\n%s' %
                                      (str(e), text))
                 else:
-                    raise ValueError("file %s contains invalid YAML:\n%s" %
+                    raise ValueError('file %s contains invalid YAML:\n%s' %
                                      (file_, str(e)))
 
             # 'param' attribute is required for non-dictionary types
@@ -472,7 +478,7 @@ class Loader(object):
             self.add_param(ros_config, full_param, data, verbose=verbose)
 
         else:
-            raise ValueError("unknown command %s" % cmd)
+            raise ValueError('unknown command %s' % cmd)
 
     def load_env(self, context, _ros_config, name, value):
         """
@@ -524,7 +530,7 @@ class Loader(object):
             except NameError:
                 pass
             if verbose:
-                print("... executing command param [%s]" % command)
+                print('... executing command param [%s]' % command)
             try:
                 if os.name != 'nt':
                     command = shlex.split(command)
@@ -568,8 +574,8 @@ class Loader(object):
                                 for f in files_of_same_name:
                                     mode = os.stat(f).st_mode
                                     if (mode & stat.S_IRUSR == stat.S_IRUSR
-                                       ) and (mode & stat.S_IXUSR !=
-                                              stat.S_IXUSR):
+                                       ) and (mode & stat.S_IXUSR
+                                              != stat.S_IXUSR):
                                         # when there is read permission but not execute permission, this is typically a Python script (in ROS)
                                         if os.path.splitext(f)[1].lower() in [
                                                 '.py', ''
@@ -584,17 +590,17 @@ class Loader(object):
                     c_value = c_value.decode('utf-8')
                 if p.returncode != 0:
                     raise ValueError(
-                        "Cannot load command parameter [%s]: command [%s] returned with code [%s]"
+                        'Cannot load command parameter [%s]: command [%s] returned with code [%s]'
                         % (name, command, p.returncode))
             except OSError as e:
                 if e.errno == errno.ENOENT:
                     raise ValueError(
-                        "Cannot load command parameter [%s]: no such command [%s]"
+                        'Cannot load command parameter [%s]: no such command [%s]'
                         % (name, command))
                 raise
             if c_value is None:
                 raise ValueError(
-                    "parameter: unable to get output of command [%s]" % command)
+                    'parameter: unable to get output of command [%s]' % command)
             return convert_value(c_value, ptype)
         else:  #_param_tag prevalidates, so this should not be reachable
-            raise ValueError("unable to determine parameter value")
+            raise ValueError('unable to determine parameter value')

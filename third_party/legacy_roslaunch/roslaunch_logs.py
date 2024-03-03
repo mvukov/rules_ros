@@ -34,15 +34,13 @@
 """
 Implementation for roslaunch-logs command-line utility.
 """
-
 # pylint: disable=bare-except
-
 import os
 import sys
 from optparse import OptionParser
 
-import rospkg
 import rosgraph
+import rospkg
 
 NAME = 'roslaunch-logs'
 
@@ -56,20 +54,20 @@ def get_run_id():
 
 
 def logs_main():
-    parser = OptionParser(usage="usage: %prog", prog=NAME)
+    parser = OptionParser(usage='usage: %prog', prog=NAME)
     _, args = parser.parse_args()
     if args:
-        parser.error("%s takes no arguments" % NAME)
+        parser.error('%s takes no arguments' % NAME)
 
     log_dir = rospkg.get_log_dir()
     if not log_dir:
-        print("Cannot determine ROS log directory", file=sys.stderr)
+        print('Cannot determine ROS log directory', file=sys.stderr)
         sys.exit(1)
 
     run_id = get_run_id()
     if not run_id:
         # go ahead and print the log directory
-        print("No active roscore", file=sys.stderr)
+        print('No active roscore', file=sys.stderr)
         print(log_dir)
         sys.exit(2)
 
