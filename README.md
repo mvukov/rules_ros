@@ -4,12 +4,12 @@ This repo aims to build ROS (1) from scratch.
 
 ## Prerequisites
 
-The code is developed and tested on Ubuntu 22.04 with Python 3.10.
-
 You will need to install Bazel, see [here](https://docs.bazel.build/versions/master/install.html).
 Besides Bazel, you will need a C++ compiler and a Python 3 interpreter.
 
 And no, you don't have to install any ROS packages via `apt`.
+
+The code is developed and tested on Ubuntu 22.04 with Python 3.10.
 
 ## What works?
 
