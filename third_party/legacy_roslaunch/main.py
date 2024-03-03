@@ -33,6 +33,7 @@
 # Revision $Id$
 # pylint: disable=bare-except,broad-except
 # pylint: disable=line-too-long
+# pylint: disable=deprecated-module,consider-using-f-string,unspecified-encoding
 import logging
 import os
 import socket

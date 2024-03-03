@@ -34,6 +34,7 @@
 Dumps parameters from ROSLaunch files to stdout as YAML.
 """
 # pylint: disable=broad-except
+# pylint: disable=consider-using-f-string
 import sys
 
 import yaml

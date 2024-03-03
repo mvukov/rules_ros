@@ -35,6 +35,7 @@ roslaunch files, including calculating missing package dependencies.
 """
 # pylint: disable=unnecessary-pass,singleton-comparison,redefined-builtin,raise-missing-from,len-as-condition,dangerous-default-value
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import os
 import sys
 from xml.dom import Node as DomNode

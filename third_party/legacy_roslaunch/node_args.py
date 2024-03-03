@@ -37,6 +37,7 @@ for a node.
 """
 # pylint: disable=unnecessary-pass,unidiomatic-typecheck,
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string,consider-using-dict-items
 import os
 import shlex
 import sys

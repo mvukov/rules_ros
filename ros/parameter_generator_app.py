@@ -20,5 +20,4 @@ loader.exec_module(module)
 try:
     module.gen.generate(args.ros_package_name, module_name, module_name)
 except AttributeError:
-    sys.exit(
-        'ERROR: {} must have "gen" generator variable!'.format(cfg_basename))
+    sys.exit(f'ERROR: {cfg_basename} must have "gen" generator variable!')

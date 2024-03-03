@@ -36,6 +36,7 @@ General routines and representations for loading roslaunch model.
 """
 # pylint: disable=broad-except,unnecessary-pass,raise-missing-from,unidiomatic-typecheck,
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string,unspecified-encoding
 import errno
 import os
 import shlex

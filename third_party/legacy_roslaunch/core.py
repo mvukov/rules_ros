@@ -34,6 +34,7 @@ Core roslaunch model and lower-level utility routines.
 """
 # pylint: disable=invalid-name,unnecessary-pass,global-statement,bare-except,raise-missing-from,logging-not-lazy,dangerous-default-value,len-as-condition,singleton-comparison,useless-super-delegation
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import getpass
 import logging
 import os

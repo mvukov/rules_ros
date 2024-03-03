@@ -46,6 +46,7 @@ execution as a different user).
 """
 # pylint: disable=bare-except,broad-except,duplicate-except,logging-not-lazy,raise-missing-from
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import errno
 import logging
 import os

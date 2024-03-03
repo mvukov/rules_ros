@@ -45,6 +45,7 @@ on the parent to provide feedback.
 """
 # pylint: disable=bare-except
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import logging
 
 from rosmaster.master_api import NUM_WORKERS

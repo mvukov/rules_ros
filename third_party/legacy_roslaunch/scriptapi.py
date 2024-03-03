@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
+# pylint: disable=consider-using-f-string
 """
 Scripting interface for roslaunch
 """

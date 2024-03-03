@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id: launch.py 2165 2008-09-17 22:38:49Z sfkwc $
+# pylint: disable=consider-using-f-string,unused-argument
 """
 Defines the L{ROSLaunchConfig} object, which holds and the state of
 the roslaunch file.

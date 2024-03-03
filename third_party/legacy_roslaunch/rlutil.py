@@ -36,6 +36,7 @@ This API should not be considered stable.
 """
 # pylint: disable=bare-except,unnecessary-pass,invalid-name,global-statement
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import os
 import platform
 import sys

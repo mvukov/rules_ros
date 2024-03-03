@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
+# pylint: disable=consider-using-f-string
 """
 Utility module of roslaunch that computes the command-line arguments
 for a launch file.

@@ -37,6 +37,7 @@ lower-level libraries.
 """
 # pylint: disable=bare-except,broad-except,unnecessary-pass,logging-not-lazy,raise-missing-from,
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import logging
 import subprocess
 import sys
@@ -555,8 +556,8 @@ class ROSLaunchRunner(object):
             if retcode < 0:
                 raise RLException('command [%s] failed with exit code %s' %
                                   (cmd, retcode))
-        except OSError as e:
-            raise RLException('command [%s] failed: %s' % (cmd, e))
+        except OSError as ex:
+            raise RLException('command [%s] failed: %s' % (cmd, ex))
 
     #TODO: _launch_run_executables, _launch_teardown_executables
     #TODO: define and implement behavior for remote launch

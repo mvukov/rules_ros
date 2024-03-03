@@ -36,6 +36,7 @@ Local process implementation for running and monitoring nodes.
 """
 # pylint: disable=invalid-name,global-statement,logging-not-lazy,raise-missing-from,broad-except,subprocess-popen-preexec-fn,bare-except
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string,unspecified-encoding
 import errno
 import logging
 import os

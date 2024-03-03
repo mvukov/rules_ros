@@ -37,6 +37,7 @@ by roslaunch and xacro, but it is not yet a top-level ROS feature.
 """
 # pylint: disable=eval-used
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import math
 import os
 from io import StringIO  # Python 3.x

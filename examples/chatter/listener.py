@@ -8,7 +8,8 @@ def callback(msg):
 
 def main():
     rospy.init_node('listener', anonymous=True)
-    sub = rospy.Subscriber('chatter', example_msgs.msg.Example, callback)
+    sub = rospy.Subscriber(  # noqa
+        'chatter', example_msgs.msg.Example, callback)
     rospy.spin()
 
 

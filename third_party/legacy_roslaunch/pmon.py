@@ -36,6 +36,7 @@ Process monitoring implementation for roslaunch.
 """
 # pylint: disable=unnecessary-pass,invalid-name,global-statement,broad-except,logging-not-lazy,broad-except,comparison-with-callable,expression-not-assigned,bare-except
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string,global-variable-not-assigned
 import atexit
 import logging
 import signal

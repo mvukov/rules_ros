@@ -36,6 +36,7 @@ Roslaunch XML file parser.
 """
 # pylint: disable=logging-not-lazy,raise-missing-from,unnecessary-pass
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 import itertools
 import logging
 import sys
@@ -194,6 +195,7 @@ class XmlLoader(loader.Loader):
         self.root_context = None
         self.resolve_anon = resolve_anon
         self.args_only = args_only
+        self.ignore_unset_args = False
 
     def resolve_args(self, args, context):
         """

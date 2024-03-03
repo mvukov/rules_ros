@@ -7,8 +7,8 @@ import sys
 # Must be set before pylint is imported!
 os.environ['PYLINTHOME'] = os.environ['TEST_UNDECLARED_OUTPUTS_DIR']
 
-import pylint.lint
-import pylint.reporters.text
+import pylint.lint  # noqa
+import pylint.reporters.text  # noqa
 
 PYLINTRC_FILE = './pylint.rc'
 NUM_CPU_CORES_FOR_PYLINT = 2
@@ -19,8 +19,7 @@ class FileLinter:
 
     def __init__(self, python_path):
         self.pylint_file = PYLINTRC_FILE
-        self.init_hook_arg = 'import sys; sys.path = {}'.format(
-            str(python_path))
+        self.init_hook_arg = f'import sys; sys.path = {python_path!s}'
 
     def __call__(self, file_to_lint):
 
