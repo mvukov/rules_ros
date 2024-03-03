@@ -43,12 +43,12 @@ from optparse import OptionParser
 import rosgraph.roslogging
 import rospkg
 
-import third_party.legacy_roslaunch as roslaunch
-from third_party.legacy_roslaunch.pmon import pmon_shutdown
-from third_party.legacy_rostest import runner
-from third_party.legacy_rostest.rostestutil import createXMLRunner
-from third_party.legacy_rostest.rostestutil import printRostestSummary
-from third_party.legacy_rostest.rostestutil import rostest_name_from_path
+from third_party.ros import roslaunch
+from third_party.ros.roslaunch.pmon import pmon_shutdown
+from third_party.ros.rostest import runner
+from third_party.ros.rostest.rostestutil import createXMLRunner
+from third_party.ros.rostest.rostestutil import printRostestSummary
+from third_party.ros.rostest.rostestutil import rostest_name_from_path
 
 _NAME = 'rostest'
 

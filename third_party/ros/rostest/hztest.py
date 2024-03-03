@@ -49,7 +49,7 @@ import unittest
 
 import rospy
 
-import third_party.legacy_rostest as rostest
+from third_party.ros import rostest
 
 NAME = 'hztest'
 

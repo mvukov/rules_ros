@@ -1,7 +1,7 @@
 import os
 import sys
 
-from third_party.legacy_rostest import rostest_main
+from third_party.ros.rostest import rostest_main
 
 test_outputs_dir = os.environ['TEST_UNDECLARED_OUTPUTS_DIR']
 os.environ['ROS_LOG_DIR'] = test_outputs_dir

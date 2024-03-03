@@ -32,6 +32,6 @@ def ros_test(name, nodes, launch_file, **kwargs):
         srcs = [launch_script],
         data = nodes + [launch_file],
         main = launch_script,
-        deps = ["@com_github_mvukov_rules_ros//third_party/legacy_rostest"],
+        deps = ["@com_github_mvukov_rules_ros//third_party/ros/rostest"],
         **kwargs
     )

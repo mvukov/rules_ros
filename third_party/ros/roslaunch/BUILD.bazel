@@ -12,7 +12,7 @@ expand_template(
 )
 
 py_library(
-    name = "legacy_roslaunch",
+    name = "roslaunch",
     srcs = glob(["*.py"]) + [":deps"],
     data = [
         "roscore.xml",
@@ -37,7 +37,7 @@ py_binary(
     args = ["--core"],
     main = "main.py",
     visibility = ["//visibility:public"],
-    deps = [":legacy_roslaunch"],
+    deps = [":roslaunch"],
 )
 
 pylint()

@@ -50,15 +50,15 @@ import logging
 
 from rosmaster.master_api import NUM_WORKERS
 
-from third_party.legacy_roslaunch import config
-from third_party.legacy_roslaunch import launch
-from third_party.legacy_roslaunch import pmon
-from third_party.legacy_roslaunch import server
-from third_party.legacy_roslaunch.core import printerrlog
-from third_party.legacy_roslaunch.core import printlog_bold
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
+from third_party.ros.roslaunch import config
+from third_party.ros.roslaunch import launch
+from third_party.ros.roslaunch import pmon
+from third_party.ros.roslaunch import server
+from third_party.ros.roslaunch.core import printerrlog
+from third_party.ros.roslaunch.core import printlog_bold
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 
 class ROSLaunchParent(object):

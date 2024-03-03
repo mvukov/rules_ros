@@ -54,10 +54,10 @@ from rosgraph.names import make_global_ns
 from rosgraph.names import ns_join
 from rosgraph.names import PRIV_NAME
 
-from third_party.legacy_roslaunch.core import Param
-from third_party.legacy_roslaunch.core import PHASE_SETUP
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.core import RosbinExecutable
+from third_party.ros.roslaunch.core import Param
+from third_party.ros.roslaunch.core import PHASE_SETUP
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.core import RosbinExecutable
 
 
 class LoadException(RLException):

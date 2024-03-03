@@ -38,9 +38,9 @@ for a launch file.
 """
 import sys
 
-from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.config import load_config_default
-from third_party.legacy_roslaunch.core import RLException
+from third_party.ros.roslaunch import xmlloader
+from third_party.ros.roslaunch.config import load_config_default
+from third_party.ros.roslaunch.core import RLException
 
 
 def get_args(roslaunch_files):

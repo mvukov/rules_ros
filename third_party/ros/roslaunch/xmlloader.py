@@ -52,13 +52,13 @@ from rosgraph.names import make_global_ns
 from rosgraph.names import ns_join
 from rospkg import ResourceNotFound
 
-from third_party.legacy_roslaunch import loader
-from third_party.legacy_roslaunch import substitution_args
-from third_party.legacy_roslaunch.core import Machine
-from third_party.legacy_roslaunch.core import Node
-from third_party.legacy_roslaunch.core import Param
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.core import Test
+from third_party.ros.roslaunch import loader
+from third_party.ros.roslaunch import substitution_args
+from third_party.ros.roslaunch.core import Machine
+from third_party.ros.roslaunch.core import Node
+from third_party.ros.roslaunch.core import Param
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.core import Test
 
 # use in our namespace
 SubstitutionException = substitution_args.SubstitutionException

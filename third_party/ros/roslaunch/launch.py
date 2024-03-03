@@ -48,23 +48,23 @@ import rosgraph.names
 import rosgraph.network
 from rosmaster.master_api import NUM_WORKERS
 
-from third_party.legacy_roslaunch import node_args
-from third_party.legacy_roslaunch.core import get_ros_root
-from third_party.legacy_roslaunch.core import is_machine_local
-from third_party.legacy_roslaunch.core import PHASE_SETUP
-from third_party.legacy_roslaunch.core import printerrlog
-from third_party.legacy_roslaunch.core import printlog
-from third_party.legacy_roslaunch.core import printlog_bold
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.core import setup_env
-from third_party.legacy_roslaunch.core import socket
-from third_party.legacy_roslaunch.nodeprocess import create_master_process
-from third_party.legacy_roslaunch.nodeprocess import create_node_process
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
-from third_party.legacy_roslaunch.pmon import ProcessListener
-from third_party.legacy_roslaunch.pmon import start_process_monitor
-from third_party.legacy_roslaunch.rlutil import update_terminal_name
+from third_party.ros.roslaunch import node_args
+from third_party.ros.roslaunch.core import get_ros_root
+from third_party.ros.roslaunch.core import is_machine_local
+from third_party.ros.roslaunch.core import PHASE_SETUP
+from third_party.ros.roslaunch.core import printerrlog
+from third_party.ros.roslaunch.core import printlog
+from third_party.ros.roslaunch.core import printlog_bold
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.core import setup_env
+from third_party.ros.roslaunch.core import socket
+from third_party.ros.roslaunch.nodeprocess import create_master_process
+from third_party.ros.roslaunch.nodeprocess import create_node_process
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
+from third_party.ros.roslaunch.pmon import ProcessListener
+from third_party.ros.roslaunch.pmon import start_process_monitor
+from third_party.ros.roslaunch.rlutil import update_terminal_name
 
 _TIMEOUT_MASTER_START = 10.0  #seconds
 _TIMEOUT_MASTER_STOP = 10.0  #seconds

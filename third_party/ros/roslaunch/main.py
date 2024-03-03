@@ -46,16 +46,16 @@ import rospkg
 from rosmaster import DEFAULT_MASTER_PORT
 from rosmaster.master_api import NUM_WORKERS
 
-from third_party.legacy_roslaunch import arg_dump
-from third_party.legacy_roslaunch import child
-from third_party.legacy_roslaunch import core
-from third_party.legacy_roslaunch import node_args
-from third_party.legacy_roslaunch import param_dump
-from third_party.legacy_roslaunch import parent
-from third_party.legacy_roslaunch import rlutil
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
+from third_party.ros.roslaunch import arg_dump
+from third_party.ros.roslaunch import child
+from third_party.ros.roslaunch import core
+from third_party.ros.roslaunch import node_args
+from third_party.ros.roslaunch import param_dump
+from third_party.ros.roslaunch import parent
+from third_party.ros.roslaunch import rlutil
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 NAME = 'roslaunch'
 

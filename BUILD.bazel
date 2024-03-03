@@ -18,11 +18,11 @@ exports_files([
 py_library(
     name = "py_roslib_slim",
     srcs = [
-        "//third_party/roslib:__init__.py",
-        "//third_party/roslib:message.py",
-        "//third_party/roslib:names.py",
+        "//third_party/ros/roslib:__init__.py",
+        "//third_party/ros/roslib:message.py",
+        "//third_party/ros/roslib:names.py",
     ],
-    imports = ["third_party"],
+    imports = ["third_party/ros"],
     visibility = ["//visibility:public"],
     deps = [
         "@ros_genmsg//:genmsg",
@@ -32,14 +32,14 @@ py_library(
 
 py_library(
     name = "dynamic_reconfigure",
-    srcs = ["//third_party/dynamic_reconfigure:parameter_generator.py"],
-    imports = ["third_party"],
+    srcs = ["//third_party/ros/dynamic_reconfigure:parameter_generator.py"],
+    imports = ["third_party/ros"],
     visibility = ["//visibility:public"],
 )
 
 alias(
     name = "roscore",
-    actual = "//third_party/legacy_roslaunch:roscore",
+    actual = "//third_party/ros/roslaunch:roscore",
 )
 
 alias(
@@ -64,5 +64,5 @@ alias(
 
 alias(
     name = "rosservice",
-    actual = "//third_party/rosservice:rosservice",
+    actual = "//third_party/ros/rosservice",
 )

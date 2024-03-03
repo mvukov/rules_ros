@@ -3,7 +3,7 @@
 
   <test name="advertisetest"
       test-name="advertisetest"
-      type="third_party/legacy_rostest/advertisetest">
+      type="third_party/ros/rostest/advertisetest">
     <rosparam>
       topics:
         - name: /chatter
@@ -14,7 +14,7 @@
 
   <test name="publishtest"
         test-name="publishtest"
-        type="third_party/legacy_rostest/publishtest">
+        type="third_party/ros/rostest/publishtest">
     <rosparam>
       topics:
         - name: /chatter

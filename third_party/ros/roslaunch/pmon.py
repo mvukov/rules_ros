@@ -51,10 +51,10 @@ from threading import Thread
 
 import roslib
 
-from third_party.legacy_roslaunch.core import printerrlog
-from third_party.legacy_roslaunch.core import printlog
-from third_party.legacy_roslaunch.core import printlog_bold
-from third_party.legacy_roslaunch.core import RLException
+from third_party.ros.roslaunch.core import printerrlog
+from third_party.ros.roslaunch.core import printlog
+from third_party.ros.roslaunch.core import printlog_bold
+from third_party.ros.roslaunch.core import RLException
 
 logger = logging.getLogger('roslaunch.pmon')
 

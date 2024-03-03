@@ -36,8 +36,8 @@
 import rosgraph
 from rosmaster.master import Master
 
-from third_party.legacy_roslaunch import core
-from third_party.legacy_roslaunch import parent
+from third_party.ros.roslaunch import core
+from third_party.ros.roslaunch import parent
 
 
 class ROSTestLaunchParent(parent.ROSLaunchParent):

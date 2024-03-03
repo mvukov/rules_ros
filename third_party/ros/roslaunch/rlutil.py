@@ -46,9 +46,9 @@ import rosclean
 import rosgraph
 import rospkg
 
-from third_party.legacy_roslaunch import core
-from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.config import load_config_default
+from third_party.ros.roslaunch import core
+from third_party.ros.roslaunch import xmlloader
+from third_party.ros.roslaunch.config import load_config_default
 
 
 def check_log_disk_usage():

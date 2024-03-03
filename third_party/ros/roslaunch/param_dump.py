@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # Software License Agreement (BSD License)
 #
-# Copyright (c) 2009, Willow Garage, Inc.
+# Copyright (c) 2010, Willow Garage, Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,6 +29,42 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from third_party import rosservice
+#
+"""
+Dumps parameters from ROSLaunch files to stdout as YAML.
+"""
+# pylint: disable=broad-except
+# pylint: disable=consider-using-f-string
+import sys
 
-rosservice.rosservicemain()
+import yaml
+
+from third_party.ros.roslaunch import config
+from third_party.ros.roslaunch import xmlloader
+
+
+def dump_params(files):
+    """
+    Dumps ROS parameters of a list of files to STDOUT in YAML
+
+    @param files: List of ROSLaunch files to load
+    @type  files: [ str ]
+    @return: True if loaded parameters successfully
+    @rtype: bool
+    """
+    launch_config = config.ROSLaunchConfig()
+    loader = xmlloader.XmlLoader()
+
+    for f in files:
+        try:
+            loader.load(f, launch_config, verbose=False)
+        except Exception as e:
+            sys.stderr.write('Unable to load file %s: %s' % (f, e))
+            return False
+
+    # Now print params in YAML format.
+    params_dict = {}
+    for k, v in launch_config.params.items():
+        params_dict[str(k)] = v.value
+    sys.stdout.write(yaml.safe_dump(params_dict) + '\n')
+    return True

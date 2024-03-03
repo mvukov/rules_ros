@@ -61,19 +61,19 @@ import rosgraph.network as network
 import rosgraph.xmlrpc as xmlrpc
 from rosgraph_msgs.msg import Log
 
-from third_party.legacy_roslaunch import config
-from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.core import add_printerrlog_handler
-from third_party.legacy_roslaunch.core import add_printlog_handler
-from third_party.legacy_roslaunch.core import printerrlog
-from third_party.legacy_roslaunch.core import printlog
-from third_party.legacy_roslaunch.core import printlog_bold
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.launch import ROSLaunchRunner
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
-from third_party.legacy_roslaunch.pmon import Process
-from third_party.legacy_roslaunch.pmon import ProcessListener
+from third_party.ros.roslaunch import config
+from third_party.ros.roslaunch import xmlloader
+from third_party.ros.roslaunch.core import add_printerrlog_handler
+from third_party.ros.roslaunch.core import add_printlog_handler
+from third_party.ros.roslaunch.core import printerrlog
+from third_party.ros.roslaunch.core import printlog
+from third_party.ros.roslaunch.core import printlog_bold
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.launch import ROSLaunchRunner
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
+from third_party.ros.roslaunch.pmon import Process
+from third_party.ros.roslaunch.pmon import ProcessListener
 
 
 # interface class so that we don't have circular deps

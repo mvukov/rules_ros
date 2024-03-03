@@ -2,7 +2,7 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("//build_tools:pylint.bzl", "pylint")
 
 py_library(
-    name = "legacy_rostest",
+    name = "rostest",
     srcs = [
         "__init__.py",
         "rostest_main.py",
@@ -12,7 +12,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_mvukov_rules_ros//third_party/legacy_roslaunch",
+        "@com_github_mvukov_rules_ros//third_party/ros/roslaunch",
         "@ros_comm//:rospy",
         "@ros_ros//:rosunit",
     ],
@@ -23,8 +23,8 @@ py_binary(
     srcs = ["advertisetest.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":legacy_rostest",
-        "@com_github_mvukov_rules_ros//third_party/rosservice",
+        ":rostest",
+        "@com_github_mvukov_rules_ros//third_party/ros/rosservice",
     ],
 )
 
@@ -33,7 +33,7 @@ py_binary(
     srcs = ["hztest.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":legacy_rostest",
+        ":rostest",
     ],
 )
 
@@ -42,7 +42,7 @@ py_binary(
     srcs = ["paramtest.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":legacy_rostest",
+        ":rostest",
     ],
 )
 
@@ -50,7 +50,7 @@ py_binary(
     name = "publishtest",
     srcs = ["publishtest.py"],
     visibility = ["//visibility:public"],
-    deps = [":legacy_rostest"],
+    deps = [":rostest"],
 )
 
 pylint()

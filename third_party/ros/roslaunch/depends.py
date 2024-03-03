@@ -43,9 +43,9 @@ from xml.dom.minidom import parse
 
 import rospkg
 
-from third_party.legacy_roslaunch.loader import convert_value
-from third_party.legacy_roslaunch.loader import load_mappings
-from third_party.legacy_roslaunch.substitution_args import resolve_args
+from third_party.ros.roslaunch.loader import convert_value
+from third_party.ros.roslaunch.loader import load_mappings
+from third_party.ros.roslaunch.substitution_args import resolve_args
 
 NAME = 'roslaunch-deps'
 

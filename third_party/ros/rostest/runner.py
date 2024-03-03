@@ -39,10 +39,10 @@ import unittest
 import rospkg
 import rosunit.junitxml
 
-import third_party.legacy_roslaunch as roslaunch
-from third_party.legacy_rostest.rostest_parent import ROSTestLaunchParent
-from third_party.legacy_rostest.rostestutil import printlog
-from third_party.legacy_rostest.rostestutil import printlogerr
+from third_party.ros import roslaunch
+from third_party.ros.rostest.rostest_parent import ROSTestLaunchParent
+from third_party.ros.rostest.rostestutil import printlog
+from third_party.ros.rostest.rostestutil import printlogerr
 
 # NOTE: ignoring Python style guide as unittest is sadly written with Java-like camel casing
 

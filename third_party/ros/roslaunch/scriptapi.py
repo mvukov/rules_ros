@@ -37,10 +37,10 @@ Scripting interface for roslaunch
 """
 import rosgraph.masterapi
 
-from third_party.legacy_roslaunch import parent
-from third_party.legacy_roslaunch import rlutil
-from third_party.legacy_roslaunch.core import Node
-from third_party.legacy_roslaunch.core import RLException
+from third_party.ros.roslaunch import parent
+from third_party.ros.roslaunch import rlutil
+from third_party.ros.roslaunch.core import Node
+from third_party.ros.roslaunch.core import RLException
 
 
 class ROSLaunch(object):

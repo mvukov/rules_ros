@@ -45,11 +45,11 @@ invoke methods on the parent to provide feedback.
 import logging
 import traceback
 
-from third_party.legacy_roslaunch import core
-from third_party.legacy_roslaunch import pmon
-from third_party.legacy_roslaunch import server
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
-from third_party.legacy_roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
+from third_party.ros.roslaunch import core
+from third_party.ros.roslaunch import pmon
+from third_party.ros.roslaunch import server
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGINT
+from third_party.ros.roslaunch.nodeprocess import DEFAULT_TIMEOUT_SIGTERM
 
 
 class ROSLaunchChild(object):

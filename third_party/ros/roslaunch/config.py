@@ -43,12 +43,12 @@ import logging
 import rosgraph.names
 import rosgraph.network
 
-from third_party.legacy_roslaunch import deps
-from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.core import is_machine_local
-from third_party.legacy_roslaunch.core import local_machine
-from third_party.legacy_roslaunch.core import Master
-from third_party.legacy_roslaunch.core import RLException
+from third_party.ros.roslaunch import deps
+from third_party.ros.roslaunch import xmlloader
+from third_party.ros.roslaunch.core import is_machine_local
+from third_party.ros.roslaunch.core import local_machine
+from third_party.ros.roslaunch.core import Master
+from third_party.ros.roslaunch.core import RLException
 
 
 def namespaces_of(name):

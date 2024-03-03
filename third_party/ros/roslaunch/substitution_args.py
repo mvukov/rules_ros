@@ -44,7 +44,7 @@ from io import StringIO  # Python 3.x
 
 import rosgraph.names
 
-from third_party.legacy_roslaunch.loader import convert_value
+from third_party.ros.roslaunch.loader import convert_value
 
 
 class SubstitutionException(Exception):

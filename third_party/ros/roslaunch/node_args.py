@@ -45,12 +45,12 @@ import sys
 import rosgraph.names
 from rosgraph.names import script_resolve_name
 
-from third_party.legacy_roslaunch import substitution_args
-from third_party.legacy_roslaunch import xmlloader
-from third_party.legacy_roslaunch.config import load_config_default
-from third_party.legacy_roslaunch.core import local_machine
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.core import setup_env
+from third_party.ros.roslaunch import substitution_args
+from third_party.ros.roslaunch import xmlloader
+from third_party.ros.roslaunch.config import load_config_default
+from third_party.ros.roslaunch.core import local_machine
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.core import setup_env
 
 
 class NodeParamsException(Exception):

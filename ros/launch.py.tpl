@@ -1,6 +1,6 @@
 import sys
 
-from third_party.legacy_roslaunch import main as roslaunch_main
+from third_party.ros.roslaunch import main as roslaunch_main
 
 LAUNCH_FILES = [{launch_files}]
 

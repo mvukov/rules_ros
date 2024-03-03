@@ -50,15 +50,15 @@ import rosgraph
 import rospkg
 from rosmaster.master_api import NUM_WORKERS
 
-from third_party.legacy_roslaunch import deps
-from third_party.legacy_roslaunch.core import is_child_mode
-from third_party.legacy_roslaunch.core import printerrlog
-from third_party.legacy_roslaunch.core import printlog_bold
-from third_party.legacy_roslaunch.core import RLException
-from third_party.legacy_roslaunch.core import setup_env
-from third_party.legacy_roslaunch.node_args import create_local_process_args
-from third_party.legacy_roslaunch.pmon import FatalProcessLaunch
-from third_party.legacy_roslaunch.pmon import Process
+from third_party.ros.roslaunch import deps
+from third_party.ros.roslaunch.core import is_child_mode
+from third_party.ros.roslaunch.core import printerrlog
+from third_party.ros.roslaunch.core import printlog_bold
+from third_party.ros.roslaunch.core import RLException
+from third_party.ros.roslaunch.core import setup_env
+from third_party.ros.roslaunch.node_args import create_local_process_args
+from third_party.ros.roslaunch.pmon import FatalProcessLaunch
+from third_party.ros.roslaunch.pmon import Process
 
 _logger = logging.getLogger('roslaunch')
 
