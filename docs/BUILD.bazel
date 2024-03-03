@@ -39,4 +39,4 @@ stardoc_with_diff_test(
     bzl_library_target = "//ros:topic",
 )
 
-update_docs()
+update_docs(name = "update")

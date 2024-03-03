@@ -146,7 +146,7 @@ expand_template(
     out = _LOGGING_CONFIG_PY,
     data = [_DEFAULT_PYTHON_LOGGING_CONFIG],
     substitutions = {
-        "{default_python_logging_conf}": "$(location {})".format(_DEFAULT_PYTHON_LOGGING_CONFIG),
+        "{default_python_logging_conf}": "$(rootpath {})".format(_DEFAULT_PYTHON_LOGGING_CONFIG),
     },
     template = "@com_github_mvukov_rules_ros//repositories:ros_logging_config.py.tpl",
 )

@@ -13,7 +13,7 @@ def ros_test(name, nodes, launch_file, **kwargs):
         launch_file: A rostest-compatible launch file.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-tests
     """
-    launch_file_path = "'$(location {})'".format(launch_file)
+    launch_file_path = "'$(rootpath {})'".format(launch_file)
     substitutions = {
         "{launch_file}": launch_file_path,
     }

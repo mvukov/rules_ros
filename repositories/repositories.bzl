@@ -7,20 +7,19 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def ros_repositories():
     """Imports external/third-party repositories.
     """
-
     maybe(
         http_archive,
         name = "rules_python",
-        sha256 = "c03246c11efd49266e8e41e12931090b613e12a59e6f55ba2efd29a7cb8b4258",
-        strip_prefix = "rules_python-0.11.0",
-        url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.11.0.tar.gz",
+        sha256 = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311",
+        strip_prefix = "rules_python-0.31.0",
+        url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.31.0.tar.gz",
     )
 
     maybe(
         http_archive,
         name = "bazel_skylib",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz"],
-        sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
+        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz"],
+        sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
     )
 
     maybe(
@@ -41,26 +40,26 @@ def ros_repositories():
 
     maybe(
         http_archive,
-        name = "com_google_googletest",
-        sha256 = "b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5",
-        strip_prefix = "googletest-release-1.11.0",
-        urls = ["https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz"],
+        name = "googletest",
+        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
+        strip_prefix = "googletest-1.14.0",
+        url = "https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz",
     )
 
     maybe(
         http_archive,
         name = "rules_foreign_cc",
-        sha256 = "4f2207a83c500a16c9095a224acc4ec8c1406c6febd0a042b3ac15ef6ff0c640",
-        strip_prefix = "rules_foreign_cc-83e6cf48cf00214bb4348691beecef8f3bc42f7d",
-        urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/83e6cf48cf00214bb4348691beecef8f3bc42f7d.zip"],
+        sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
+        strip_prefix = "rules_foreign_cc-0.10.1",
+        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/0.10.1.tar.gz",
     )
 
     maybe(
         http_archive,
         name = "com_github_nelhage_rules_boost",
-        strip_prefix = "rules_boost-98495a618246683c9058dd87c2c78a2c06087999",
-        sha256 = "fc2b63b293d0d5eebe7a6b3328bec8a13f4b0bc2b532f4e117b51c7f4e5d421b",
-        urls = ["https://github.com/nelhage/rules_boost/archive/98495a618246683c9058dd87c2c78a2c06087999.zip"],
+        sha256 = "90028713d869769d49a9f26a57e89e9f0e83cc0edc1208727aecf0e3ee094967",
+        strip_prefix = "rules_boost-f621ad7bec2abf5a597ed1271fd823d2761943b2",
+        urls = ["https://github.com/nelhage/rules_boost/archive/f621ad7bec2abf5a597ed1271fd823d2761943b2.zip"],
     )
 
     maybe(
@@ -204,10 +203,10 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "eigen",
-        build_file = "@com_github_mvukov_rules_ros//repositories:eigen.BUILD.bazel",
-        sha256 = "7985975b787340124786f092b3a07d594b2e9cd53bbfe5f3d9b1daee7d55f56f",
-        strip_prefix = "eigen-3.3.9",
-        urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz"],
+        build_file = "@com_github_mvukov_rules_ros2//repositories:eigen.BUILD.bazel",
+        sha256 = "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72",
+        strip_prefix = "eigen-3.4.0",
+        urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz"],
     )
 
     maybe(

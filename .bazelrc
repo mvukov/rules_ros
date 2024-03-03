@@ -1,11 +1,45 @@
-build:opt -c opt
-build:opt --copt=-O3
+# See e.g. https://blog.aspect.dev/bazelrc-flags
 
-build:platform_build --incompatible_enable_cc_toolchain_resolution
+# https://github.com/bazelbuild/rules_foreign_cc/issues/1129
+# Mandatory at the moment for Bazel 7.0.0.
+build --noincompatible_sandbox_hermetic_tmp
 
-build:jetson --config=platform_build --platforms=@bazel_gcc_toolchain//platforms:aarch64_linux
+# This is mandatory if your build env doesn't have a proper Python 3 exe
+# -- like the CI build image for this repo.
+# The build image is using a fake python exe, see
+# https://github.com/mvukov/bazel_builder/blob/main/Dockerfile.
+# If blzmod is enabled, but not used as in this repo at the moment),
+# then bazel for some reason tries to auto-detect a Python exe.
+build --noenable_bzlmod
 
-build:jetson-opt --config=jetson
-build:jetson-opt --config=opt
+# Fix the wrong default to generate __init__.py to delimit a Python package.
+# This is a mandatory flag.
+build --incompatible_default_to_explicit_init_py
 
-test --test_output=errors
+# All code will be compiled with C++17 flag.
+# Users can naturally override copts for cc_* targets.
+# NOTE: googletest >=v1.13.0 requires min C++14.
+# This is a mandatory flag.
+build --cxxopt=-std=c++17
+
+# Ensure that you don't accidentally make non-hermetic actions/tests
+# which depend on remote services. Tag an individual target with
+# tags=["requires-network"] to opt-out of the enforcement.
+build --sandbox_default_allow_network=false
+# Don't let environment variables like $PATH sneak into the build,
+# which can cause massive cache misses when they change.
+build --incompatible_strict_action_env
+# Helps debugging when Bazel runs out of memory
+build --heap_dump_on_oom
+# Speed up all builds by not checking if output files have been modified.
+build --noexperimental_check_output_files
+
+# Don't bother building targets which aren't dependencies of the tests.
+test --build_tests_only
+
+# Load any settings specific to the current user.
+# user.bazelrc should appear in .gitignore so that settings are not shared with
+# team members. This needs to be last statement in this config,
+# as the user configuration should be able to overwrite flags from this file.
+# See https://docs.bazel.build/versions/master/best-practices.html#bazelrc
+try-import %workspace%/user.bazelrc

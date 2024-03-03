@@ -4,13 +4,10 @@
 - Generating C++ and Python ROS message definitions.
 - Defining C++ and Python ROS nodes.
 - Defining a ROS deployment -- i.e. a ROS-launch Bazel target.
-- Defining a Docker images for the example ROS deployment.
 - Defining a Bazel target for running ROS-topic introspection functionality.
 """
 
-load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//docker:image.bzl", "container_image")
 load("//ros:cc_defs.bzl", "cc_ros_binary")
 load(
     "//ros:interfaces.bzl",
@@ -21,7 +18,6 @@ load(
 load("//ros:launch.bzl", "ros_launch")
 load("//ros:test.bzl", "ros_test")
 load("//ros:topic.bzl", "ros_topic")
-load("//third_party:packaging.bzl", "binary_pkg_tar")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
 # handling protobuf messages (e.g. proto_library and cc_proto_library).
@@ -105,26 +101,6 @@ ros_launch(
     ],
 )
 
-# Define a Docker image target with chatter deployment. Just run as
-# `bazel run //examples/chatter:chatter_image`. This will build the nodes,
-# the Docker image, and start execution of the deployment inside a container.
-container_image(
-    name = "chatter_image",
-    base = "@ros_deploy_base//image",
-    binary = ":chatter",
-    docker_run_flags = "-it --rm --network=host",
-)
-
-# Here is how a chatter image can be published to a remote repo.
-container_push(
-    name = "chatter_publish",
-    format = "Docker",
-    image = ":chatter_image",
-    registry = "docker.io",
-    repository = "mvukov/chatter",
-    tag = "demo",
-)
-
 # catkin workflow gives to rostopic app ability to handle all messages that
 # live the devel/install workspace. With Bazel workflow we don't have that.
 # Here, rostopic is deployment-specific.
@@ -132,10 +108,4 @@ container_push(
 ros_topic(
     name = "rostopic",
     deps = [":chatter"],
-)
-
-# Builds an archive out of the deployment and it's dependencies.
-binary_pkg_tar(
-    name = "chatter_pkg",
-    binary = ":chatter",
 )

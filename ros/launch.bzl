@@ -13,7 +13,7 @@ def ros_launch(name, nodes, launch_files, **kwargs):
         launch_files: A list of roslaunch-compatible launch files.
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes-binaries
     """
-    launch_file_paths = ["'$(location {})'".format(x) for x in launch_files]
+    launch_file_paths = ["'$(rootpath {})'".format(x) for x in launch_files]
     substitutions = {
         "{launch_files}": ", ".join(launch_file_paths),
     }

@@ -8,7 +8,7 @@ cc_test(
     name = "simple_tests",
     size = "small",
     srcs = ["simple_tests.cc"],
-    deps = ["@com_google_googletest//:gtest_main"],
+    deps = ["@googletest//:gtest_main"],
 )
 
 ros_test(

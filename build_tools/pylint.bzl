@@ -44,7 +44,7 @@ def pylint():
             for label in rule.get("srcs", [])
             if _is_py_source_label(label)
         ]
-        source_filenames = ["$(location {})".format(x) for x in source_labels]
+        source_filenames = ["$(rootpath {})".format(x) for x in source_labels]
 
         # Run the pylint checker as a unit test.
         if len(source_filenames) > 0:

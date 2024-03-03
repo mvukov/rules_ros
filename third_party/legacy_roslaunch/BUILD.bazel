@@ -7,7 +7,7 @@ expand_template(
     name = "deps",
     out = "deps.py",
     data = ["roscore.xml"],
-    substitutions = {"{roscore_xml_path}": "$(location roscore.xml)"},
+    substitutions = {"{roscore_xml_path}": "$(rootpath roscore.xml)"},
     template = "deps.py.tpl",
 )
 
