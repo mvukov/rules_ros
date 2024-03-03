@@ -1,0 +1,21 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "dynamic_reconfigure",
+    srcs = ["//third_party/ros/dynamic_reconfigure:parameter_generator.py"],
+    imports = ["."],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "roslaunch",
+    visibility = ["//visibility:public"],
+    deps = ["//third_party/ros/roslaunch"],
+)
+
+py_library(
+    name = "roslib",
+    imports = ["."],
+    visibility = ["//visibility:public"],
+    deps = ["//third_party/ros/roslib"],
+)

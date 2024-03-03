@@ -19,9 +19,9 @@ py_library(
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosout",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//third_party/ros:__pkg__"],
     deps = [
-        "//:py_roslib_slim",
+        "//third_party/ros:roslib",
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosparam",
         "@ros_comm_msgs//:py_rosgraph_msgs",

@@ -32,6 +32,6 @@ def ros_launch(name, nodes, launch_files, **kwargs):
         srcs = [launch_script],
         data = nodes + launch_files,
         main = launch_script,
-        deps = ["@com_github_mvukov_rules_ros//third_party/ros/roslaunch"],
+        deps = ["@com_github_mvukov_rules_ros//third_party/ros:roslaunch"],
         **kwargs
     )

@@ -1,5 +1,15 @@
-exports_files([
-    "__init__.py",
-    "message.py",
-    "names.py",
-])
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "roslib",
+    srcs = [
+        "__init__.py",
+        "message.py",
+        "names.py",
+    ],
+    visibility = ["//third_party/ros:__pkg__"],
+    deps = [
+        "@ros_genmsg//:genmsg",
+        "@ros_genpy//:genpy",
+    ],
+)

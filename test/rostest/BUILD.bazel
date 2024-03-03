@@ -2,6 +2,7 @@
 """
 
 load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_python//python:defs.bzl", "py_test")
 load("//ros:test.bzl", "ros_test")
 
 cc_test(
@@ -15,4 +16,11 @@ ros_test(
     name = "simple_tests_ros",
     launch_file = "simple_tests.launch",
     nodes = [":simple_tests"],
+)
+
+py_test(
+    name = "roslaunch_tests",
+    size = "small",
+    srcs = ["roslaunch_tests.py"],
+    deps = ["//third_party/ros:roslaunch"],
 )
