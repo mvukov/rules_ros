@@ -18,3 +18,9 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [":gencpp_lib"],
 )
+
+filegroup(
+    name = "templates",
+    srcs = glob(["scripts/*.template"]),
+    visibility = ["//visibility:public"],
+)

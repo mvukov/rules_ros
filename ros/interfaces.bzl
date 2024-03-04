@@ -139,6 +139,8 @@ def _get_all_srcs(target, ctx):
 def _cc_ros_generator_aspect_impl(target, ctx):
     include_flags = _get_include_flags(target, ctx)
     all_srcs = _get_all_srcs(target, ctx)
+    templates_dir = ctx.attr._templates.files.to_list()[0].dirname
+    all_files = depset(transitive = [all_srcs, ctx.attr._templates.files])
 
     ros_package_name = target.label.name
     srcs = target[RosInterfaceInfo].info.srcs
@@ -163,10 +165,11 @@ def _cc_ros_generator_aspect_impl(target, ctx):
         args = ctx.actions.args()
         args.add("-o", msg_header.dirname)
         args.add("-p", ros_package_name)
+        args.add("-e", templates_dir)
         args.add_all(include_flags)
         args.add(src)
         ctx.actions.run(
-            inputs = all_srcs,
+            inputs = all_files,
             outputs = msg_headers,
             executable = ctx.executable._gencpp,
             arguments = [args],
@@ -195,6 +198,9 @@ cc_ros_generator_aspect = aspect(
             default = Label("@ros_gencpp//:gencpp"),
             executable = True,
             cfg = "exec",
+        ),
+        "_templates": attr.label(
+            default = Label("@ros_gencpp//:templates"),
         ),
     },
     provides = [CcInfo],
