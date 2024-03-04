@@ -75,6 +75,8 @@ def _cc_ros_dynamic_reconfigure_generator_impl(ctx):
         outputs = [output],
         executable = ctx.executable._generator,
         arguments = [args],
+        mnemonic = "RosDynamicReconfigureCpp",
+        progress_message = "Generating C++ dynamic reconfiguration interfaces for %{label}",
     )
 
     cc_include_dir = _get_parent_dir(output.dirname)

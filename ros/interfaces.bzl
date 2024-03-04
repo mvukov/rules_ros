@@ -61,6 +61,8 @@ def _ros_interface_library_impl(ctx):
                 outputs = action_msgs,
                 executable = ctx.executable._genaction,
                 arguments = [genaction_args],
+                mnemonic = "RosGenaction",
+                progress_message = "Generating IDL action messages for {}".format(src.short_path),
             )
             output_srcs.extend(action_msgs)
 
@@ -173,6 +175,8 @@ def _cc_ros_generator_aspect_impl(target, ctx):
             outputs = msg_headers,
             executable = ctx.executable._gencpp,
             arguments = [args],
+            mnemonic = "RosGencpp",
+            progress_message = "Generating C++ IDL interfaces for {}".format(src.short_path),
         )
 
     cc_include_dir = "/".join(srcs[0].dirname.split("/")[:-1])
@@ -281,6 +285,8 @@ def _py_generate(
         outputs = py_msg_files,
         executable = generator,
         arguments = [args],
+        mnemonic = "RosGenPythonMsgSrv",
+        progress_message = "Generating Python IDL interfaces for %{label}",
     )
 
     init_py = ctx.actions.declare_file(
@@ -296,6 +302,8 @@ def _py_generate(
         outputs = [init_py],
         executable = generator,
         arguments = [args],
+        mnemonic = "RosGenPythonMsgSrvInit",
+        progress_message = "Generating Python IDL interfaces (initialization) for %{label}",
     )
 
     return py_msg_files + [init_py]
