@@ -218,7 +218,6 @@ def _cc_ros_generator_impl(ctx):
 
 cc_ros_generator = rule(
     implementation = _cc_ros_generator_impl,
-    output_to_genfiles = True,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
@@ -434,7 +433,6 @@ def _py_ros_generator_impl(ctx):
 
 py_ros_generator = rule(
     implementation = _py_ros_generator_impl,
-    output_to_genfiles = True,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
@@ -465,7 +463,6 @@ def py_ros_interface_library(name, deps, **kwargs):
 
 py_ros_interface_collector = rule(
     implementation = _py_ros_generator_impl,
-    output_to_genfiles = True,
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
