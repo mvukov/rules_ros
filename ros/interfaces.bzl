@@ -42,8 +42,9 @@ _ACTION_OUTPUT_MAPPING = [
 
 def _ros_interface_library_impl(ctx):
     ros_package_name = ctx.label.name 
-    if ctx.attr.ros_pkg_name:
-        ros_package_name = ctx.attr.ros_pkg_name
+    if ctx.attr.strip_end and "interface" in ros_package_name:
+        ros_package_name = ros_package_name.split("_")
+        ros_package_name = "_".join(ros_package_name[0:-1])
     output_srcs = []  # Messages and services.
     for src in ctx.files.srcs:
         if src.extension == "action":
@@ -101,8 +102,8 @@ ros_interface_library = rule(
             providers = [RosInterfaceInfo],
             doc = " A list of other `ros_interface_library` targets. ",
         ),
-        "ros_pkg_name": attr.string(
-            doc = "An override to override the ros pkg name."
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
         ),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
@@ -121,6 +122,9 @@ For Python generated code the target name defines the Python package name.
 
 def _get_include_flags(target, ctx):
     ros_package_name = target.label.name
+    if ctx.attr.strip_end and "interface" in ros_package_name:
+        ros_package_name = ros_package_name.split("_")
+        ros_package_name = "_".join(ros_package_name[0:-1])
     srcs = target[RosInterfaceInfo].info.srcs
     deps = target[RosInterfaceInfo].deps
 
@@ -147,8 +151,9 @@ def _cc_ros_generator_aspect_impl(target, ctx):
 
     ros_package_name = target.label.name
 
-    if ctx.attr.pkg_override:
-        ros_package_name = ctx.attr.pkg_override
+    if ctx.attr.strip_end and "interface" in ros_package_name:
+        ros_package_name = ros_package_name.split("_")
+        ros_package_name = "_".join(ros_package_name[0:-1])
 
     srcs = target[RosInterfaceInfo].info.srcs
     all_headers = []
@@ -205,7 +210,9 @@ cc_ros_generator_aspect = aspect(
             executable = True,
             cfg = "exec",
         ),
-        "pkg_override": attr.string(values = ['']),
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+        ),
     },
     provides = [CcInfo],
 )
@@ -225,23 +232,26 @@ cc_ros_generator = rule(
             aspects = [cc_ros_generator_aspect],
             providers = [RosInterfaceInfo],
         ),
-        "pkg_override": attr.string(),
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+        ),
     },
 )
 
-def cc_ros_interface_library(name, deps, pkg_override = None, **kwargs):
+def cc_ros_interface_library(name, deps, strip_end = False, **kwargs):
     """ Defines a C++ ROS interface library.
 
     Args:
         name: A unique target name.
         deps: A list of deps (list of `ros_interface_library` targets).
+        strip_end: "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile
         **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
     """
     name_gencpp = "{}_gencpp".format(name)
     cc_ros_generator(
         name = name_gencpp,
         deps = deps,
-        pkg_override = pkg_override,
+        strip_end = strip_end,
     )
     cc_library(
         name = name,
