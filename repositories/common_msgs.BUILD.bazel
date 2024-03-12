@@ -125,3 +125,22 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [":py_sensor_msgs"],
 )
+
+ros_interface_library(
+    name = "visualization_msgs",
+    srcs = glob([
+        "visualization_msgs/msg/*.msg",
+        "visualization_msgs/srv/*.srv",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros_std_msgs//:std_msgs",
+        ":geometry_msgs",
+    ],
+)
+
+cc_ros_interface_library(
+    name = "cc_visualization_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":visualization_msgs"],
+)

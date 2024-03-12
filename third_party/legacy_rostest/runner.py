@@ -147,7 +147,7 @@ def rostestRunner(test, results_base_dir=None):
             # needs to be renamed as it aliases the module where the
             # constant is elsewhere defined. The fix is to rename
             # rostest.py
-            XML_OUTPUT_FLAG = '--gtest_output=xml:'  #use gtest-compatible flag
+            XML_OUTPUT_FLAG = '--gtest_output=xml:'   #use gtest-compatible flag
 
             test.args = "%s %s%s" % (test.args, XML_OUTPUT_FLAG, test_file)
             if _textMode:

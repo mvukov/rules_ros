@@ -57,8 +57,8 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "com_github_nelhage_rules_boost",
-    url = "https://github.com/nelhage/rules_boost/archive/96e9b631f104b43a53c21c87b01ac538ad6f3b48.tar.gz",
-    strip_prefix = "rules_boost-96e9b631f104b43a53c21c87b01ac538ad6f3b48",
+        url = "https://github.com/Pailowmenah/rules_boost/archive/refs/tags/11.tar.gz",
+        strip_prefix = "rules_boost-11",
     )
 
     maybe(
@@ -133,14 +133,14 @@ def ros_repositories():
         urls = ["https://github.com/ros/ros_comm_msgs/archive/1.11.3.tar.gz"],
     )
 
-    maybe(
-        http_archive,
-        name = "lz4",
-        build_file = "@com_github_mvukov_rules_ros//repositories:lz4.BUILD.bazel",
-        sha256 = "030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ffe2c1",
-        strip_prefix = "lz4-1.9.3",
-        urls = ["https://github.com/lz4/lz4/archive/v1.9.3.tar.gz"],
-    )
+    # maybe(
+    #     http_archive,
+    #     name = "lz4",
+    #     build_file = "@com_github_mvukov_rules_ros//repositories:lz4.BUILD.bazel",
+    #     sha256 = "030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ffe2c1",
+    #     strip_prefix = "lz4-1.9.3",
+    #     urls = ["https://github.com/lz4/lz4/archive/v1.9.3.tar.gz"],
+    # )
 
     maybe(
         http_archive,

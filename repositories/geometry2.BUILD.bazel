@@ -37,6 +37,7 @@ cc_ros_library(
     hdrs = glob(["tf2/include/**/*.h"]),
     includes = ["tf2/include"],
     visibility = ["//visibility:public"],
+    copts = [ "-std=c++17"],
     deps = [
         ":cc_tf2_msgs",
         "@boost//:signals2",
@@ -59,7 +60,7 @@ cc_ros_library(
         "tf2_ros/src/transform_listener.cpp",
     ],
     hdrs = glob(["tf2_ros/include/tf2_ros/*.h"]),
-    copts = ["-w"],
+    copts = ["-w",  "-std=c++17"],
     includes = ["tf2_ros/include"],
     visibility = ["//visibility:public"],
     deps = [
@@ -85,4 +86,16 @@ cc_ros_binary(
     srcs = ["tf2_ros/src/static_transform_broadcaster_program.cpp"],
     visibility = ["//visibility:public"],
     deps = [":tf2_ros"],
+)
+
+cc_ros_library(
+    name = "tf2_eigen",
+    srcs = [
+        "tf2_eigen/include/tf2_eigen/tf2_eigen.h"
+    ],
+    includes = ["tf2_eigen/include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tf2",
+    ],
 )

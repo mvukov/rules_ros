@@ -9,12 +9,18 @@ config_setting(
 
 cc_ros_library(
     name = "rospack",
-    srcs = glob(["src/*.cpp"]),
+    srcs = [
+        "src/rospack.cpp",
+        "src/rospack_cmdline.cpp",
+        "src/utils.cpp",
+        "src/rospack_backcompat.cpp",
+        
+    ],
     hdrs = glob(["include/rospack/*.h", "src/*.h"]),
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
-        "@python_linux//:python39_lib",
+        "@python_linux//:python37_lib",
         "@boost//:unordered",
         "@boost//:program_options",
         "@boost//:thread",

@@ -26,6 +26,9 @@ EIGEN_FILES = [
     "unsupported/Eigen/SpecialFunctions",
     "unsupported/Eigen/src/MatrixFunctions/**",
     "unsupported/Eigen/src/SpecialFunctions/**",
+    "unsupported/Eigen/src/NumericalDiff/**",
+    "unsupported/Eigen/src/NonLinearOptimization/**",
+    "unsupported/Eigen/*",
 ]
 
 # Files known to be under MPL2 license.

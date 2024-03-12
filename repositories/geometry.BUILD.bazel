@@ -29,12 +29,17 @@ cc_ros_interface_library(
 
 cc_ros_library(
     name = "tf",
-    srcs = glob(["tf/src/*.cpp", "tf/src/tf/*.cpp"]),
+    srcs = [
+        "tf/src/cache.cpp",
+        "tf/src/tf.cpp",
+        "tf/src/transform_broadcaster.cpp",
+        "tf/src/transform_listener.cpp",
+    ],
     hdrs = glob(["tf/include/**/*.h"]),
     includes = ["tf/include"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Igeometry"
+        "-Igeometry", "-std=c++17"
     ],
     deps = [
         ":cc_tf_msgs",

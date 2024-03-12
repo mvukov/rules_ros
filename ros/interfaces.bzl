@@ -203,7 +203,7 @@ def _cc_ros_generator_aspect_impl(target, ctx):
 
 cc_ros_generator_aspect = aspect(
     implementation = _cc_ros_generator_aspect_impl,
-    attr_aspects = ["deps" , "pkg_override"],
+    attr_aspects = ["deps" , "strip_end"],
     attrs = {
         "_gencpp": attr.label(
             default = Label("@ros_gencpp//:gencpp"),
@@ -421,6 +421,9 @@ py_ros_generator_aspect = aspect(
             executable = True,
             cfg = "exec",
         ),
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+        ),
     },
     provides = [PyRosGeneratorAspectInfo],
 )
@@ -448,6 +451,9 @@ py_ros_generator = rule(
             mandatory = True,
             aspects = [py_ros_generator_aspect],
             providers = [RosInterfaceInfo],
+        ),
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
         ),
     },
 )
@@ -478,6 +484,9 @@ py_ros_interface_collector = rule(
         "deps": attr.label_list(
             mandatory = True,
             aspects = [py_ros_generator_aspect],
+        ),
+        "strip_end": attr.bool(
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
         ),
     },
 )
