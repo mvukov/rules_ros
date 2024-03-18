@@ -57,8 +57,8 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "com_github_nelhage_rules_boost",
-        url = "https://github.com/Pailowmenah/rules_boost/archive/refs/tags/11.tar.gz",
-        strip_prefix = "rules_boost-11",
+        url = "https://github.com/bearrobotics/rules_boost/archive/refs/tags/v0.0.1.tar.gz",
+        strip_prefix = "rules_boost-0.0.1",
     )
 
     maybe(

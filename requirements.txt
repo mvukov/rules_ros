@@ -15,7 +15,7 @@ pyyaml --global-option="--without-libyaml"
 # NOTE: Targets depending Python packages with compiled extensions should not
 # be used with cross-compilation deployments.
 gnupg
-numpy  # Compiled, only one file in rospy needs it.
+numpy==1.16.6  # Compiled, only one file in rospy needs it.
 pycryptodomex
 
 # Here are packages only needed for development.
