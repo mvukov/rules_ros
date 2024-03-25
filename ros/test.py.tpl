@@ -8,6 +8,8 @@ os.environ['ROS_LOG_DIR'] = test_outputs_dir
 os.environ['ROS_TEST_RESULTS_DIR'] = test_outputs_dir
 os.environ['ROS_MASTER_URI'] = "http://0.0.0.0:11311"
 os.environ['ROS_HOSTNAME'] = "0.0.0.0"
+os.environ['ROS_ROOT'] = os.getcwd()
+os.environ['ROS_PACKAGE_PATH'] = os.getcwd() + "/ROS"
 
 LAUNCH_FILE = {launch_file}
 
