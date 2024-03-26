@@ -2,4 +2,4 @@
 bazel-*
 __pycache__
 user.bazelrc
-MODULE.bazel*
+MODULE.bazel.lock
