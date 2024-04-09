@@ -57,8 +57,9 @@ def ros_repositories():
     maybe(
         http_archive,
         name = "com_github_nelhage_rules_boost",
-        url = "https://github.com/bearrobotics/rules_boost/archive/refs/tags/v0.0.1.tar.gz",
-        strip_prefix = "rules_boost-0.0.1",
+        sha256 = "ce25d7663a84562f437bde42ab452479daf38fb85f1a10a61ff60558c1f527fc",
+        url = "https://github.com/bearrobotics/rules_boost/archive/refs/tags/v0.0.3.tar.gz",
+        strip_prefix = "rules_boost-0.0.3",
     )
 
     maybe(
@@ -274,9 +275,9 @@ def ros_repositories():
         http_archive,
         name = "geometry",
         build_file = "@com_github_mvukov_rules_ros//repositories:geometry.BUILD.bazel",
-        sha256 = "e8633fda3ae482945c572e312af2a340f638800f49df762f0c1c60a5cfa17b79",
-        strip_prefix = "geometry-1.0.5",
-        urls = ["https://github.com/bearrobotics/geometry/archive/refs/tags/v1.0.5.zip"],
+        sha256 = "ed4ecf3864ece4f304c6d1dd6404b03e33b76b5e79e37a44ffe7b069f2af96df",
+        strip_prefix = "geometry-1.0.6",
+        urls = ["https://github.com/bearrobotics/geometry/archive/refs/tags/v1.0.6.zip"],
     )
     maybe(
         http_archive,

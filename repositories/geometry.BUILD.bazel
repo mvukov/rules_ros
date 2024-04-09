@@ -10,7 +10,7 @@ load(
 )
 
 ros_interface_library(
-    name = "tf_msgs",
+    name = "tf_interface",
     srcs = glob([
         "tf/msg/*",
         "tf/srv/*"
@@ -23,8 +23,12 @@ ros_interface_library(
 )
 
 cc_ros_interface_library(
-    name = "cc_tf_msgs",
-    deps = [":tf_msgs"],
+    name = "cc_tf_interface",
+    deps = [":tf_interface"],
+    strip_end = True, 
+    visibility = [
+        "//visibility:public",
+    ]
 )
 
 cc_ros_library(
@@ -42,7 +46,7 @@ cc_ros_library(
         "-Igeometry", "-std=c++17"
     ],
     deps = [
-        ":cc_tf_msgs",
+        ":cc_tf_interface",
         "@boost//:signals2",
         "@boost//:thread",
         "@boost//:unordered",
