@@ -54,13 +54,6 @@ def ros_repositories():
         urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/83e6cf48cf00214bb4348691beecef8f3bc42f7d.zip"],
     )
 
-    maybe(
-        http_archive,
-        name = "com_github_nelhage_rules_boost",
-        sha256 = "ce25d7663a84562f437bde42ab452479daf38fb85f1a10a61ff60558c1f527fc",
-        url = "https://github.com/bearrobotics/rules_boost/archive/refs/tags/v0.0.3.tar.gz",
-        strip_prefix = "rules_boost-0.0.3",
-    )
 
     maybe(
         http_archive,
