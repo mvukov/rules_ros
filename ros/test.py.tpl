@@ -13,6 +13,9 @@ os.environ['ROS_PACKAGE_PATH'] = os.getcwd() + "/ROS"
 
 LAUNCH_FILE = {launch_file}
 
+# stupid hack for swapping with gen rules
+if "bazel-out/k8-fastbuild/bin/" in LAUNCH_FILE:
+    LAUNCH_FILE = "/".join(LAUNCH_FILE.split("/")[3:])
 sys.argv = sys.argv + [LAUNCH_FILE]
 path_override = [{node_path_override}]
 
