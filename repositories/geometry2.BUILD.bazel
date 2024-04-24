@@ -99,3 +99,13 @@ cc_ros_library(
         ":tf2",
     ],
 )
+
+cc_ros_library(
+    name = "tf2_geometry_msgs",
+    srcs = [ "tf2_geometry_msgs/include/tf2_geometry_msgs/tf2_geometry_msgs.h" ],
+    includes = ["tf2_geometry_msgs/include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@orocos_kdl//:orocos_kdl"
+    ]
+)
