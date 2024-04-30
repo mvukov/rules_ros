@@ -144,3 +144,22 @@ cc_ros_interface_library(
     visibility = ["//visibility:public"],
     deps = [":visualization_msgs"],
 )
+
+ros_interface_library(
+    name = "trajectory_msgs",
+    srcs = glob([
+        "trajectory_msgs/msg/*.msg",
+        "trajectory_msgs/srv/*.srv",
+    ]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros_std_msgs//:std_msgs",
+        ":geometry_msgs",
+    ],
+)
+
+cc_ros_interface_library(
+    name = "cc_trajectory_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":trajectory_msgs"],
+)
