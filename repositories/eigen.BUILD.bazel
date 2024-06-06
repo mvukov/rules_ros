@@ -21,6 +21,7 @@ EIGEN_FILES = [
     "unsupported/Eigen/FFT",
     "unsupported/Eigen/KroneckerProduct",
     "unsupported/Eigen/src/FFT/**",
+    "unsupported/Eigen/src/Polynomials/**",
     "unsupported/Eigen/src/KroneckerProduct/**",
     "unsupported/Eigen/MatrixFunctions",
     "unsupported/Eigen/SpecialFunctions",

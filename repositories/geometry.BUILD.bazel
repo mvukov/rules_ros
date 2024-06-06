@@ -39,7 +39,7 @@ cc_ros_library(
         "tf/src/transform_broadcaster.cpp",
         "tf/src/transform_listener.cpp",
     ],
-    hdrs = glob(["tf/include/**/*.h"]),
+    hdrs = glob(["tf/include/**/*.h","tf/include/tf/transform_datatypes.h"]),
     includes = ["tf/include"],
     visibility = ["//visibility:public"],
     copts = [
@@ -59,4 +59,118 @@ cc_ros_library(
         "@ros_geometry2//:tf2_ros",
         "@angles//:angles",
     ],
+)
+
+cc_ros_library(
+    name = "tf_conversions",
+    srcs = [
+        "tf_conversions/src/tf_eigen.cpp",
+        "tf_conversions/src/tf_kdl.cpp",
+    ],
+    hdrs = glob(["tf_conversions/include/**/*.h",]),
+    includes = ["tf_conversions/include"],
+    visibility = ["//visibility:public"],
+    copts = [
+        "-Igeometry", "-std=c++17"
+    ],
+    deps = [
+        ":cc_tf_interface",
+        ":tf",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_common_msgs//:cc_sensor_msgs",
+        "@roscpp_core//:rostime",
+        "@ros_comm//:roscpp_lib",
+        "@ros_geometry2//:tf2",
+        "@ros_geometry2//:tf2_ros",
+        "@angles//:angles",
+        ":kdl_conversions",
+    ],
+)
+
+cc_ros_library(
+    name = "kdl_conversions",
+    srcs = [
+        "kdl_conversions/src/kdl_msg.cpp",
+    ],
+    hdrs = glob(["kdl_conversions/include/**/*.h"]),
+    includes = ["kdl_conversions/include"],
+    visibility = ["//visibility:public"],
+    copts = [
+        "-Igeometry", "-std=c++17"
+    ],
+    deps = [
+        ":cc_tf_interface",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_common_msgs//:cc_sensor_msgs",
+        "@roscpp_core//:rostime",
+        "@ros_comm//:roscpp_lib",
+        "@ros_geometry2//:tf2",
+        "@ros_geometry2//:tf2_ros",
+        "@angles//:angles",
+        "@orocos_kdl//:orocos_kdl"
+    ],
+)
+
+cc_ros_library(
+    name = "eigen_conversions",
+    srcs = glob(["eigen_conversions/src/**/*.cpp"]),
+    hdrs = glob(["eigen_conversions/include/**/*.h"]),
+    includes = ["eigen_conversions/include"],
+    visibility = ["//visibility:public"],
+    copts = [
+        "-Igeometry", "-std=c++17"
+    ],
+    deps = [
+        ":cc_tf_interface",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_common_msgs//:cc_sensor_msgs",
+        "@roscpp_core//:rostime",
+        "@ros_comm//:roscpp_lib",
+        "@ros_geometry2//:tf2",
+        "@ros_geometry2//:tf2_ros",
+        "@angles//:angles",
+        "@orocos_kdl//:orocos_kdl"
+    ],
+)
+
+
+
+
+cc_binary(
+    name = "static_transform_publisher",
+    srcs = [
+        "tf/src/static_transform_publisher.cpp",
+        "tf/src/transform_broadcaster.cpp",
+        "tf/src/tf.cpp",
+    ] + glob(["tf/include/**"]),
+    includes = ["tf/include"],
+    deps =[ 
+        "@ros_comm//:roscpp_lib",
+        "@ros_geometry2//:tf2",
+        "@ros_geometry2//:tf2_ros",
+        ":cc_tf_interface",
+        "@boost//:signals2",
+        "@boost//:thread",
+        "@boost//:unordered",
+        "@console_bridge",
+        "@ros_common_msgs//:cc_geometry_msgs",
+        "@ros_common_msgs//:cc_sensor_msgs",
+        "@roscpp_core//:rostime",
+        "@angles//:angles",
+    ],
+    visibility = [
+        "//visibility:public",
+    ]
 )
