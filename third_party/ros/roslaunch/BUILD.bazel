@@ -1,21 +1,42 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 load("//build_tools:pylint.bzl", "pylint")
-load("//third_party:expand_template.bzl", "expand_template")
 
-expand_template(
+genrule(
     name = "deps",
-    out = "deps.py",
-    data = ["roscore.xml"],
-    substitutions = {"{roscore_xml_path}": "$(rootpath roscore.xml)"},
-    template = "deps.py.tpl",
+    outs = ["deps.py"],
+    cmd = """
+ROSMASTER=($(rootpaths @ros_comm//:rosmaster))
+cat <<EOF > $@
+ROSMASTER_PATH = '$${ROSMASTER}'
+ROSCORE_XML_PATH = '$(rootpath roscore.xml)'
+EOF""",
+    srcs = [
+        "roscore.xml",
+        "@ros_comm//:rosmaster",
+    ],
+)
+
+genrule(
+    name = "roscore_xml",
+    outs = ["roscore.xml"],
+    cmd = """
+ROS_COMM=$(rootpaths @ros_comm//:rosout)
+cat <<EOF > $@
+<launch>
+  <group ns="/">
+    <node type="$${ROS_COMM}" name="rosout" respawn="true"/>
+  </group>
+</launch>
+EOF""",
+    srcs = ["@ros_comm//:rosout"],
 )
 
 py_library(
     name = "roslaunch",
     srcs = glob(["*.py"]) + [":deps"],
     data = [
-        "roscore.xml",
+        ":roscore_xml",
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosout",
     ],
