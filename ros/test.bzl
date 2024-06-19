@@ -4,7 +4,7 @@
 load("@rules_python//python:defs.bzl", "py_test")
 load("//third_party:expand_template.bzl", "expand_template")
 
-def ros_test(name, nodes, launch_file, **kwargs):
+def ros_test(name, nodes, launch_file, deps = [], **kwargs):
     """ Defines a ROS test.
 
     Args:
@@ -32,6 +32,6 @@ def ros_test(name, nodes, launch_file, **kwargs):
         srcs = [launch_script],
         data = nodes + [launch_file],
         main = launch_script,
-        deps = ["@com_github_mvukov_rules_ros//third_party/ros/rostest"],
+        deps = ["@com_github_mvukov_rules_ros//third_party/ros/rostest"] + deps,
         **kwargs
     )
