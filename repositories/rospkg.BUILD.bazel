@@ -1,0 +1,10 @@
+load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+py_library(
+    name = "rospkg",
+    deps = [
+        requirement("rospkg")
+    ],
+    visibility = [
+        "//visibility:public",
+    ]
+)

@@ -150,9 +150,9 @@ def ros_repositories():
         http_archive,
         name = "ros_comm",
         build_file = "@com_github_mvukov_rules_ros//repositories:ros_comm.BUILD.bazel",
-        sha256 = "65906eab18bdf5832af7b6de8c21e3d87d3fac9732a1219637f5b6f5c948508d",
-        strip_prefix = "ros_comm-30922861f247937001f82094c0934a6b802b6325",
-        urls = ["https://github.com/mvukov/ros_comm/archive/30922861f247937001f82094c0934a6b802b6325.tar.gz"],
+        sha256 = "845984fd3cb757a7d6a5e334084b4deb87624b26d38890e513a7feccf6bcea06",
+        strip_prefix = "ros_comm-0.0.1",
+        urls = ["https://github.com/Pailowmenah/ros_comm/archive/refs/tags/0.0.1.tar.gz"],
     )
 
     maybe(
@@ -255,6 +255,14 @@ def ros_repositories():
         sha256 = "85e2cb33ada71eb67d26e84c149f8a5812f9a6e6a1329e4923b95ae74921613a",
         strip_prefix = "rospack-2.6.2",
         urls = ["https://github.com/ros/rospack/archive/refs/tags/2.6.2.tar.gz"],
+    )
+    maybe(
+        http_archive,
+        name = "rospkg",
+        build_file = "@com_github_mvukov_rules_ros//repositories:rospkg.BUILD.bazel",
+        sha256 = "bda5ac5d4c268779529db9b750921dbe347773da8c920dd07959ae87c6d7e0c5",
+        strip_prefix = "rospkg-1.5.1",
+        urls = ["https://github.com/ros-infrastructure/rospkg/archive/refs/tags/1.5.1.zip"],
     )
     maybe(
         http_archive,
