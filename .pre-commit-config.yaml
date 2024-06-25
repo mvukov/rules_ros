@@ -67,6 +67,6 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.3
+    rev: v2.12.2
     hooks:
       - id: pylint
