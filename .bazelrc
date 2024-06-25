@@ -37,6 +37,9 @@ build --noexperimental_check_output_files
 # Don't bother building targets which aren't dependencies of the tests.
 test --build_tests_only
 
+# Make sure Starlark repo rules must be used
+common --incompatible_disable_native_repo_rules
+
 # Load any settings specific to the current user.
 # user.bazelrc should appear in .gitignore so that settings are not shared with
 # team members. This needs to be last statement in this config,
