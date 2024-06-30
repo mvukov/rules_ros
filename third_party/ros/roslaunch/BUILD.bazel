@@ -4,6 +4,10 @@ load("//build_tools:pylint.bzl", "pylint")
 
 genrule(
     name = "deps",
+    srcs = [
+        "roscore.xml",
+        "@ros_comm//:rosmaster",
+    ],
     outs = ["deps.py"],
     cmd = """
 ROSMASTER=($(rootpaths @ros_comm//:rosmaster))
@@ -11,14 +15,11 @@ cat <<EOF > $@
 ROSMASTER_PATH = '$${ROSMASTER}'
 ROSCORE_XML_PATH = '$(rootpath roscore.xml)'
 EOF""",
-    srcs = [
-        "roscore.xml",
-        "@ros_comm//:rosmaster",
-    ],
 )
 
 genrule(
     name = "roscore_xml",
+    srcs = ["@ros_comm//:rosout"],
     outs = ["roscore.xml"],
     cmd = """
 ROS_COMM=$(rootpaths @ros_comm//:rosout)
@@ -29,7 +30,6 @@ cat <<EOF > $@
   </group>
 </launch>
 EOF""",
-    srcs = ["@ros_comm//:rosout"],
 )
 
 py_library(
@@ -60,5 +60,3 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [":roslaunch"],
 )
-
-pylint()

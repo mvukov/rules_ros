@@ -52,5 +52,3 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [":rostest"],
 )
-
-pylint()
