@@ -7,60 +7,6 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def ros_repositories():
     """Imports external/third-party repositories.
     """
-    maybe(
-        http_archive,
-        name = "rules_python",
-        sha256 = "4912ced70dc1a2a8e4b86cec233b192ca053e82bc72d877b98e126156e8f228d",
-        strip_prefix = "rules_python-0.32.2",
-        url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.32.2.tar.gz",
-    )
-
-    maybe(
-        http_archive,
-        name = "bazel_skylib",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz"],
-        sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_gflags_gflags",
-        sha256 = "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf",
-        strip_prefix = "gflags-2.2.2",
-        urls = ["https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"],
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_google_glog",
-        sha256 = "62efeb57ff70db9ea2129a16d0f908941e355d09d6d83c9f7b18557c0a7ab59e",
-        strip_prefix = "glog-d516278b1cd33cd148e8989aec488b6049a4ca0b",
-        urls = ["https://github.com/google/glog/archive/d516278b1cd33cd148e8989aec488b6049a4ca0b.zip"],
-    )
-
-    maybe(
-        http_archive,
-        name = "googletest",
-        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
-        strip_prefix = "googletest-1.14.0",
-        url = "https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz",
-    )
-
-    maybe(
-        http_archive,
-        name = "rules_foreign_cc",
-        sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
-        strip_prefix = "rules_foreign_cc-0.10.1",
-        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/refs/tags/0.10.1.tar.gz",
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_nelhage_rules_boost",
-        sha256 = "90028713d869769d49a9f26a57e89e9f0e83cc0edc1208727aecf0e3ee094967",
-        strip_prefix = "rules_boost-f621ad7bec2abf5a597ed1271fd823d2761943b2",
-        urls = ["https://github.com/nelhage/rules_boost/archive/f621ad7bec2abf5a597ed1271fd823d2761943b2.zip"],
-    )
 
     maybe(
         http_archive,
@@ -134,24 +80,6 @@ def ros_repositories():
         urls = ["https://github.com/ros/ros_comm_msgs/archive/1.11.3.tar.gz"],
     )
 
-    maybe(
-        http_archive,
-        name = "lz4",
-        build_file = "@com_github_mvukov_rules_ros//repositories:lz4.BUILD.bazel",
-        sha256 = "030644df4611007ff7dc962d981f390361e6c97a34e5cbc393ddfbe019ffe2c1",
-        strip_prefix = "lz4-1.9.3",
-        urls = ["https://github.com/lz4/lz4/archive/v1.9.3.tar.gz"],
-    )
-
-    maybe(
-        http_archive,
-        name = "bzip2",
-        build_file = "@com_github_mvukov_rules_ros//repositories:bzip2.BUILD.bazel",
-        sha256 = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
-        strip_prefix = "bzip2-1.0.8",
-        urls = ["https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"],
-    )
-
     # Branched off ros_comm 1.15.9. Changes are in branch feature/rules_ros.
     maybe(
         http_archive,
@@ -199,15 +127,6 @@ def ros_repositories():
     )
 
     ############################################################################
-
-    maybe(
-        http_archive,
-        name = "eigen",
-        build_file = "@com_github_mvukov_rules_ros2//repositories:eigen.BUILD.bazel",
-        sha256 = "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72",
-        strip_prefix = "eigen-3.4.0",
-        urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz"],
-    )
 
     maybe(
         http_archive,
