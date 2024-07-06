@@ -1,0 +1,42 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:base"],
+  dependencyDashboard: true,
+  pip_requirements: {
+    enabled: false,
+  },
+  "pre-commit": {
+    enabled: true,
+  },
+  packageRules: [
+    {
+      matchManagers: ["bazel"],
+      matchPackagePatterns: ["*"],
+      enabled: false,
+    },
+    {
+      matchManagers: ["bazel"],
+      matchPackageNames: [
+        "bazel_skylib",
+        "bzip2",
+        "eigen",
+        "gflags",
+        "glog",
+        "googletest",
+        "lz4",
+        "platforms",
+        "rules_boost",
+        "rules_cc",
+        "rules_foreign_cc",
+        "rules_python",
+      ],
+      enabled: true,
+    },
+    {
+      matchManagers: ["pre-commit"],
+      matchPackagePatterns: ["*"],
+      groupName: "pre-commit-deps",
+    },
+  ],
+  schedule: ["every weekend"],
+}
