@@ -1,5 +1,4 @@
 exports_files([
-    "deps.bzl",
     "repositories.bzl",
     "ros_logging_config.py.tpl",
 ])
