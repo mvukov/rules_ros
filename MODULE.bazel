@@ -67,9 +67,3 @@ pip.parse(
     requirements_lock = "@com_github_mvukov_rules_ros//:requirements_lock.txt",
 )
 use_repo(pip, "rules_ros_pip_deps")
-
-internal_deps = use_extension("@rules_python//python/private/bzlmod:internal_deps.bzl", "internal_deps")
-use_repo(
-    internal_deps,
-    "rules_python_internal",
-)
