@@ -1,0 +1,69 @@
+module(
+    name = "rules_ros",
+    repo_name = "com_github_mvukov_rules_ros",
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "bzip2", version = "1.0.8.bcr.1")
+bazel_dep(name = "eigen", version = "3.4.0.bcr.1")
+bazel_dep(name = "gflags", version = "2.2.2")
+bazel_dep(name = "glog", version = "0.7.0")
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
+bazel_dep(name = "lz4", version = "1.9.4")
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "rules_cc", version = "0.0.9")
+bazel_dep(name = "rules_foreign_cc", version = "0.10.1")
+
+bazel_dep(name = "rules_python", version = "0.33.1", dev_dependency = True)
+
+non_module_ros_repositories = use_extension("//extensions:ros_repositories.bzl", "non_module_dependencies")
+use_repo(
+    non_module_ros_repositories,
+    "console_bridge",
+    "orocos_kdl",
+    "ros_actionlib",
+    "ros_comm",
+    "ros_comm_msgs",
+    "ros_common_msgs",
+    "ros_dynamic_reconfigure",
+    "ros_gencpp",
+    "ros_genmsg",
+    "ros_genpy",
+    "ros_geometry2",
+    "ros_ros",
+    "ros_std_msgs",
+    "rosconsole",
+    "roscpp_core",
+    "tinyxml",
+    "urdfdom",
+    "urdfdom_headers",
+)
+
+bazel_dep(name = "rules_boost")
+archive_override(
+    module_name = "rules_boost",
+    integrity = "sha256-I1iTdF3qckTmDRab+0yjA37Iya9AOGvEGJVoPtfpADM=",
+    strip_prefix = "rules_boost-42d8155d8f20a1aee8ee20b7903a495bdfb9befd",
+    urls = "https://github.com/nelhage/rules_boost/archive/42d8155d8f20a1aee8ee20b7903a495bdfb9befd.zip",
+)
+
+non_module_boost_repositories = use_extension("@rules_boost//:boost/repositories.bzl", "non_module_dependencies")
+use_repo(
+    non_module_boost_repositories,
+    "boost",
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.10",
+)
+use_repo(python, "python_3_10", "python_versions")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "rules_ros_pip_deps",
+    python_version = "3.10",
+    requirements_lock = "@com_github_mvukov_rules_ros//:requirements_lock.txt",
+)
+use_repo(pip, "rules_ros_pip_deps")

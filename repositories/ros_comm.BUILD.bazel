@@ -255,7 +255,7 @@ cc_ros_library(
         ":roslz4",
         "@boost//:filesystem",
         "@boost//:format",
-        "@bzip2",
+        "@bzip2//:bz2",
         "@console_bridge",
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
