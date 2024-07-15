@@ -20,7 +20,7 @@ cc_ros_library(
     includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [
-        "@python_linux//:python37_lib",
+        "@python_linux//:python10_lib",
         "@boost//:unordered",
         "@boost//:program_options",
         "@boost//:thread",
