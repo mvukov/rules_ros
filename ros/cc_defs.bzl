@@ -23,6 +23,10 @@ def cc_ros_library(name, ros_package_name = None, **kwargs):
     cc_library(
         name = name,
         local_defines = local_defines,
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//os:osx",
+        ],
         **kwargs
     )
 
@@ -43,5 +47,9 @@ def cc_ros_binary(name, ros_package_name = None, **kwargs):
     cc_binary(
         name = name,
         local_defines = local_defines,
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//os:osx",
+        ],
         **kwargs
     )
