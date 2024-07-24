@@ -40,11 +40,11 @@ cc_library(
     name = "roscpp_traits",
     hdrs = glob(["roscpp_traits/include/ros/*.h"]),
     includes = ["roscpp_traits/include"],
-    visibility = ["//visibility:public"],
     target_compatible_with = [
         "@platforms//os:linux",
         "@platforms//os:osx",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
         ":rostime",
@@ -67,11 +67,11 @@ cc_ros_library(
 
 cc_library(
     name = "roscpp_core",
-    visibility = ["//visibility:public"],
     target_compatible_with = [
         "@platforms//os:linux",
         "@platforms//os:osx",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
         ":roscpp_serialization",
