@@ -41,7 +41,7 @@ use_repo(
 bazel_dep(name = "rules_boost")
 archive_override(
     module_name = "rules_boost",
-     integrity = "sha256-EEmldYvkzka7KLDMgziSgCXDWK9J04/F3DBdFnv+188=",
+    integrity = "sha256-EEmldYvkzka7KLDMgziSgCXDWK9J04/F3DBdFnv+188=",
     strip_prefix = "rules_boost-8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1",
     urls = "https://github.com/nelhage/rules_boost/archive/8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1.zip",
 )
