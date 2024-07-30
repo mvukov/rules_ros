@@ -98,6 +98,7 @@ ros_launch(
     nodes = [
         ":talker",
         ":listener",
+        ":py_listener",
     ],
 )
 

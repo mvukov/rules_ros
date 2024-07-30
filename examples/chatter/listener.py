@@ -1,4 +1,5 @@
-import example_msgs.msg
+#!/usr/bin/env python3
+from examples.chatter.example_msgs.msg import Example
 import rospy
 
 
@@ -9,7 +10,7 @@ def callback(msg):
 def main():
     rospy.init_node('listener', anonymous=True)
     sub = rospy.Subscriber(  # noqa
-        'chatter', example_msgs.msg.Example, callback)
+        'chatter', Example, callback)
     rospy.spin()
 
 
