@@ -6,6 +6,15 @@ config_setting(
     values = {"cpu": "k8"},
     visibility = ["//visibility:public"],
 )
+cc_library(
+    name = "python310_lib",
+    srcs = ["@python310_x86_64-unknown-linux-gnu//:lib/libpython3.so"],
+    hdrs = ["@python310_x86_64-unknown-linux-gnu//:includes"],
+    includes = [
+        "external/python310_x86_64-unknown-linux-gnu/include/python3.10/",
+    ],
+    visibility = ["//visibility:public"]
+)
 
 cc_ros_library(
     name = "rospack",
@@ -17,10 +26,16 @@ cc_ros_library(
         
     ],
     hdrs = glob(["include/rospack/*.h", "src/*.h"]),
-    includes = ["include"],
+    copts = [
+        "-Iexternal/python310_x86_64-unknown-linux-gnu/include/python3.10/"
+    ],
+    linkopts=[
+        "-lpython3.10",
+    ],
+    includes = ["include", "include/python3.10"],
     visibility = ["//visibility:public"],
     deps = [
-        "@python_linux//:python310_lib",
+        ":python310_lib",
         "@boost//:unordered",
         "@boost//:program_options",
         "@boost//:thread",
