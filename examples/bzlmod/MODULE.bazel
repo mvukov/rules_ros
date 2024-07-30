@@ -9,12 +9,13 @@ local_path_override(
     module_name = "com_github_mvukov_rules_ros",
     path = "../..",
 )
-# but normal usage would be to use a git override
-#git_override(
-#    module_name = "com_github_mvukov_rules_ros",
-#    remote = "https://github.com/mvukov/rules_ros.git",
-#    commit = "160940582fea35a2335d04183e0c540c1209d27e", # TODO update 
-#)
+# but normal usage would be to use an archive override
+# archive_override(
+#     module_name = "com_github_mvukov_rules_ros",
+#     integrity = "sha256-zIzL/BydBIPyok6HhmaKbKIA4SL6qE9buk2Sz+E8LeQ=", # TODO Update
+#     strip_prefix = "rules_ros-8223b6f7dc6f35cc7aca74cb9a09394a76a149bb", # TODO Update
+#     urls = "https://github.com/mvukov/rules_ros//archive/8223b6f7dc6f35cc7aca74cb9a09394a76a149bb.zip" # TODO Update
+# )
 
 bazel_dep(name = "rules_boost")
 archive_override(
