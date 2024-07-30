@@ -94,7 +94,7 @@ py_binary(
 # the deployment and start the launcher.
 ros_launch(
     name = "chatter",
-    launch_files = [":chatter.launch"],
+    launch_files = ["chatter.launch"],
     nodes = [
         ":talker",
         ":listener",
