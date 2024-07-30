@@ -1,4 +1,5 @@
 <launch>
-  <node type="examples/chatter/talker" name="talker" />
-  <node type="examples/chatter/listener" name="listener" output="screen" />
+  <node type="examples/chatter/talker" name="talker" required="true" />
+  <node type="examples/chatter/listener" name="listener" output="screen" required="true" />
+  <node pkg="examples/chatter" type="examples/chatter/listener.py" name="listenerpy" output="screen" required="true" />
 </launch>
