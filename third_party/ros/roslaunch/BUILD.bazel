@@ -45,6 +45,7 @@ py_library(
         "//third_party/ros:roslib",
         "@ros_comm//:rosmaster",
         "@ros_comm//:rosparam",
+        "@ros_comm//:rospy",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_ros//:rosclean",
         requirement("pyyaml"),
