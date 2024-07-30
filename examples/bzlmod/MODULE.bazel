@@ -1,0 +1,25 @@
+module(
+    name = "bzlmod_example",
+    repo_name = "bzlmod_example",
+)
+
+bazel_dep(name = "com_github_mvukov_rules_ros")
+# local_path_override just so that one can test this locally
+local_path_override(
+    module_name = "com_github_mvukov_rules_ros",
+    path = "../..",
+)
+# but normal usage would be to use a git override
+#git_override(
+#    module_name = "com_github_mvukov_rules_ros",
+#    remote = "https://github.com/mvukov/rules_ros.git",
+#    commit = "160940582fea35a2335d04183e0c540c1209d27e", # TODO update 
+#)
+
+bazel_dep(name = "rules_boost")
+archive_override(
+    module_name = "rules_boost",
+    integrity = "sha256-EEmldYvkzka7KLDMgziSgCXDWK9J04/F3DBdFnv+188=",
+    strip_prefix = "rules_boost-8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1",
+    urls = "https://github.com/nelhage/rules_boost/archive/8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1.zip",
+)
