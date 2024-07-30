@@ -42,9 +42,9 @@ use_repo(
 bazel_dep(name = "rules_boost")
 archive_override(
     module_name = "rules_boost",
-    integrity = "sha256-I1iTdF3qckTmDRab+0yjA37Iya9AOGvEGJVoPtfpADM=",
-    strip_prefix = "rules_boost-42d8155d8f20a1aee8ee20b7903a495bdfb9befd",
-    urls = "https://github.com/nelhage/rules_boost/archive/42d8155d8f20a1aee8ee20b7903a495bdfb9befd.zip",
+     integrity = "sha256-EEmldYvkzka7KLDMgziSgCXDWK9J04/F3DBdFnv+188=",
+    strip_prefix = "rules_boost-8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1",
+    urls = "https://github.com/nelhage/rules_boost/archive/8fa193c4e21daaa2d46ff6b9c2b5a2de70b6caa1.zip",
 )
 
 non_module_boost_repositories = use_extension("@rules_boost//:boost/repositories.bzl", "non_module_dependencies")
