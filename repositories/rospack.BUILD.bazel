@@ -6,14 +6,24 @@ config_setting(
     values = {"cpu": "k8"},
     visibility = ["//visibility:public"],
 )
-cc_library(
+
+cc_binary(
     name = "python310_lib",
+    deps = [
+        ":_python310_lib"
+    ],
+    linkshared = True
+)
+cc_library(
+    name = "_python310_lib",
     srcs = ["@python310_x86_64-unknown-linux-gnu//:lib/libpython3.so"],
     hdrs = ["@python310_x86_64-unknown-linux-gnu//:includes"],
     includes = [
         "external/python310_x86_64-unknown-linux-gnu/include/python3.10/",
     ],
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
+    alwayslink=True,
+    linkstatic=True,
 )
 
 cc_ros_library(
@@ -43,4 +53,6 @@ cc_ros_library(
         "@console_bridge",
         "@tinyxml2//:tinyxml2",
     ],
+    alwayslink = True, 
+    linkstatic = True,
 )
