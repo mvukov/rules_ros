@@ -137,7 +137,7 @@ pkg_tar(
 # to run the roslaunch command.
 oci_image(
     name = "chatter_oci_image",
-    base = "@base-image",
+    base = "@com_github_mvukov_rules_ros_base_image",
     tars = [":chatter_tar"],
     workdir = "/chatter/chatter.runfiles/_main",
     entrypoint = ["/chatter/chatter"],
