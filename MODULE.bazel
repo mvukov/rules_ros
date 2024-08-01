@@ -14,6 +14,22 @@ bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
 
+bazel_dep(name = "rules_oci")
+archive_override(
+    module_name = "rules_oci",
+    strip_prefix = "rules_oci-e389ddeed00139eaec9ca24689fa71079725d8ab",
+    urls = "https://github.com/bazel-contrib/rules_oci/archive/e389ddeed00139eaec9ca24689fa71079725d8ab.zip",
+)
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "base-image",
+    image = "public.ecr.aws/docker/library/python:3.10",
+    platforms = ["linux/amd64"],
+)
+use_repo(oci, "base-image", "base-image_linux_amd64")
+
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+
 bazel_dep(name = "rules_python", version = "0.33.2", dev_dependency = True)
 
 non_module_ros_repositories = use_extension("//ros:extensions.bzl", "non_module_dependencies")
