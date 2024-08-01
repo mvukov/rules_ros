@@ -39,9 +39,6 @@ cc_ros_library(
     copts = [
         "-Iexternal/python310_x86_64-unknown-linux-gnu/include/python3.10/"
     ],
-    linkopts=[
-        "-lpython3.10",
-    ],
     includes = ["include", "include/python3.10"],
     visibility = ["//visibility:public"],
     deps = [
