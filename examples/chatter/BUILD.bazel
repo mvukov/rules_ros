@@ -7,6 +7,12 @@
 - Defining a Bazel target for running ROS-topic introspection functionality.
 """
 
+load(
+    "@rules_oci//oci:defs.bzl", 
+    "oci_image", 
+    "oci_load"
+    )
+load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ros:cc_defs.bzl", "cc_ros_binary")
 load(
@@ -108,4 +114,40 @@ ros_launch(
 ros_topic(
     name = "rostopic",
     deps = [":chatter"],
+)
+
+# packages up the nodes, launch file, and all the other required runfiles.
+# Note the symlink is required in order to place the files where ros_launch is
+# expecting them to be.
+pkg_tar(
+    name = "chatter_tar",
+    srcs = [
+        ":chatter",
+    ],
+    include_runfiles = True,
+    package_dir = "chatter",
+    symlinks = {
+        "/chatter/chatter.runfiles/_main/external": "/chatter/chatter.runfiles",
+    }
+)
+
+# builds the oci image on top of the @base-image defined at the MODULE level. 
+# Note that even though the version of python that the nodes run in is contained
+# in the runfiles, a version of python is required at the system level in order
+# to run the roslaunch command.
+oci_image(
+    name = "chatter_oci_image",
+    base = "@com_github_mvukov_rules_ros_base_image",
+    tars = [":chatter_tar"],
+    workdir = "/chatter/chatter.runfiles/_main",
+    entrypoint = ["/chatter/chatter"],
+)
+
+# loads the oci image into the docker daemon.
+# Example usage: `bazel run //examples/chatter:chatter_oci_load`
+# Then to run the container: `docker run -it --rm chatter:latest`
+oci_load(
+    name = "chatter_oci_load",
+    image = ":chatter_oci_image",
+    repo_tags = ["chatter:latest"],
 )
