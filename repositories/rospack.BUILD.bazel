@@ -36,6 +36,9 @@ cc_ros_library(
         
     ],
     hdrs = glob(["include/rospack/*.h", "src/*.h"]),
+    linkopts =[ 
+        "-lpython3.9"
+    ],
     copts = [
         "-Iexternal/python310_x86_64-unknown-linux-gnu/include/python3.10/"
     ],
