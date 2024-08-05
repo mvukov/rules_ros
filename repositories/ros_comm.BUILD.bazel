@@ -120,8 +120,8 @@ cc_ros_library(
     linkopts = ["-lm"],
     ros_package_name = "roscpp",
     visibility = ["//visibility:public"],
-    linkstatic = True, 
-    alwayslink = True, 
+    linkstatic = True,
+    alwayslink = True,
     deps = [
         ":cc_roscpp",
         ":xmlrpcpp",
@@ -333,7 +333,6 @@ py_library(
     deps = [
         ":py_topic_tools",
         ":rospy",
-        "@com_github_mvukov_rules_ros//:py_roslib_slim",
         requirement("gnupg"),
         requirement("pycryptodomex"),
         requirement("rospkg"),
@@ -348,7 +347,6 @@ py_library(
     deps = [
         ":py_roscpp",
         ":rosgraph_lib",
-        "@com_github_mvukov_rules_ros//:py_roslib_slim",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
         "@ros_std_msgs//:py_std_msgs",
