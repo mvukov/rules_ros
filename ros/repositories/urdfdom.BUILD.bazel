@@ -2,7 +2,7 @@
 """
 
 load(
-    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "@rules_ros//ros:cc_defs.bzl",
     "cc_ros_binary",
     "cc_ros_library",
 )

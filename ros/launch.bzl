@@ -21,7 +21,7 @@ def ros_launch(name, nodes, launch_files, **kwargs):
     launch_script = "{}_launch.py".format(name)
     expand_template(
         name = "{}_launch_gen".format(name),
-        template = "@com_github_mvukov_rules_ros//ros:launch.py.tpl",
+        template = "@rules_ros//ros:launch.py.tpl",
         substitutions = substitutions,
         out = launch_script,
         data = launch_files,
@@ -32,6 +32,6 @@ def ros_launch(name, nodes, launch_files, **kwargs):
         srcs = [launch_script],
         data = nodes + launch_files,
         main = launch_script,
-        deps = ["@com_github_mvukov_rules_ros//third_party/ros:roslaunch"],
+        deps = ["@rules_ros//third_party/ros:roslaunch"],
         **kwargs
     )

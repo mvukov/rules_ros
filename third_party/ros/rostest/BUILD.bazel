@@ -12,9 +12,9 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_mvukov_rules_ros//third_party/ros:roslaunch",
         "@ros_comm//:rospy",
         "@ros_ros//:rosunit",
+        "@rules_ros//third_party/ros:roslaunch",
     ],
 )
 
@@ -24,7 +24,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":rostest",
-        "@com_github_mvukov_rules_ros//third_party/ros/rosservice",
+        "@rules_ros//third_party/ros/rosservice",
     ],
 )
 

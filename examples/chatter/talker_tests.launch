@@ -1,9 +1,9 @@
 <launch>
-  <node name="talker" type="examples/chatter/talker" />
+  <node name="talker" type="chatter/talker" />
 
   <test name="advertisetest"
       test-name="advertisetest"
-      type="third_party/ros/rostest/advertisetest">
+      type="../rules_ros~/third_party/ros/rostest/advertisetest">
     <rosparam>
       topics:
         - name: /chatter
@@ -14,7 +14,7 @@
 
   <test name="publishtest"
         test-name="publishtest"
-        type="third_party/ros/rostest/publishtest">
+        type="../rules_ros~/third_party/ros/rostest/publishtest">
     <rosparam>
       topics:
         - name: /chatter
