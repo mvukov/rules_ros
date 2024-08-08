@@ -59,7 +59,7 @@ cc_ros_binary(
 # Defines tests for the talker node.
 ros_test(
     name = "talker_tests",
-    launch_file = ":talker_tests.launch",
+    launch_file = "talker_tests.launch",
     nodes = [
         ":talker",
         "@rules_ros//third_party/ros/rostest:advertisetest",
