@@ -1,8 +1,8 @@
 """ Builds roscpp_core.
 """
 
-load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_ros//ros:cc_defs.bzl", "cc_ros_library")
 
 cc_ros_library(
     name = "cpp_common",

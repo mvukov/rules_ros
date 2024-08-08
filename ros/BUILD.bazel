@@ -17,5 +17,5 @@ py_binary(
     srcs = ["parameter_generator_app.py"],
     main = "parameter_generator_app.py",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_mvukov_rules_ros//third_party/ros:dynamic_reconfigure"],
+    deps = ["@rules_ros//third_party/ros:dynamic_reconfigure"],
 )

@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("//build_tools:pylint.bzl", "pylint")
+load("//third_party:symlink.bzl", "symlink")
 
 py_library(
     name = "rostest",
@@ -12,45 +13,69 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_mvukov_rules_ros//third_party/ros:roslaunch",
         "@ros_comm//:rospy",
         "@ros_ros//:rosunit",
+        "@rules_ros//third_party/ros:roslaunch",
     ],
 )
 
 py_binary(
-    name = "advertisetest",
+    name = "advertisetest_impl",
     srcs = ["advertisetest.py"],
-    visibility = ["//visibility:public"],
+    main = "advertisetest.py",
     deps = [
         ":rostest",
-        "@com_github_mvukov_rules_ros//third_party/ros/rosservice",
+        "@rules_ros//third_party/ros/rosservice",
     ],
 )
 
+symlink(
+    name = "advertisetest",
+    executable = ":advertisetest_impl",
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
-    name = "hztest",
+    name = "hztest_impl",
     srcs = ["hztest.py"],
-    visibility = ["//visibility:public"],
+    main = "hztest.py",
     deps = [
         ":rostest",
     ],
 )
 
+symlink(
+    name = "hztest",
+    executable = ":hztest_impl",
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
-    name = "paramtest",
+    name = "paramtest_impl",
     srcs = ["paramtest.py"],
-    visibility = ["//visibility:public"],
+    main = "paramtest.py",
     deps = [
         ":rostest",
     ],
 )
 
-py_binary(
-    name = "publishtest",
-    srcs = ["publishtest.py"],
+symlink(
+    name = "paramtest",
+    executable = ":paramtest_impl",
     visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "publishtest_impl",
+    srcs = ["publishtest.py"],
+    main = "publishtest.py",
     deps = [":rostest"],
+)
+
+symlink(
+    name = "publishtest",
+    executable = ":publishtest_impl",
+    visibility = ["//visibility:public"],
 )
 
 pylint()

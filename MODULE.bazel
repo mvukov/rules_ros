@@ -1,7 +1,4 @@
-module(
-    name = "rules_ros",
-    repo_name = "com_github_mvukov_rules_ros",
-)
+module(name = "rules_ros")
 
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "bzip2", version = "1.0.8.bcr.1")
@@ -13,8 +10,7 @@ bazel_dep(name = "lz4", version = "1.9.4")
 bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
-
-bazel_dep(name = "rules_python", version = "0.34.0", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "0.34.0")
 
 non_module_ros_repositories = use_extension("//ros:extensions.bzl", "non_module_dependencies")
 use_repo(
@@ -64,6 +60,6 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "rules_ros_pip_deps",
     python_version = "3.10",
-    requirements_lock = "@com_github_mvukov_rules_ros//:requirements_lock.txt",
+    requirements_lock = "@rules_ros//:requirements_lock.txt",
 )
 use_repo(pip, "rules_ros_pip_deps")
