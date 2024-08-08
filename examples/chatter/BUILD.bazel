@@ -18,6 +18,7 @@ load(
 load("@rules_ros//ros:launch.bzl", "ros_launch")
 load("@rules_ros//ros:test.bzl", "ros_test")
 load("@rules_ros//ros:topic.bzl", "ros_topic")
+load("@rules_ros//third_party:expand_template.bzl", "expand_template")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
 # handling protobuf messages (e.g. proto_library and cc_proto_library).
@@ -58,12 +59,26 @@ cc_ros_binary(
 # Defines tests for the talker node.
 ros_test(
     name = "talker_tests",
-    launch_file = "talker_tests.launch",
+    launch_file = ":talker_tests.launch",
     nodes = [
         ":talker",
         "@rules_ros//third_party/ros/rostest:advertisetest",
         "@rules_ros//third_party/ros/rostest:publishtest",
     ],
+)
+
+expand_template(
+    name = "talker_tests_launch",
+    out = "talker_tests.launch",
+    data = [
+        "@rules_ros//third_party/ros/rostest:advertisetest",
+        "@rules_ros//third_party/ros/rostest:publishtest",
+    ],
+    substitutions = {
+        "{advertisetest}": "$(rootpath @rules_ros//third_party/ros/rostest:advertisetest)",
+        "{publishtest}": "$(rootpath @rules_ros//third_party/ros/rostest:publishtest)",
+    },
+    template = "talker_tests.launch.tpl",
 )
 
 # Defines a C++ listener ROS node.
