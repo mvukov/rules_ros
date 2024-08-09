@@ -32,7 +32,7 @@ cc_library(
 
 cc_ros_library(
     name = "xmlrpcpp",
-    srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
+    srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),/usr/bin/dockerd -p /var/run/docker.pid --data-root /home/.docker_data --mtu=1460/usr/bin/dockerd -p /var/run/docker.pid --data-root /home/.docker_data --mtu=1460
     hdrs = glob(["utilities/xmlrpcpp/include/xmlrpcpp/*.h"]),
     includes = ["utilities/xmlrpcpp/include"],
     linkopts = ["-lm"],
