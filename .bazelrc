@@ -26,6 +26,7 @@ build --heap_dump_on_oom
 # Speed up all builds by not checking if output files have been modified.
 build --noexperimental_check_output_files
 
+# This is a mandatory flag.
 build --@rules_python//python/config_settings:python_version=3.10
 
 # Don't bother building targets which aren't dependencies of the tests.

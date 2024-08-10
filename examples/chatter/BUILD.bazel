@@ -71,10 +71,12 @@ expand_template(
     name = "talker_tests_launch",
     out = "talker_tests.launch",
     data = [
+        ":talker",
         "@rules_ros//third_party/ros/rostest:advertisetest",
         "@rules_ros//third_party/ros/rostest:publishtest",
     ],
     substitutions = {
+        "{talker}": "$(rootpath :talker)",
         "{advertisetest}": "$(rootpath @rules_ros//third_party/ros/rostest:advertisetest)",
         "{publishtest}": "$(rootpath @rules_ros//third_party/ros/rostest:publishtest)",
     },

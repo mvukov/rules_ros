@@ -1,5 +1,5 @@
 <launch>
-  <node name="talker" type="chatter/talker" />
+  <node name="talker" type="{talker}" />
 
   <test name="advertisetest"
       test-name="advertisetest"
