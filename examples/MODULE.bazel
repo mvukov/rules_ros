@@ -49,9 +49,3 @@ archive_override(
     strip_prefix = "rules_boost-42d8155d8f20a1aee8ee20b7903a495bdfb9befd",
     urls = "https://github.com/nelhage/rules_boost/archive/42d8155d8f20a1aee8ee20b7903a495bdfb9befd.zip",
 )
-
-non_module_boost_repositories = use_extension("@rules_boost//:boost/repositories.bzl", "non_module_dependencies")
-use_repo(
-    non_module_boost_repositories,
-    "boost",
-)
