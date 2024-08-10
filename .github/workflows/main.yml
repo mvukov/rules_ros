@@ -51,6 +51,21 @@ jobs:
       image: mvukov/bazel-builder:commit-49178bdf9c151b1fdb1fb0bac580da5d53a990fd
       options: --user ${{ needs.configure.outputs.uid_gid }}
 
+    # Run bazel test with gcc and clang in each workspace
+    strategy:
+      matrix:
+        folder:
+          - "."
+          - "examples"
+        toolchain:
+          - "gcc"
+          - "clang"
+        include:
+          - toolchain: "gcc"
+            config_option: ""
+          - toolchain: "clang"
+            config_option: "--config=clang"
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
@@ -74,12 +89,13 @@ jobs:
           path: |
             ~/.cache/bazel
             ~/.cache/bazel-repo
-          key: v1-bazel-repo-cache-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'repositories/**', 'requirements_lock.txt') }}
-          restore-keys: v4-bazel-repo-cache
-      - name: bazel test //...
+          key: v4-bazel-repo-cache-${{ matrix.toolchain }}-${{ hashFiles('.bazelversion', 'examples/WORKSPACE', 'repositories/**', 'requirements_lock.txt', 'WORKSPACE') }}
+          restore-keys: v4-bazel-repo-cache-${{ matrix.toolchain }}-
+      - name: bazel test ${{ matrix.config_option }} //...
         env:
           # Bazelisk will download bazel to here, ensure it is cached between runs.
           XDG_CACHE_HOME: /github/home/.cache/bazel-repo
           BUILDBUDDY_ORG_API_KEY: ${{ secrets.BUILDBUDDY_ORG_API_KEY }}
           USER: ${{ needs.configure.outputs.user_name }}
-        run: ${GITHUB_WORKSPACE}/.github/workflows/test.sh
+        working-directory: ${{ matrix.folder }}
+        run: ${GITHUB_WORKSPACE}/.github/workflows/test.sh ${{ matrix.config_option }}
