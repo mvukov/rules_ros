@@ -7,8 +7,8 @@ import sys
 # Must be set before pylint is imported!
 os.environ['PYLINTHOME'] = os.environ['TEST_UNDECLARED_OUTPUTS_DIR']
 
-import pylint.lint  # noqa
-import pylint.reporters.text  # noqa
+import pylint.lint
+import pylint.reporters.text
 
 PYLINTRC_FILE = './pylint.rc'
 NUM_CPU_CORES_FOR_PYLINT = 2
