@@ -6,9 +6,12 @@ load("//ros:cc_defs.bzl", "cc_ros_binary")
 load(
     "//ros:dynamic_reconfigure.bzl",
     "cc_ros_dynamic_reconfigure_library",
+    "py_ros_dynamic_reconfigure_library",
     "ros_dynamic_reconfigure_library",
 )
 load("//ros:launch.bzl", "ros_launch")
+
+exports_files(["Tutorial.cfg"])
 
 ros_dynamic_reconfigure_library(
     name = "tutorial_cfg",
@@ -18,6 +21,19 @@ ros_dynamic_reconfigure_library(
 cc_ros_dynamic_reconfigure_library(
     name = "cc_tutorial_cfg",
     dep = ":tutorial_cfg",
+)
+
+py_ros_dynamic_reconfigure_library(
+    name = "py_tutorial_cfg",
+    dep = ":tutorial_cfg",
+)
+
+py_binary(
+    name = "py_server",
+    srcs = ["server.py"],
+    legacy_create_init = 0,
+    main = "server.py",
+    deps = [":py_tutorial_cfg"],
 )
 
 cc_ros_binary(
