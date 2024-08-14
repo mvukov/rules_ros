@@ -2,15 +2,13 @@
 """
 
 load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
-load("@rules_python//python:defs.bzl", "py_library")
 load(
     "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",
 )
-
-
+load("@rules_python//python:defs.bzl", "py_library")
 
 ros_interface_library(
     name = "dynamic_reconfigure",
@@ -53,19 +51,27 @@ py_library(
     name = "dynamic_reconfigure_py_lib",
     srcs = glob(["src/dynamic_reconfigure/*"]),
     imports = [
-        "src"
+        "src",
     ],
     deps = [
         ":py_dynamic_reconfigure",
     ],
     visibility = ["//visibility:public"],
-)   
+)
 
 filegroup(
     name = "cc_templates",
     srcs = [
         "templates/ConfigType.h.template",
         "templates/GroupClass.h.template",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "py_templates",
+    srcs = [
+        "templates/ConfigType.py.template",
     ],
     visibility = ["//visibility:public"],
 )

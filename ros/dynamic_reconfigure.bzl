@@ -16,6 +16,7 @@
 """
 
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_library")
 load("//ros:utils.bzl", "get_stem")
 
 RosDynamicReconfigureInfo = provider(
@@ -31,7 +32,7 @@ def _ros_dynamic_reconfigure_library_impl(ctx):
 
     if ctx.attr.pkg_override:
         ros_package_name = ctx.attr.pkg_override
-    
+
     return [
         DefaultInfo(files = depset(src)),
         RosDynamicReconfigureInfo(
@@ -50,8 +51,8 @@ ros_dynamic_reconfigure_library = rule(
             doc = "A configuration file (.cfg).",
         ),
         "pkg_override": attr.string(
-            doc = "An override for pkg name."
-        )
+            doc = "An override for pkg name.",
+        ),
     },
     implementation = _ros_dynamic_reconfigure_library_impl,
     doc = " Defines a rule for storing a dynamic_reconfigure configuration. ",
@@ -133,5 +134,81 @@ def cc_ros_dynamic_reconfigure_library(name, dep, **kwargs):
             "@boost//:thread",
             "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
         ],
+        **kwargs
+    )
+
+def _py_ros_dynamic_reconfigure_generator_impl(ctx):
+    info = ctx.attr.dep[RosDynamicReconfigureInfo].info
+    cfg_file = info.src[0]
+    ros_package_name = info.ros_package_name
+    templates = ctx.attr._templates[DefaultInfo].files.to_list()
+    dynconfpath = _get_parent_dir(templates[0].dirname)
+
+    stem = get_stem(cfg_file)
+    output = ctx.actions.declare_file(
+        "{}/cfg/{}Config.py".format(ros_package_name, stem),
+    )
+
+    args = ctx.actions.args()
+    args.add("--input", cfg_file)
+    args.add("--ros_package_name", ros_package_name)
+    args.add("--dynconfpath", dynconfpath)
+    args.add("--py_gen_dir", _get_parent_dir(output.dirname))
+
+    ctx.actions.run(
+        inputs = [cfg_file] + templates,
+        outputs = [output],
+        executable = ctx.executable._generator,
+        arguments = [args],
+    )
+
+    return [
+        DefaultInfo(
+            files = depset([output]),
+            runfiles = ctx.runfiles(files = [output]),
+        ),
+        PyInfo(
+            transitive_sources = depset([output]),
+            imports = depset([]),
+        ),
+    ]
+
+py_ros_dynamic_reconfigure_generator = rule(
+    implementation = _py_ros_dynamic_reconfigure_generator_impl,
+    attrs = {
+        "dep": attr.label(
+            mandatory = True,
+            providers = [RosDynamicReconfigureInfo],
+        ),
+        "_generator": attr.label(
+            default = Label("@com_github_mvukov_rules_ros//ros:parameter_generator_app"),
+            executable = True,
+            cfg = "exec",
+        ),
+        "_templates": attr.label(
+            default = Label("@ros_dynamic_reconfigure//:py_templates"),
+        ),
+    },
+)
+
+def py_ros_dynamic_reconfigure_library(name, dep, **kwargs):
+    """ Defines a Python dynamic reconfiguration library.
+
+    Args:
+        name: A unique target name.
+        dep: A configuration file -- a `ros_dynamic_reconfigure_library` target.
+        **kwargs: https://bazel.build/reference/be/common-definitions#common-attributes
+    """
+    generator_name = name + "_generator"
+    py_ros_dynamic_reconfigure_generator(
+        name = generator_name,
+        dep = dep,
+    )
+
+    py_library(
+        name = name,
+        srcs = [generator_name],
+        imports = ["."],
+        # deps = ["@ros_dynamic_reconfigure//:dynamic_reconfigure_py_lib"],
         **kwargs
     )
