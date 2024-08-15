@@ -9,7 +9,7 @@ local_path_override(
     path = "..",
 )
 
-# In a normal workflow, you would typically import rules_ros2 into your
+# In a normal workflow, you would typically import rules_ros into your
 # (mono)repo as follows:
 # bazel_dep(name = "rules_ros")
 # archive_override(
