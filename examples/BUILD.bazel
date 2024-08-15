@@ -1,3 +1,5 @@
+# The following aliases are defined for convenience.
+
 alias(
     name = "roscore",
     actual = "@rules_ros//third_party/ros/roslaunch:roscore",
