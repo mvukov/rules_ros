@@ -8,16 +8,17 @@
 """
 
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//ros:cc_defs.bzl", "cc_ros_binary")
+load("@rules_ros//ros:cc_defs.bzl", "cc_ros_binary")
 load(
-    "//ros:interfaces.bzl",
+    "@rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",
 )
-load("//ros:launch.bzl", "ros_launch")
-load("//ros:test.bzl", "ros_test")
-load("//ros:topic.bzl", "ros_topic")
+load("@rules_ros//ros:launch.bzl", "ros_launch")
+load("@rules_ros//ros:test.bzl", "ros_test")
+load("@rules_ros//ros:topic.bzl", "ros_topic")
+load("@rules_ros//third_party:expand_template.bzl", "expand_template")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
 # handling protobuf messages (e.g. proto_library and cc_proto_library).
@@ -61,9 +62,25 @@ ros_test(
     launch_file = "talker_tests.launch",
     nodes = [
         ":talker",
-        "//third_party/ros/rostest:advertisetest",
-        "//third_party/ros/rostest:publishtest",
+        "@rules_ros//third_party/ros/rostest:advertisetest",
+        "@rules_ros//third_party/ros/rostest:publishtest",
     ],
+)
+
+expand_template(
+    name = "talker_tests_launch",
+    out = "talker_tests.launch",
+    data = [
+        ":talker",
+        "@rules_ros//third_party/ros/rostest:advertisetest",
+        "@rules_ros//third_party/ros/rostest:publishtest",
+    ],
+    substitutions = {
+        "{talker}": "$(rootpath :talker)",
+        "{advertisetest}": "$(rootpath @rules_ros//third_party/ros/rostest:advertisetest)",
+        "{publishtest}": "$(rootpath @rules_ros//third_party/ros/rostest:publishtest)",
+    },
+    template = "talker_tests.launch.tpl",
 )
 
 # Defines a C++ listener ROS node.

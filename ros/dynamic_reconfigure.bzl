@@ -95,7 +95,7 @@ cc_ros_dynamic_reconfigure_generator = rule(
             providers = [RosDynamicReconfigureInfo],
         ),
         "_generator": attr.label(
-            default = Label("@com_github_mvukov_rules_ros//ros:parameter_generator_app"),
+            default = Label("@rules_ros//ros:parameter_generator_app"),
             executable = True,
             cfg = "exec",
         ),

@@ -3,23 +3,23 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load(
-    "@com_github_mvukov_rules_ros//ros:cc_defs.bzl",
+    "@rules_ros//ros:cc_defs.bzl",
     "cc_ros_binary",
     "cc_ros_library",
 )
 load(
-    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "@rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",
 )
 load(
-    "@com_github_mvukov_rules_ros//third_party:expand_template.bzl",
+    "@rules_ros//third_party:expand_template.bzl",
     "expand_template",
 )
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
 cc_library(
@@ -148,7 +148,7 @@ expand_template(
     substitutions = {
         "{default_python_logging_conf}": "$(rootpath {})".format(_DEFAULT_PYTHON_LOGGING_CONFIG),
     },
-    template = "@com_github_mvukov_rules_ros//ros/repositories:ros_logging_config.py.tpl",
+    template = "@rules_ros//ros/repositories:ros_logging_config.py.tpl",
 )
 
 py_library(
@@ -342,7 +342,7 @@ py_library(
     deps = [
         ":py_topic_tools",
         ":rospy",
-        "@com_github_mvukov_rules_ros//third_party/ros:roslib",
+        "@rules_ros//third_party/ros:roslib",
         requirement("gnupg"),
         requirement("pycryptodomex"),
         requirement("rospkg"),
@@ -357,10 +357,10 @@ py_library(
     deps = [
         ":py_roscpp",
         ":rosgraph_lib",
-        "@com_github_mvukov_rules_ros//third_party/ros:roslib",
         "@ros_comm_msgs//:py_rosgraph_msgs",
         "@ros_genpy//:genpy",
         "@ros_std_msgs//:py_std_msgs",
+        "@rules_ros//third_party/ros:roslib",
         requirement("numpy"),
         requirement("pyyaml"),
         requirement("rospkg"),

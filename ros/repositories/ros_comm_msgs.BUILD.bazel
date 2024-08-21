@@ -2,7 +2,7 @@
 """
 
 load(
-    "@com_github_mvukov_rules_ros//ros:interfaces.bzl",
+    "@rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",
