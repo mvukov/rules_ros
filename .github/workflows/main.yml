@@ -82,7 +82,7 @@ jobs:
             ~/.cache/bazel
             ~/.cache/bazel-repo
           key: v4-bazel-repo-cache-${{ hashFiles('.bazelversion', 'examples/MODULE.bazel', 'repositories/**', 'requirements_lock.txt', 'MODULE.bazel') }}
-          restore-keys: v4-bazel-repo-cache-
+          restore-keys: v4-bazel-repo-cache
       - name: bazel test //...
         env:
           # Bazelisk will download bazel to here, ensure it is cached between runs.
