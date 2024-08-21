@@ -34,7 +34,10 @@ cc_ros_library(
     name = "xmlrpcpp",
     srcs = glob(["utilities/xmlrpcpp/src/*.cpp"]),
     hdrs = glob(["utilities/xmlrpcpp/include/xmlrpcpp/*.h"]),
-    includes = ["utilities/xmlrpcpp/include"],
+    includes = [
+        "utilities/xmlrpcpp/include",
+        "utilities/xmlrpcpp/include/xmlrpcpp",
+    ],
     linkopts = ["-lm"],
     visibility = ["//visibility:public"],
     deps = [
@@ -249,7 +252,7 @@ cc_ros_library(
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-        "@pluginlib//:pluginlib"
+        "@pluginlib//:pluginlib",
     ],
 )
 
@@ -271,7 +274,7 @@ cc_ros_library(
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-        "@ros_ros//:ros"
+        "@ros_ros//:ros",
     ],
 )
 
