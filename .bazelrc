@@ -14,7 +14,7 @@ build --incompatible_default_to_explicit_init_py
 # This is a mandatory flag.
 build --cxxopt=-std=c++17
 
-# This is a mandatory flag for the user repos.
+# This is a mandatory flag for user repos.
 build --@rules_python//python/config_settings:python_version=3.10
 
 # Ensure that you don't accidentally make non-hermetic actions/tests
