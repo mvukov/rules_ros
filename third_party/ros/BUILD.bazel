@@ -2,8 +2,10 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "dynamic_reconfigure",
-    srcs = ["//third_party/ros/dynamic_reconfigure:parameter_generator.py",
-            "//third_party/ros/dynamic_reconfigure:parameter_generator_catkin.py"],
+    srcs = [
+        "//third_party/ros/dynamic_reconfigure:parameter_generator.py",
+        "//third_party/ros/dynamic_reconfigure:parameter_generator_catkin.py",
+    ],
     imports = ["."],
     visibility = ["//visibility:public"],
 )
