@@ -14,6 +14,9 @@ build --incompatible_default_to_explicit_init_py
 # This is a mandatory flag.
 build --cxxopt=-std=c++17
 
+# This is a mandatory flag for the user repos.
+build --@rules_python//python/config_settings:python_version=3.10
+
 # Ensure that you don't accidentally make non-hermetic actions/tests
 # which depend on remote services. Tag an individual target with
 # tags=["requires-network"] to opt-out of the enforcement.
@@ -25,9 +28,6 @@ build --incompatible_strict_action_env
 build --heap_dump_on_oom
 # Speed up all builds by not checking if output files have been modified.
 build --noexperimental_check_output_files
-
-# This is a mandatory flag.
-build --@rules_python//python/config_settings:python_version=3.10
 
 # Don't bother building targets which aren't dependencies of the tests.
 test --build_tests_only
