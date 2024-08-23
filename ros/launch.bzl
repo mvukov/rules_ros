@@ -18,6 +18,9 @@ def ros_launch(name, nodes, launch_files, **kwargs):
         "{launch_files}": ", ".join(launch_file_paths),
     }
 
+    # Extract data field from kwargs
+    data = kwargs.pop("data", [])
+
     launch_script = "{}_launch.py".format(name)
     expand_template(
         name = "{}_launch_gen".format(name),
@@ -30,7 +33,7 @@ def ros_launch(name, nodes, launch_files, **kwargs):
     py_binary(
         name = name,
         srcs = [launch_script],
-        data = nodes + launch_files,
+        data = nodes + launch_files + data,
         main = launch_script,
         deps = ["@com_github_mvukov_rules_ros//third_party/ros:roslaunch"],
         **kwargs
