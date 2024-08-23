@@ -18,7 +18,6 @@ def ros_test(name, nodes, launch_file, node_path_override=[], **kwargs):
     joined = []
     for override in node_path_override:
         joined.append("\"{}\"".format(override))
-    print(joined)
     substitutions = {
         "{launch_file}": launch_file_path,
         "{node_path_override}": ",".join(joined),
