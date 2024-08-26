@@ -70,7 +70,7 @@ def _cc_ros_dynamic_reconfigure_generator_impl(ctx):
 
     stem = get_stem(cfg_file)
     output = ctx.actions.declare_file(
-        "{}/{}Config.h".format(ros_package_name, stem),
+        "include/{}/{}Config.h".format(ros_package_name, stem),
     )
 
     args = ctx.actions.args()
