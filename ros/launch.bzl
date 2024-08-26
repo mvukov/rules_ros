@@ -18,7 +18,6 @@ def ros_launch(name, nodes, launch_files, **kwargs):
         "{launch_files}": ", ".join(launch_file_paths),
     }
 
-    # Extract data field from kwargs
     data = kwargs.pop("data", [])
 
     launch_script = "{}_launch.py".format(name)
