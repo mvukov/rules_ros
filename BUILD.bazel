@@ -12,6 +12,7 @@ py_library(
         "//third_party/roslib:__init__.py",
         "//third_party/roslib:message.py",
         "//third_party/roslib:names.py",
+        "//third_party/roslib:packages.py",
     ],
     imports = ["third_party"],
     visibility = ["//visibility:public"],
