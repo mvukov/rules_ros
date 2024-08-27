@@ -41,7 +41,7 @@ _ACTION_OUTPUT_MAPPING = [
 ]
 
 def _ros_interface_library_impl(ctx):
-    ros_package_name = ctx.label.name 
+    ros_package_name = ctx.label.name
     if ctx.attr.strip_end and "interface" in ros_package_name:
         ros_package_name = ros_package_name.split("_")
         ros_package_name = "_".join(ros_package_name[0:-1])
@@ -103,7 +103,7 @@ ros_interface_library = rule(
             doc = " A list of other `ros_interface_library` targets. ",
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
         "_genaction": attr.label(
             default = Label("@ros_common_msgs//:genaction"),
@@ -203,7 +203,7 @@ def _cc_ros_generator_aspect_impl(target, ctx):
 
 cc_ros_generator_aspect = aspect(
     implementation = _cc_ros_generator_aspect_impl,
-    attr_aspects = ["deps" , "strip_end"],
+    attr_aspects = ["deps", "strip_end"],
     attrs = {
         "_gencpp": attr.label(
             default = Label("@ros_gencpp//:gencpp"),
@@ -211,7 +211,7 @@ cc_ros_generator_aspect = aspect(
             cfg = "exec",
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
     },
     provides = [CcInfo],
@@ -233,7 +233,7 @@ cc_ros_generator = rule(
             providers = [RosInterfaceInfo],
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
     },
 )
@@ -422,7 +422,7 @@ py_ros_generator_aspect = aspect(
             cfg = "exec",
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
     },
     provides = [PyRosGeneratorAspectInfo],
@@ -453,7 +453,7 @@ py_ros_generator = rule(
             providers = [RosInterfaceInfo],
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
     },
 )
@@ -486,7 +486,7 @@ py_ros_interface_collector = rule(
             aspects = [py_ros_generator_aspect],
         ),
         "strip_end": attr.bool(
-            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile"
+            doc = "An override to override the ros pkg name. Use this to avoid changing import paths. Warning: Fragile",
         ),
     },
 )

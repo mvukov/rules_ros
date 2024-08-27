@@ -7,6 +7,21 @@ exports_files([
 ])
 
 py_library(
+    name = "py_roslib_slim",
+    srcs = [
+        "//third_party/roslib:__init__.py",
+        "//third_party/roslib:message.py",
+        "//third_party/roslib:names.py",
+    ],
+    imports = ["third_party"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@ros_genmsg//:genmsg",
+        "@ros_genpy//:genpy",
+    ],
+)
+
+py_library(
     name = "dynamic_reconfigure",
     srcs = ["//third_party/dynamic_reconfigure:parameter_generator.py"],
     imports = ["third_party"],
@@ -22,7 +37,7 @@ alias(
     name = "rosgraph",
     actual = "@ros_comm//:rosgraph",
 )
- 
+
 alias(
     name = "rosparam",
     actual = "@ros_comm//:rosparam",

@@ -5,6 +5,7 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
+        "@com_github_mvukov_rules_ros//:py_roslib_slim",
         "@ros_comm//:rosgraph_lib",
         "@ros_comm//:rospy",
         "@ros_genpy//:genpy",
