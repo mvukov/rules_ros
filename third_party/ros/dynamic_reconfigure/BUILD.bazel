@@ -1,3 +1,4 @@
 exports_files([
     "parameter_generator.py",
+    "parameter_generator_catkin.py",
 ])
