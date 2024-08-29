@@ -1,3 +1,4 @@
 exports_files([
     "expand_template.bzl",
+    "symlink.bzl",
 ])

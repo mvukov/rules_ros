@@ -21,7 +21,7 @@ def ros_test(name, nodes, launch_file, deps = [], **kwargs):
     launch_script = "{}_launch.py".format(name)
     expand_template(
         name = "{}_launch_gen".format(name),
-        template = "@com_github_mvukov_rules_ros//ros:test.py.tpl",
+        template = "@rules_ros//ros:test.py.tpl",
         substitutions = substitutions,
         out = launch_script,
         data = [launch_file],
@@ -32,6 +32,6 @@ def ros_test(name, nodes, launch_file, deps = [], **kwargs):
         srcs = [launch_script],
         data = nodes + [launch_file],
         main = launch_script,
-        deps = ["@com_github_mvukov_rules_ros//third_party/ros/rostest"] + deps,
+        deps = ["@rules_ros//third_party/ros/rostest"] + deps,
         **kwargs
     )

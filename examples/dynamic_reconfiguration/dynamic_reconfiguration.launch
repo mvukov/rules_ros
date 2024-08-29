@@ -1,4 +1,4 @@
 <launch>
-  <node type="examples/dynamic_reconfiguration/server" name="server" output="screen" />
-  <node type="examples/dynamic_reconfiguration/client" name="client" output="screen" />
+  <node type="dynamic_reconfiguration/server" name="server" output="screen" />
+  <node type="dynamic_reconfiguration/client" name="client" output="screen" />
 </launch>

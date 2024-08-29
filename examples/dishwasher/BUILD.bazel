@@ -2,13 +2,13 @@
 interaction.
 """
 
-load("//ros:cc_defs.bzl", "cc_ros_binary")
+load("@rules_ros//ros:cc_defs.bzl", "cc_ros_binary")
 load(
-    "//ros:interfaces.bzl",
+    "@rules_ros//ros:interfaces.bzl",
     "cc_ros_interface_library",
     "ros_interface_library",
 )
-load("//ros:launch.bzl", "ros_launch")
+load("@rules_ros//ros:launch.bzl", "ros_launch")
 
 ros_interface_library(
     name = "dishwasher_actions",
