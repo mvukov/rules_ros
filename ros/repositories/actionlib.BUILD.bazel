@@ -1,8 +1,8 @@
 """ Builds actionlib.
 """
 
-load("@com_github_mvukov_rules_ros//ros:cc_defs.bzl", "cc_ros_library")
 load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_ros//ros:cc_defs.bzl", "cc_ros_library")
 
 cc_ros_library(
     name = "actionlib",

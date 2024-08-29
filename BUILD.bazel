@@ -13,33 +13,3 @@ exports_files([
     "requirements.txt",
     "requirements_lock.txt",
 ])
-
-alias(
-    name = "roscore",
-    actual = "//third_party/ros/roslaunch:roscore",
-)
-
-alias(
-    name = "rosgraph",
-    actual = "@ros_comm//:rosgraph",
-)
-
-alias(
-    name = "rosparam",
-    actual = "@ros_comm//:rosparam",
-)
-
-alias(
-    name = "rosbag_record",
-    actual = "@ros_comm//:rosbag_record",
-)
-
-alias(
-    name = "rosbag_play",
-    actual = "@ros_comm//:rosbag_play",
-)
-
-alias(
-    name = "rosservice",
-    actual = "//third_party/ros/rosservice",
-)

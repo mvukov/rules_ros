@@ -2,13 +2,13 @@
    for dynamic reconfiguration.
 """
 
-load("//ros:cc_defs.bzl", "cc_ros_binary")
+load("@rules_ros//ros:cc_defs.bzl", "cc_ros_binary")
 load(
-    "//ros:dynamic_reconfigure.bzl",
+    "@rules_ros//ros:dynamic_reconfigure.bzl",
     "cc_ros_dynamic_reconfigure_library",
     "ros_dynamic_reconfigure_library",
 )
-load("//ros:launch.bzl", "ros_launch")
+load("@rules_ros//ros:launch.bzl", "ros_launch")
 
 ros_dynamic_reconfigure_library(
     name = "tutorial_cfg",
