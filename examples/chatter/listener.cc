@@ -25,7 +25,7 @@
 #include <ros/ros.h>
 
 void ChatterCallback(const example_msgs::Example& msg) {
-  ROS_INFO_STREAM("Received: " << msg.message);
+  ROS_INFO_STREAM("C++ listener received: " << msg.message);
 }
 
 int main(int argc, char** argv) {
