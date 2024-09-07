@@ -1,7 +1,7 @@
 # Here are packages necessary for the core functionality, i.e. running C++-based
 # nodes with ros_launch deployments. Those deps, and their deps, should not
 # have any deps with compiled extensions.
-setuptools==44.1.1
+setuptools==59.8.0
 python-dateutil
 defusedxml
 empy==3.3.4
