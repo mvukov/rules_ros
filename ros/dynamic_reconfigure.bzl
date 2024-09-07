@@ -209,6 +209,6 @@ def py_ros_dynamic_reconfigure_library(name, dep, **kwargs):
         name = name,
         srcs = [generator_name],
         imports = ["."],
-        # deps = ["@ros_dynamic_reconfigure//:dynamic_reconfigure_py_lib"],
+        deps = ["@ros_dynamic_reconfigure//:dynamic_reconfigure_py_lib"],
         **kwargs
     )

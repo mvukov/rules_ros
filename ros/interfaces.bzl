@@ -357,7 +357,7 @@ def _py_ros_generator_aspect_impl(target, ctx):
 
         ros_package_name = target.label.name
         srcs = target[RosInterfaceInfo].info.srcs
-        rel_output_dir = ros_package_name
+        rel_output_dir = "src/" + ros_package_name
         all_py_files = []
 
         msgs = [src for src in srcs if src.extension == "msg"]
