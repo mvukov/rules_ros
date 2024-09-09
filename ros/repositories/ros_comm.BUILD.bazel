@@ -119,6 +119,10 @@ cc_ros_library(
     includes = ["clients/roscpp/include"],
     linkopts = ["-lm"],
     ros_package_name = "roscpp",
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//os:macos",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":cc_roscpp",
@@ -134,10 +138,6 @@ cc_ros_library(
         "@roscpp_core//:roscpp_serialization",
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
-    ],
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//os:macos",
     ],
 )
 
