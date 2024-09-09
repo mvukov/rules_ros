@@ -42,7 +42,7 @@ cc_library(
     includes = ["roscpp_traits/include"],
     target_compatible_with = [
         "@platforms//os:linux",
-        "@platforms//os:osx",
+        "@platforms//os:macos",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -69,7 +69,7 @@ cc_library(
     name = "roscpp_core",
     target_compatible_with = [
         "@platforms//os:linux",
-        "@platforms//os:osx",
+        "@platforms//os:macos",
     ],
     visibility = ["//visibility:public"],
     deps = [
