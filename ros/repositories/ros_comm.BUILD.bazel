@@ -135,6 +135,10 @@ cc_ros_library(
         "@roscpp_core//:roscpp_traits",
         "@roscpp_core//:rostime",
     ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//os:macos",
+    ],
 )
 
 _DEFAULT_PYTHON_LOGGING_CONFIG = "tools/rosgraph/conf/python_logging.conf"

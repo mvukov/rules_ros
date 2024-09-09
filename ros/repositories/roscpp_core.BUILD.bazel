@@ -40,10 +40,6 @@ cc_library(
     name = "roscpp_traits",
     hdrs = glob(["roscpp_traits/include/ros/*.h"]),
     includes = ["roscpp_traits/include"],
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//os:macos",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
