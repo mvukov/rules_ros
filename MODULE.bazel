@@ -17,12 +17,12 @@ bazel_dep(name = "rules_oci", version = "2.0.0")
 
 oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
 oci.pull(
-    name = "com_github_mvukov_rules_ros_base_image",
+    name = "rules_ros_base_image",
     image = "python:3.10-bookworm",
     digest = "sha256:428430918ab72109921ef55d5f8bdd3a02a90734fd79ee920146cf385a13c110",
     platforms = ["linux/amd64"],
 )
-use_repo(oci, "com_github_mvukov_rules_ros_base_image", "com_github_mvukov_rules_ros_base_image_linux_amd64")
+use_repo(oci, "rules_ros_base_image", "rules_ros_base_image_linux_amd64")
 
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 
