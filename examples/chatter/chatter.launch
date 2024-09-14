@@ -1,4 +1,5 @@
 <launch>
   <node type="chatter/talker" name="talker" />
-  <node type="chatter/listener" name="listener" output="screen" />
+  <node type="chatter/listener" name="cc_listener" output="screen" />
+  <node type="chatter/py_listener" name="py_listener" output="screen" />
 </launch>
