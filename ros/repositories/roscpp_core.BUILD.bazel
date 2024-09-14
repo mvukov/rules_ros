@@ -63,6 +63,10 @@ cc_ros_library(
 
 cc_library(
     name = "roscpp_core",
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//os:macos",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
