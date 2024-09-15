@@ -2,6 +2,7 @@
 """
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
@@ -106,7 +107,7 @@ expand_template(
                 {"#cmakedefine HAVE_EPOLL": "/*#cmakedefine HAVE_EPOLL*/"},
             ),
         },
-        no_match_error = "Only Linux and macOS are supported!",
+        no_match_error = "Supported OSs: Linux, macOS",
     ),
     template = "clients/roscpp/src/libros/config.h.in",
 )
@@ -119,10 +120,12 @@ cc_ros_library(
     includes = ["clients/roscpp/include"],
     linkopts = ["-lm"],
     ros_package_name = "roscpp",
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//os:macos",
-    ],
+    target_compatible_with = selects.with_or(
+        {
+            ("@platforms//os:linux", "@platforms//os:macos"): [],
+            "//conditions:default": ["@platforms//:incompatible"],
+        },
+    ),
     visibility = ["//visibility:public"],
     deps = [
         ":cc_roscpp",
