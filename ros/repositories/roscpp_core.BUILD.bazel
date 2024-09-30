@@ -15,6 +15,12 @@ cc_ros_library(
         "HAVE_CXXABI_H",
         "HAVE_GLIBC_BACKTRACE",
     ],
+    target_compatible_with = selects.with_or(
+        {
+            ("@platforms//os:linux", "@platforms//os:macos"): [],
+            "//conditions:default": ["@platforms//:incompatible"],
+        },
+    ),
     visibility = ["//visibility:public"],
     deps = [
         "@boost//:system",
