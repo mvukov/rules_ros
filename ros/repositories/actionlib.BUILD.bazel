@@ -11,8 +11,8 @@ cc_ros_library(
     includes = ["actionlib/include"],
     visibility = ["//visibility:public"],
     deps = [
-        "@boost//:interprocess",
-        "@boost//:thread",
+        "@boost.interprocess",
+        "@boost.thread",
         "@ros_comm//:roscpp_lib",
         "@ros_common_msgs//:cc_actionlib_msgs",
         "@ros_std_msgs//:cc_std_msgs",

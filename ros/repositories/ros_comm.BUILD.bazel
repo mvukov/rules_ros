@@ -40,7 +40,7 @@ cc_ros_library(
     visibility = ["//visibility:public"],
     deps = [
         ":libb64",
-        "@boost//:thread",
+        "@boost.thread",
         "@roscpp_core//:cpp_common",
         "@roscpp_core//:rostime",
     ],
@@ -130,11 +130,11 @@ cc_ros_library(
     deps = [
         ":cc_roscpp",
         ":xmlrpcpp",
-        "@boost//:chrono",
-        "@boost//:filesystem",
-        "@boost//:scope_exit",
-        "@boost//:signals2",
-        "@boost//:system",
+        "@boost.chrono",
+        "@boost.filesystem",
+        "@boost.scope_exit",
+        "@boost.signals2",
+        "@boost.system",
         "@ros_comm_msgs//:cc_rosgraph_msgs",
         "@ros_std_msgs//:cc_std_msgs",
         "@rosconsole",
@@ -260,8 +260,8 @@ cc_ros_library(
     visibility = ["//visibility:public"],
     deps = [
         ":roslz4",
-        "@boost//:filesystem",
-        "@boost//:format",
+        "@boost.filesystem",
+        "@boost.format",
         "@bzip2//:bz2",
         "@console_bridge",
         "@roscpp_core//:roscpp_serialization",
@@ -313,10 +313,10 @@ cc_ros_library(
         ":rosbag_storage",
         ":roscpp_lib",
         ":topic_tools",
-        "@boost//:date_time",
-        "@boost//:filesystem",
-        "@boost//:regex",
-        "@boost//:thread",
+        "@boost.date_time",
+        "@boost.filesystem",
+        "@boost.regex",
+        "@boost.thread",
         "@ros_comm_msgs//:cc_std_srvs",
     ],
 )
@@ -327,7 +327,7 @@ cc_ros_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":rosbag",
-        "@boost//:program_options",
+        "@boost.program_options",
     ],
 )
 
@@ -337,7 +337,7 @@ cc_ros_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":rosbag",
-        "@boost//:program_options",
+        "@boost.program_options",
     ],
 )
 
@@ -438,7 +438,7 @@ cc_ros_library(
     visibility = ["//visibility:public"],
     deps = [
         ":roscpp_lib",
-        "@boost//:thread",
+        "@boost.thread",
         "@rosconsole",
     ],
 )
