@@ -122,9 +122,9 @@ def cc_ros_dynamic_reconfigure_library(name, dep, **kwargs):
         name = name,
         deps = [
             generator_name,
-            "@boost//:any",
-            "@boost//:smart_ptr",
-            "@boost//:thread",
+            "@boost.any",
+            "@boost.smart_ptr",
+            "@boost.thread",
             "@ros_dynamic_reconfigure//:dynamic_reconfigure_lib",
         ],
         **kwargs
