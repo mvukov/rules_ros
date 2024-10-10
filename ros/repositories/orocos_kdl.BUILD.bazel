@@ -21,7 +21,7 @@ cc_library(
     includes = ["orocos_kdl/src"],
     visibility = ["//visibility:public"],
     deps = [
-        "@boost//:smart_ptr",
+        "@boost.smart_ptr",
         "@eigen",
     ],
 )
