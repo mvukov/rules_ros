@@ -38,6 +38,7 @@ cc_ros_library(
     deps = [
         ":cpp_common",
         "@boost.date_time",
+        "@boost.math",
         "@boost.system",
         "@boost.thread",
     ],
