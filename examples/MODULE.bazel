@@ -1,6 +1,9 @@
 module(name = "rules_ros_examples")
 
-bazel_dep(name = "rules_python", version = "0.34.0")
+bazel_dep(name = "rules_python", version = "0.36.0")
+bazel_dep(name = "boost.any", version = "1.83.0")
+bazel_dep(name = "boost.smart_ptr", version = "1.83.0")
+bazel_dep(name = "boost.thread", version = "1.83.0")
 
 # This import is relevant for these examples and this (rules_ros) repository.
 bazel_dep(name = "rules_ros")
@@ -41,7 +44,3 @@ use_repo(
     "urdfdom",
     "urdfdom_headers",
 )
-
-bazel_dep(name = "boost.any", version = "1.83.0")
-bazel_dep(name = "boost.smart_ptr", version = "1.83.0")
-bazel_dep(name = "boost.thread", version = "1.83.0")
