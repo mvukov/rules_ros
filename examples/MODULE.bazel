@@ -41,3 +41,7 @@ use_repo(
     "urdfdom",
     "urdfdom_headers",
 )
+
+bazel_dep(name = "boost.any", version = "1.83.0")
+bazel_dep(name = "boost.smart_ptr", version = "1.83.0")
+bazel_dep(name = "boost.thread", version = "1.83.0")
