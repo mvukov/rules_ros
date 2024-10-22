@@ -23,8 +23,8 @@ cc_ros_library(
     ),
     visibility = ["//visibility:public"],
     deps = [
-        "@boost//:system",
-        "@boost//:thread",
+        "@boost.system",
+        "@boost.thread",
         "@console_bridge",
     ],
 )
@@ -37,9 +37,10 @@ cc_ros_library(
     visibility = ["//visibility:public"],
     deps = [
         ":cpp_common",
-        "@boost//:date_time",
-        "@boost//:system",
-        "@boost//:thread",
+        "@boost.date_time",
+        "@boost.math",
+        "@boost.system",
+        "@boost.thread",
     ],
 )
 

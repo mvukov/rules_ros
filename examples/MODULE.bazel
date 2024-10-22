@@ -1,6 +1,9 @@
 module(name = "rules_ros_examples")
 
-bazel_dep(name = "rules_python", version = "0.34.0")
+bazel_dep(name = "rules_python", version = "0.36.0")
+bazel_dep(name = "boost.any", version = "1.83.0")
+bazel_dep(name = "boost.smart_ptr", version = "1.83.0")
+bazel_dep(name = "boost.thread", version = "1.83.0")
 
 # This import is relevant for these examples and this (rules_ros) repository.
 bazel_dep(name = "rules_ros")
@@ -40,18 +43,4 @@ use_repo(
     "tinyxml",
     "urdfdom",
     "urdfdom_headers",
-)
-
-bazel_dep(name = "rules_boost")
-archive_override(
-    module_name = "rules_boost",
-    integrity = "sha256-I1iTdF3qckTmDRab+0yjA37Iya9AOGvEGJVoPtfpADM=",
-    strip_prefix = "rules_boost-42d8155d8f20a1aee8ee20b7903a495bdfb9befd",
-    urls = "https://github.com/nelhage/rules_boost/archive/42d8155d8f20a1aee8ee20b7903a495bdfb9befd.zip",
-)
-
-non_module_boost_repositories = use_extension("@rules_boost//:boost/repositories.bzl", "non_module_dependencies")
-use_repo(
-    non_module_boost_repositories,
-    "boost",
 )
