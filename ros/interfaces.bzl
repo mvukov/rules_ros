@@ -121,10 +121,7 @@ For Python generated code the target name defines the Python package name.
 )
 
 def _get_include_flags(target, ctx):
-    ros_package_name = target.label.name
-    if ctx.attr.strip_end and "interface" in ros_package_name:
-        ros_package_name = ros_package_name.split("_")
-        ros_package_name = "_".join(ros_package_name[0:-1])
+    ros_package_name = target[RosInterfaceInfo].info.ros_package_name
     srcs = target[RosInterfaceInfo].info.srcs
     deps = target[RosInterfaceInfo].deps
 
@@ -355,9 +352,9 @@ def _py_ros_generator_aspect_impl(target, ctx):
         include_flags = _get_include_flags(target, ctx)
         all_srcs = _get_all_srcs(target, ctx)
 
-        ros_package_name = target.label.name
+        ros_package_name = target[RosInterfaceInfo].info.ros_package_name
         srcs = target[RosInterfaceInfo].info.srcs
-        rel_output_dir = ros_package_name
+        rel_output_dir = "src/" + ros_package_name
         all_py_files = []
 
         msgs = [src for src in srcs if src.extension == "msg"]

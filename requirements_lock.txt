@@ -148,9 +148,9 @@ pycryptodomex==3.20.0 \
     --hash=sha256:f2e497413560e03421484189a6b65e33fe800d3bd75590e6d78d4dfdb7accf3b \
     --hash=sha256:ff5c9a67f8a4fba4aed887216e32cbc48f2a6fb2673bb10a99e43be463e15913
     # via -r requirements.txt
-pyparsing==3.1.2 \
-    --hash=sha256:a1bac0ce561155ecc3ed78ca94d3c9378656ad4c94c1270de543f621420f94ad \
-    --hash=sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742
+pyparsing==3.1.4 \
+    --hash=sha256:a6a7ee4235a3f944aa1fa2249307708f893fe5717dc603503c6c7969c070fb7c \
+    --hash=sha256:f86ec8d1a83f11977c9a6ea7598e8c27fc5cddfa5b07ea2241edbbde1d7bc032
     # via catkin-pkg
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
@@ -185,9 +185,9 @@ six==1.16.0 \
     # via python-dateutil
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==44.1.1 \
-    --hash=sha256:27a714c09253134e60a6fa68130f78c7037e5562c4f21f8f318f2ae900d152d5 \
-    --hash=sha256:c67aa55db532a0dadc4d2e20ba9961cbd3ccc84d544e9029699822542b5a476b
+setuptools==59.8.0 \
+    --hash=sha256:09980778aa734c3037a47997f28d6db5ab18bdf2af0e49f719bfc53967fd2e82 \
+    --hash=sha256:608a7885b664342ae9fafc43840b29d219c5a578876f6f7e00c4e2612160587f
     # via
     #   -r requirements.txt
     #   catkin-pkg
