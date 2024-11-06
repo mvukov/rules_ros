@@ -19,6 +19,12 @@ load("@rules_ros//ros:launch.bzl", "ros_launch")
 load("@rules_ros//ros:test.bzl", "ros_test")
 load("@rules_ros//ros:topic.bzl", "ros_topic")
 load("@rules_ros//third_party:expand_template.bzl", "expand_template")
+load(
+    "@rules_oci//oci:defs.bzl", 
+    "oci_image", 
+    "oci_load"
+)
+load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
 # handling protobuf messages (e.g. proto_library and cc_proto_library).
@@ -126,4 +132,38 @@ ros_launch(
 ros_topic(
     name = "rostopic",
     deps = [":chatter"],
+)
+
+
+# packages up the nodes, launch file, and all the other required runfiles.
+# Note the symlink is required in order to place the files where ros_launch is
+# expecting them to be.
+pkg_tar(
+    name = "chatter_tar",
+    srcs = [
+        ":chatter",
+    ],
+    include_runfiles = True,
+    package_dir = "chatter",
+    symlinks = {
+        "/chatter/chatter.runfiles/_main/external": "/chatter/chatter.runfiles",
+    }
+)
+
+# builds the oci image on top of the @rules_ros_base_image defined at the MODULE level. 
+oci_image(
+    name = "chatter_oci_image",
+    base = "@rules_ros_base_image",
+    tars = [":chatter_tar"],
+    workdir = "/chatter/chatter.runfiles/_main",
+    entrypoint = ["/chatter/chatter"],
+)
+
+# loads the oci image into the docker daemon.
+# Example usage: `bazel run //chatter:chatter_oci_load`
+# Then to run the container: `docker run -it --rm chatter:latest`
+oci_load(
+    name = "chatter_oci_load",
+    image = ":chatter_oci_image",
+    repo_tags = ["chatter:latest"],
 )
