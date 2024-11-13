@@ -136,7 +136,6 @@ ros_interface_library(
     name = "visualization_msgs",
     srcs = glob([
         "visualization_msgs/msg/*.msg",
-        "visualization_msgs/srv/*.srv",
     ]),
     visibility = ["//visibility:public"],
     deps = [
@@ -155,7 +154,6 @@ ros_interface_library(
     name = "trajectory_msgs",
     srcs = glob([
         "trajectory_msgs/msg/*.msg",
-        "trajectory_msgs/srv/*.srv",
     ]),
     visibility = ["//visibility:public"],
     deps = [
