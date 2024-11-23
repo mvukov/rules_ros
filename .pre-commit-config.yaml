@@ -57,6 +57,7 @@ repos:
     rev: v19.1.1
     hooks:
       - id: clang-format
+        exclude_types: [json]
   - repo: https://github.com/cpplint/cpplint
     rev: 1.6.1
     hooks:
