@@ -1,7 +1,7 @@
 ## Releasing
 
 Releases are automated on a cron trigger.
-If you do nothing, eventually the newest commits will be released automatically. See `.github/workflows/tag.yaml`.
+If you do nothing, eventually the newest commits will be released automatically. See .github/workflows/tag.yaml.
 
 To trigger a release where the new version can be determined automatically from the commit history, just navigate to
 https://github.com/mvukov/rules_ros/actions/workflows/tag.yaml
