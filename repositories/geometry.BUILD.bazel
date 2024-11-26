@@ -8,12 +8,28 @@ load(
     "cc_ros_interface_library",
     "ros_interface_library",
 )
+load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "py_tf",
+    srcs = [
+        "tf/src/tf/broadcaster.py",
+        "tf/src/tf/listener.py",
+        "tf/src/tf/tfwtf.py",
+        "tf/src/tf/transformations.py",
+    ],
+    imports = ["tf/src"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("numpy"),
+    ],
+)
 
 ros_interface_library(
     name = "tf_interface",
     srcs = glob([
         "tf/msg/*",
-        "tf/srv/*"
+        "tf/srv/*",
     ]),
     visibility = ["//visibility:public"],
     deps = [
@@ -25,10 +41,10 @@ ros_interface_library(
 cc_ros_interface_library(
     name = "cc_tf_interface",
     deps = [":tf_interface"],
-    strip_end = True, 
+    strip_end = True,
     visibility = [
         "//visibility:public",
-    ]
+    ],
 )
 
 cc_ros_library(
@@ -39,11 +55,12 @@ cc_ros_library(
         "tf/src/transform_broadcaster.cpp",
         "tf/src/transform_listener.cpp",
     ],
-    hdrs = glob(["tf/include/**/*.h","tf/include/tf/transform_datatypes.h"]),
+    hdrs = glob(["tf/include/**/*.h", "tf/include/tf/transform_datatypes.h"]),
     includes = ["tf/include"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Igeometry", "-std=c++17"
+        "-Igeometry",
+        "-std=c++17",
     ],
     deps = [
         ":cc_tf_interface",
@@ -67,11 +84,12 @@ cc_ros_library(
         "tf_conversions/src/tf_eigen.cpp",
         "tf_conversions/src/tf_kdl.cpp",
     ],
-    hdrs = glob(["tf_conversions/include/**/*.h",]),
+    hdrs = glob(["tf_conversions/include/**/*.h"]),
     includes = ["tf_conversions/include"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Igeometry", "-std=c++17"
+        "-Igeometry",
+        "-std=c++17",
     ],
     deps = [
         ":cc_tf_interface",
@@ -100,7 +118,8 @@ cc_ros_library(
     includes = ["kdl_conversions/include"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Igeometry", "-std=c++17"
+        "-Igeometry",
+        "-std=c++17",
     ],
     deps = [
         ":cc_tf_interface",
@@ -115,7 +134,7 @@ cc_ros_library(
         "@ros_geometry2//:tf2",
         "@ros_geometry2//:tf2_ros",
         "@angles//:angles",
-        "@orocos_kdl//:orocos_kdl"
+        "@orocos_kdl//:orocos_kdl",
     ],
 )
 
@@ -126,7 +145,8 @@ cc_ros_library(
     includes = ["eigen_conversions/include"],
     visibility = ["//visibility:public"],
     copts = [
-        "-Igeometry", "-std=c++17"
+        "-Igeometry",
+        "-std=c++17",
     ],
     deps = [
         ":cc_tf_interface",
@@ -141,12 +161,9 @@ cc_ros_library(
         "@ros_geometry2//:tf2",
         "@ros_geometry2//:tf2_ros",
         "@angles//:angles",
-        "@orocos_kdl//:orocos_kdl"
+        "@orocos_kdl//:orocos_kdl",
     ],
 )
-
-
-
 
 cc_binary(
     name = "static_transform_publisher",
@@ -156,7 +173,7 @@ cc_binary(
         "tf/src/tf.cpp",
     ] + glob(["tf/include/**"]),
     includes = ["tf/include"],
-    deps =[ 
+    deps = [
         "@ros_comm//:roscpp_lib",
         "@ros_geometry2//:tf2",
         "@ros_geometry2//:tf2_ros",
@@ -172,5 +189,5 @@ cc_binary(
     ],
     visibility = [
         "//visibility:public",
-    ]
+    ],
 )

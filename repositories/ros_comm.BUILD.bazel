@@ -329,6 +329,17 @@ cc_ros_binary(
 )
 
 py_library(
+    name = "py_rosmsg",
+    srcs = ["tools/rosmsg/src/rosmsg/__init__.py"],
+    imports = ["tools/rosmsg/src"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_mvukov_rules_ros//:py_roslib_slim",
+        requirement("rospkg"),
+    ],
+)
+
+py_library(
     name = "py_rosbag",
     srcs = ["tools/rosbag/src/rosbag/bag.py"],
     imports = ["tools/rosbag/src"],

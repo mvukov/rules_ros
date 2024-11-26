@@ -53,8 +53,6 @@ def ros_repositories():
         strip_prefix = "rules_foreign_cc-83e6cf48cf00214bb4348691beecef8f3bc42f7d",
         urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/83e6cf48cf00214bb4348691beecef8f3bc42f7d.zip"],
     )
-
-
     maybe(
         http_archive,
         name = "console_bridge",
