@@ -10,3 +10,10 @@ cc_ros_library(
     includes = ["angles/include"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "py_angles",
+    srcs = ["angles/src/angles/__init__.py"],
+    imports = ["angles"],
+    visibility = ["//visibility:public"],
+)
