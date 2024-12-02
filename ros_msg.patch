@@ -41,14 +41,6 @@ index 9be35402..97229809 100644
 +        'ROS/dev_tools/pennybot_tools/src/pennybot_tools')
 +    results = []
 +
-+    # Search in basic ros path(/opt/pennybot/install/share)
-+    for search_dir in search_dirs:
-+        ros_path = os.path.join(search_dir, pkgname)
-+        if os.path.exists(ros_path):
-+            results.append(ros_path)
-+            if first_match_only:
-+                return results
-+
 +    # Search in bear_msgs path
 +    bear_msgs_path = os.path.join(bear_msgs_dir, 'bear_msgs')
 +    if os.path.exists(bear_msgs_path):
