@@ -53,8 +53,6 @@ def ros_repositories():
         strip_prefix = "rules_foreign_cc-83e6cf48cf00214bb4348691beecef8f3bc42f7d",
         urls = ["https://github.com/bazelbuild/rules_foreign_cc/archive/83e6cf48cf00214bb4348691beecef8f3bc42f7d.zip"],
     )
-
-
     maybe(
         http_archive,
         name = "console_bridge",
@@ -152,6 +150,7 @@ def ros_repositories():
         build_file = "@com_github_mvukov_rules_ros//repositories:ros_comm.BUILD.bazel",
         sha256 = "845984fd3cb757a7d6a5e334084b4deb87624b26d38890e513a7feccf6bcea06",
         strip_prefix = "ros_comm-0.0.1",
+        patchs = ["@com_github_mvukov_rules_ros//:ros_msg.patch"],
         urls = ["https://github.com/Pailowmenah/ros_comm/archive/refs/tags/0.0.1.tar.gz"],
     )
 
