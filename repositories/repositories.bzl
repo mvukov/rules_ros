@@ -150,7 +150,7 @@ def ros_repositories():
         build_file = "@com_github_mvukov_rules_ros//repositories:ros_comm.BUILD.bazel",
         sha256 = "845984fd3cb757a7d6a5e334084b4deb87624b26d38890e513a7feccf6bcea06",
         strip_prefix = "ros_comm-0.0.1",
-        patchs = ["@com_github_mvukov_rules_ros//:ros_msg.patch"],
+        patches = ["@com_github_mvukov_rules_ros//:ros_msg.patch"],
         urls = ["https://github.com/Pailowmenah/ros_comm/archive/refs/tags/0.0.1.tar.gz"],
     )
 

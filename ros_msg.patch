@@ -1,7 +1,7 @@
 diff --git a/tools/rosmsg/src/rosmsg/__init__.py b/tools/rosmsg/src/rosmsg/__init__.py
-index 9be35402..97229809 100644
---- /tools/rosmsg/src/rosmsg/__init__.py
-+++ /tools/rosmsg/src/rosmsg/__init__.py
+index 9be35402..d1848741 100644
+--- tools/rosmsg/src/rosmsg/__init__.py
++++ tools/rosmsg/src/rosmsg/__init__.py
 @@ -44,7 +44,6 @@ import os
  import sys
  import yaml
@@ -10,25 +10,16 @@ index 9be35402..97229809 100644
  
  import rospkg
  import genmsg
-@@ -54,6 +53,9 @@ import roslib.message
+@@ -54,6 +53,8 @@ import roslib.message
  
  from optparse import OptionParser
  
 +from rules_python.python.runfiles import runfiles
 +
-+
  MODE_MSG = '.msg'
  MODE_SRV = '.srv'
  
-@@ -534,6 +536,7 @@ def iterate_packages(rospack, mode):
-         subdir = 'srv'
-     else:
-         raise ValueError('Unknown mode for iterate_packages: %s'%mode)
-+   
- 
-     pkgs = rospack.list()
-     for p in pkgs:
-@@ -546,11 +549,35 @@ def iterate_packages(rospack, mode):
+@@ -546,11 +547,27 @@ def iterate_packages(rospack, mode):
  _catkin_workspace_to_source_spaces = {}
  _catkin_source_path_to_packages = {}
  
