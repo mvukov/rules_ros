@@ -4,6 +4,8 @@ bazel_dep(name = "rules_python", version = "0.38.0")
 bazel_dep(name = "boost.any", version = "1.83.0")
 bazel_dep(name = "boost.smart_ptr", version = "1.83.0.bcr.1")
 bazel_dep(name = "boost.thread", version = "1.83.0")
+bazel_dep(name = "rules_oci", version = "2.0.1")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
 
 # This import is relevant for these examples and this (rules_ros) repository.
 bazel_dep(name = "rules_ros")
@@ -34,3 +36,18 @@ use_repo(
     "urdfdom",
     "urdfdom_headers",
 )
+
+# in order to build an oci image with our ros nodes in it, one
+# needs to define the base image to use, and that must be performed
+# at the module level here. 
+# NOTE: Even though the version of python that the nodes run in is contained
+# in the runfiles, a version of python is required at the system level in order
+# to run the roslaunch command.
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "rules_ros_base_image",
+    image = "python:3.10-bookworm",
+    digest = "sha256:fd0fa50d997eb56ce560c6e5ca6a1f5cf8fdff87572a16ac07fb1f5ca01eb608",
+    platforms = ["linux/amd64"],
+)
+use_repo(oci, "rules_ros_base_image", "rules_ros_base_image_linux_amd64")
