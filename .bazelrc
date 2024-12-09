@@ -29,6 +29,9 @@ build --heap_dump_on_oom
 # Speed up all builds by not checking if output files have been modified.
 build --noexperimental_check_output_files
 
+# See https://github.com/bazel-contrib/bazel-lib/blob/1e953e4764c01bd6743cc85ae4c15bf9edb05f82/.aspect/bazelrc/performance.bazelrc#L8C1-L14C35
+build --nolegacy_external_runfiles
+
 # Don't bother building targets which aren't dependencies of the tests.
 test --build_tests_only
 
