@@ -204,6 +204,7 @@ py_binary(
     name = "rosmaster",
     srcs = ["tools/rosmaster/src/rosmaster/main.py"],
     main = "tools/rosmaster/src/rosmaster/main.py",
+    legacy_create_init = False,
     visibility = ["//visibility:public"],
     deps = [":rosmaster_lib"],
 )
@@ -416,6 +417,7 @@ py_binary(
     srcs = [_ROSPARAM_APP_PY],
     main = _ROSPARAM_APP_PY,
     visibility = ["//visibility:public"],
+    legacy_create_init = False,
     deps = [":rosparam_lib"],
 )
 
