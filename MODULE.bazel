@@ -27,28 +27,7 @@ bazel_dep(name = "rules_cc", version = "0.1.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.12.0")
 bazel_dep(name = "rules_python", version = "0.40.0")
 
-non_module_ros_repositories = use_extension("//ros:extensions.bzl", "non_module_dependencies")
-use_repo(
-    non_module_ros_repositories,
-    "console_bridge",
-    "orocos_kdl",
-    "ros_actionlib",
-    "ros_comm",
-    "ros_comm_msgs",
-    "ros_common_msgs",
-    "ros_dynamic_reconfigure",
-    "ros_gencpp",
-    "ros_genmsg",
-    "ros_genpy",
-    "ros_geometry2",
-    "ros_ros",
-    "ros_std_msgs",
-    "rosconsole",
-    "roscpp_core",
-    "tinyxml",
-    "urdfdom",
-    "urdfdom_headers",
-)
+include("//ros/repositories:repositories.MODULE.bazel")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
