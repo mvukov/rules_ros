@@ -1,4 +1,1 @@
-exports_files([
-    "repositories.bzl",
-    "ros_logging_config.py.tpl",
-])
+exports_files(["ros_logging_config.py.tpl"])
