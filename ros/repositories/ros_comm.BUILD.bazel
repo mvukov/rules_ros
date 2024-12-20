@@ -1,6 +1,7 @@
 """ Builds ros_comm.
 """
 
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
@@ -16,10 +17,6 @@ load(
     "cc_ros_interface_library",
     "py_ros_interface_library",
     "ros_interface_library",
-)
-load(
-    "@rules_ros//third_party:expand_template.bzl",
-    "expand_template",
 )
 load("@rules_ros_pip_deps//:requirements.bzl", "requirement")
 
