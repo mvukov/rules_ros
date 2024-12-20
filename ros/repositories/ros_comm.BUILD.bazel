@@ -1,10 +1,7 @@
 """ Builds ros_comm.
 """
 
-load(
-    "@aspect_bazel_lib//lib:expand_template.bzl",
-    "expand_template",
-)
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
