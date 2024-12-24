@@ -211,9 +211,7 @@ def setUp(self):
     # new test_parent for each run. we are a bit inefficient as it would be possible to
     # reuse the roslaunch base infrastructure for each test, but the roslaunch code
     # is not abstracted well enough yet
-    self.test_parent = ROSTestLaunchParent(self.config, [self.test_file],
-                                           reuse_master=self.reuse_master,
-                                           clear=self.clear)
+    self.test_parent = ROSTestLaunchParent(self.config, [self.test_file])
 
     printlog('setup[%s] run_id[%s] starting', self.test_file,
              self.test_parent.run_id)
@@ -239,10 +237,7 @@ def tearDown(self):
     printlog('rostest teardown %s complete', self.test_file)
 
 
-def createUnitTest(test_file,
-                   reuse_master=False,
-                   clear=False,
-                   results_base_dir=None):
+def createUnitTest(test_file, results_base_dir=None):
     """
     Unit test factory. Constructs a unittest class based on the roslaunch
 
@@ -259,8 +254,6 @@ def createUnitTest(test_file,
         'config': config,
         'test_parent': None,
         'test_file': test_file,
-        'reuse_master': reuse_master,
-        'clear': clear
     }
 
     # add in the tests
