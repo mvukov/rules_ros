@@ -1,11 +1,11 @@
 """ Builds orocos_kdl.
 """
 
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load(
-    "@rules_ros//third_party:expand_template.bzl",
+    "@aspect_bazel_lib//lib:expand_template.bzl",
     "expand_template",
 )
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "orocos_kdl",
