@@ -5,9 +5,22 @@ on:
   # Can be triggered from the tag.yaml workflow
   workflow_call:
     inputs:
-      tag_name:
-        required: true
+      prerelease:
+        default: true
+        description: Indicator of whether or not this is a prerelease.
+        type: boolean
+      release_prep_command:
+        default: .github/workflows/release_prep.sh
+        description: |
+          Command to run to prepare the release and generate release notes.
+          Release notes are expected to be outputted to stdout.
         type: string
+      tag_name:
+        description: |
+          The tag which is being released.
+          By default, https://github.com/softprops/action-gh-release will use `github.ref_name`.
+        type: string
+
   # Or, developers can manually push a tag from their clone
   push:
     tags:
@@ -17,8 +30,32 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    uses: ./.github/workflows/main.yml
   release:
-    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@c9d6d1893b10a8d68584a6ba52c3dd35506486d0 # 2024-12-03
-    with:
-      release_files: rules_ros-*.tar.gz
-      tag_name: ${{ inputs.tag_name }}
+    needs: test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag_name }}
+
+      - name: Build release artifacts and prepare release notes
+        run: |
+          if [ ! -f "${{ inputs.release_prep_command }}" ]; then
+            echo "ERROR: create a ${{ inputs.release_prep_command }} release prep script or configure a different release prep command with the release_prep_command attribute"
+            exit 1
+          fi
+          ${{ inputs.release_prep_command }} ${{ inputs.tag_name || env.GITHUB_REF_NAME }} > release_notes.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: ${{ inputs.prerelease }}
+          # Use GH feature to populate the changelog automatically
+          generate_release_notes: true
+          body_path: release_notes.txt
+          fail_on_unmatched_files: true
+          files: rules_ros-*.tar.gz
+          tag_name: ${{ inputs.tag_name }}

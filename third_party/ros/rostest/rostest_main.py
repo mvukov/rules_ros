@@ -90,26 +90,7 @@ def rostestmain():
                       dest='results_filename',
                       default=None,
                       help='results_filename')
-    parser.add_option(
-        '-r',
-        '--reuse-master',
-        action='store_true',
-        help=
-        'Connect to an existing ROS master instead of spawning a new ROS master on a custom port'
-    )
-    parser.add_option(
-        '-c',
-        '--clear',
-        action='store_true',
-        help=
-        'Clear all parameters when connecting to an existing ROS master (only works with --reuse-master)'
-    )
     (options, args) = parser.parse_args()
-
-    if options.clear and not options.reuse_master:
-        print('The --clear option is only valid with --reuse-master',
-              file=sys.stderr)
-        sys.exit(1)
 
     try:
         args = roslaunch.rlutil.resolve_launch_arguments(args)
@@ -149,8 +130,7 @@ def rostestmain():
             results_file)
 
     try:
-        testCase = runner.createUnitTest(test_file, options.reuse_master,
-                                         options.clear, results_dir)
+        testCase = runner.createUnitTest(test_file, results_dir)
         suite = unittest.TestLoader().loadTestsFromTestCase(testCase)
 
         if options.text_mode:
