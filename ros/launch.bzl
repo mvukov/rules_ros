@@ -1,8 +1,8 @@
 """ Implements functionality for launching ROS deployments using roslaunch.
 """
 
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//third_party:expand_template.bzl", "expand_template")
 
 def ros_launch(name, nodes, launch_files, **kwargs):
     """ Defines a ROS deployment.
