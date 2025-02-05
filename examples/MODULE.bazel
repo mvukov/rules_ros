@@ -1,7 +1,8 @@
 module(name = "rules_ros_examples")
 
+bazel_dep(name = "aspect_bazel_lib", version = "2.10.0")
 bazel_dep(name = "rules_python", version = "0.38.0")
-bazel_dep(name = "boost.any", version = "1.83.0")
+bazel_dep(name = "boost.any", version = "1.83.0.bcr.1")
 bazel_dep(name = "boost.smart_ptr", version = "1.83.0.bcr.1")
 bazel_dep(name = "boost.thread", version = "1.83.0")
 
