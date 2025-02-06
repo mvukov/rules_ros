@@ -91,6 +91,7 @@ class ROSLaunchChild(object):
         self.pm = None
         self.sigint_timeout = sigint_timeout
         self.sigterm_timeout = sigterm_timeout
+        self.exit_code = 0
 
         pmon._init_signal_handlers()
 
@@ -139,6 +140,7 @@ class ROSLaunchChild(object):
             if self.pm:
                 self.pm.shutdown()
                 self.pm.join()
+                self.exit_code = self.pm.exit_code
             if self.child_server:
                 self.child_server.shutdown('roslaunch child complete')
 
@@ -146,3 +148,4 @@ class ROSLaunchChild(object):
         if self.pm:
             self.pm.shutdown()
             self.pm.join()
+            self.exit_code = self.pm.exit_code

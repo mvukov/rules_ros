@@ -320,6 +320,7 @@ def handle_exception(roslaunch_core, logger, msg, e):
 def main(argv):
     options = None
     logger = None
+    exit_code = 0
     try:
         parser = _get_optparse()
 
@@ -374,7 +375,7 @@ def main(argv):
         logger.info('roslaunch env is %s', os.environ)
 
         if options.child_name:
-            logger.info('starting in child mode')
+            logger.info('starting {} in child mode'.format(options.child_name))
 
             # This is a roslaunch child, spin up client server.
             # client spins up an XML-RPC server that waits for
@@ -385,6 +386,8 @@ def main(argv):
                                      sigint_timeout=options.sigint_timeout,
                                      sigterm_timeout=options.sigterm_timeout)
             c.run()
+            exit_code = c.exit_code
+            logger.debug('child node {} done {}'.format(options.child_name, exit_code))
         else:
             logger.info('starting in server mode')
 
@@ -427,6 +430,7 @@ def main(argv):
                 sigterm_timeout=options.sigterm_timeout)
             p.start()
             p.spin()
+            exit_code = p.exit_code
 
     except RLException as e:
         handle_exception(core, logger, 'RLException: ', e)
@@ -445,6 +449,8 @@ def main(argv):
                 os.unlink(options.pid_fn)
             except os.error:
                 pass
+
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':
