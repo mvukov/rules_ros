@@ -375,7 +375,7 @@ def main(argv):
         logger.info('roslaunch env is %s', os.environ)
 
         if options.child_name:
-            logger.info('starting {} in child mode'.format(options.child_name))
+            logger.info('starting %s in child mode', options.child_name)
 
             # This is a roslaunch child, spin up client server.
             # client spins up an XML-RPC server that waits for
@@ -387,8 +387,7 @@ def main(argv):
                                      sigterm_timeout=options.sigterm_timeout)
             c.run()
             exit_code = c.exit_code
-            logger.debug('child node {} done {}'.format(options.child_name,
-                                                        exit_code))
+            logger.debug('child node %s done %d', options.child_name, exit_code)
         else:
             logger.info('starting in server mode')
 
