@@ -7,6 +7,7 @@
 - Defining a Bazel target for running ROS-topic introspection functionality.
 """
 
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_ros//ros:cc_defs.bzl", "cc_ros_binary")
 load(
@@ -18,7 +19,6 @@ load(
 load("@rules_ros//ros:launch.bzl", "ros_launch")
 load("@rules_ros//ros:test.bzl", "ros_test")
 load("@rules_ros//ros:topic.bzl", "ros_topic")
-load("@rules_ros//third_party:expand_template.bzl", "expand_template")
 
 # Handling of ROS messages & services resembles to some extent Bazel's rules for
 # handling protobuf messages (e.g. proto_library and cc_proto_library).

@@ -1,8 +1,8 @@
 """ Implements functionality for defining ROS tests using rostest.
 """
 
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_python//python:defs.bzl", "py_test")
-load("//third_party:expand_template.bzl", "expand_template")
 
 def ros_test(name, nodes, launch_file, deps = [], **kwargs):
     """ Defines a ROS test.

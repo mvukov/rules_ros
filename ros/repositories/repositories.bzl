@@ -21,9 +21,9 @@ def ros_repositories():
         http_archive,
         name = "roscpp_core",
         build_file = "@rules_ros//ros/repositories:roscpp_core.BUILD.bazel",
-        sha256 = "a2aa77814ed97b48995c872a405c51f6b0f1ab9d40e38ece483852bbd273ad7b",
-        strip_prefix = "roscpp_core-0.7.2",
-        urls = ["https://github.com/ros/roscpp_core/archive/0.7.2.tar.gz"],
+        sha256 = "9ada9ab00f1c28ef39069f8bb8642a33f127d6c5c49bc3d9057cadbd8d7c172e",
+        strip_prefix = "roscpp_core-0.7.3",
+        urls = ["https://github.com/ros/roscpp_core/archive/0.7.3.tar.gz"],
     )
 
     maybe(
