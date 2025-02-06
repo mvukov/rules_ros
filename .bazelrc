@@ -35,6 +35,10 @@ build --nolegacy_external_runfiles
 # Don't bother building targets which aren't dependencies of the tests.
 test --build_tests_only
 
+# Default changed in bazel 8
+# See: https://github.com/bazelbuild/bazel/commit/489d08bf472f4568b3f7f478a8747a30cb956111
+build --zip_undeclared_test_outputs=true
+
 # Load any settings specific to the current user.
 # user.bazelrc should appear in .gitignore so that settings are not shared with
 # team members. This needs to be last statement in this config,
