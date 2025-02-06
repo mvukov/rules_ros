@@ -387,7 +387,8 @@ def main(argv):
                                      sigterm_timeout=options.sigterm_timeout)
             c.run()
             exit_code = c.exit_code
-            logger.debug('child node {} done {}'.format(options.child_name, exit_code))
+            logger.debug('child node {} done {}'.format(options.child_name,
+                                                        exit_code))
         else:
             logger.info('starting in server mode')
 
