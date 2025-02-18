@@ -8,7 +8,7 @@
 """
 
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("@rules_ros//ros:cc_defs.bzl", "cc_ros_binary")
 load(
     "@rules_ros//ros:interfaces.bzl",
@@ -126,4 +126,11 @@ ros_launch(
 ros_topic(
     name = "rostopic",
     deps = [":chatter"],
+)
+
+# Ensure tf2_py imports
+py_test(
+    name = "test_tf2_py",
+    srcs = ["test_tf2_py.py"],
+    deps = ["@ros_geometry2//:tf2_py"]
 )

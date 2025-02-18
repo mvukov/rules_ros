@@ -1,0 +1,12 @@
+diff --git a/tools/rosbag/src/rosbag/__init__.py b/tools/rosbag/src/rosbag/__init__.py
+index ccc8461..078d6c0 100644
+--- a/tools/rosbag/src/rosbag/__init__.py
++++ b/tools/rosbag/src/rosbag/__init__.py
+@@ -33,5 +33,6 @@
+ from .bag import Bag, Compression, ROSBagException, ROSBagFormatException, ROSBagUnindexedException
+ 
+ # Import rosbag main to be used by the rosbag executable
+-from .rosbag_main import rosbagmain
++# TODO(jbrindza): Remove since roslib.packages in unsupported in bazel ros
++#from .rosbag_main import rosbagmain
+ 

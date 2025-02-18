@@ -58,6 +58,12 @@ cc_ros_interface_library(
     deps = [":geometry_msgs"],
 )
 
+py_ros_interface_library(
+    name = "py_geometry_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":geometry_msgs"],
+)
+
 ros_interface_library(
     name = "nav_msgs",
     srcs = glob([
