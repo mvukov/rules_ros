@@ -88,6 +88,9 @@ def ros_repositories():
         sha256 = "65906eab18bdf5832af7b6de8c21e3d87d3fac9732a1219637f5b6f5c948508d",
         strip_prefix = "ros_comm-30922861f247937001f82094c0934a6b802b6325",
         urls = ["https://github.com/mvukov/ros_comm/archive/30922861f247937001f82094c0934a6b802b6325.tar.gz"],
+        patches = ["//third_party/patches:ros_comm-remove_rosbag_main.patch"],
+        patch_tool = "patch",
+        patch_args = ["-p1"],
     )
 
     maybe(
@@ -135,6 +138,9 @@ def ros_repositories():
         sha256 = "0b5d461c71d6dc1dbdb99a2ba39e1515194cd451c2e53d53caadb3ecea13367a",
         strip_prefix = "geometry2-0.7.5",
         urls = ["https://github.com/ros/geometry2/archive/0.7.5.tar.gz"],
+        patches = ["//third_party/patches:geometry2-tf2_py.patch"],
+        patch_tool = "patch",
+        patch_args = ["-p1"],
     )
 
     maybe(

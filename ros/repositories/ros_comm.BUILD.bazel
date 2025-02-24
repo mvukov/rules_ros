@@ -340,7 +340,7 @@ cc_ros_binary(
 
 py_library(
     name = "py_rosbag",
-    srcs = ["tools/rosbag/src/rosbag/bag.py"],
+    srcs = glob(["tools/rosbag/src/**/*.py"]),
     imports = ["tools/rosbag/src"],
     visibility = ["//visibility:public"],
     deps = [

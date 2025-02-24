@@ -1,0 +1,21 @@
+diff --git a/tf2_py/src/tf2_py/__init__.py b/tf2_py/src/tf2_py/__init__.py
+index 5a38341..39e2af8 100644
+--- a/tf2_py/src/tf2_py/__init__.py
++++ b/tf2_py/src/tf2_py/__init__.py
+@@ -35,4 +35,15 @@
+ #* Author: Eitan Marder-Eppstein
+ #***********************************************************
+ from __future__ import absolute_import
+-from ._tf2 import *
++
++import importlib.util
++from python.runfiles import runfiles
++r = runfiles.Create()
++
++lib_name = "ros_geometry2/libcc_tf2_py.so"
++lib_path = r.Rlocation(lib_name)
++print(f"lib_path: '{lib_name}' :: {lib_path}")
++
++spec = importlib.util.spec_from_file_location("_tf2", lib_path)
++pkg = importlib.util.module_from_spec(spec)
++print(pkg)
