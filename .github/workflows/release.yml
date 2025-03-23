@@ -50,7 +50,7 @@ jobs:
           ${{ inputs.release_prep_command }} ${{ inputs.tag_name || env.GITHUB_REF_NAME }} > release_notes.txt
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: ${{ inputs.prerelease }}
           # Use GH feature to populate the changelog automatically
