@@ -26,4 +26,5 @@
     },
   ],
   schedule: ["every 1 months on the first day of the month"],
+  automerge: true,
 }
