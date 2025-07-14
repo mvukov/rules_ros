@@ -39,10 +39,10 @@ cc_ros_library(
     visibility = ["//visibility:public"],
     deps = [
         ":cc_tf2_msgs",
+        "@boost.foreach",
         "@boost.signals2",
         "@boost.thread",
         "@boost.unordered",
-        "@boost.foreach",
         "@console_bridge",
         "@ros_common_msgs//:cc_geometry_msgs",
         "@roscpp_core//:rostime",
