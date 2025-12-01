@@ -27,7 +27,7 @@ jobs:
       new-tag-version: ${{ steps.ccv.outputs.new-tag-version }}
       new-tag-version-type: ${{ steps.ccv.outputs.new-tag-version-type }}
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v5.0.1
         with:
           # Need enough history to find the prior release tag
           fetch-depth: 0
